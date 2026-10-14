@@ -12,5 +12,11 @@ namespace BankApp
     {
         private double balance; //Ammount in the account.
         private float interest;
+
+        //Method that returns account balance.
+        public double DisplayBalance()
+        {
+            return balance;
+        }
     }
 }
