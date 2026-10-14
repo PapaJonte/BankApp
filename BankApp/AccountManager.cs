@@ -14,5 +14,15 @@ namespace BankApp
 
         private int phoneNumber;
         private int bankID;
+
+        //Constructor for access to the properties above
+        public AccountManager (string passWord, string emailAddress, int phoneNumber, int bankID)
+        {
+            this.passWord = passWord;
+            this.emailAddress = emailAddress;
+
+            this.phoneNumber = phoneNumber;
+            this.bankID = bankID;
+        }
     }
 }
