@@ -4,9 +4,10 @@ using System.Text;
 
 namespace BankApp
 {
-    //This class stores properties related to the bank balance of account.
-    internal class SavingsAccount : BankAccount
+    
+    //This class stores properties related to balance of the account.
+    internal class SavingsAccount : AccountManager
     {
-
+        
     }
 }
