@@ -11,6 +11,6 @@ namespace BankApp
     internal class SavingsAccount : BankAccount
     {
         private double balance; //Ammount in the account.
-        
+        private float interest;
     }
 }
