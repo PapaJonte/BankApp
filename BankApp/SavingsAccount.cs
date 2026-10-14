@@ -18,5 +18,10 @@ namespace BankApp
         {
             return balance;
         }
+        //Method that returns interest.
+        public double DisplayInterest()
+        {
+            return interest;
+        }
     }
 }
