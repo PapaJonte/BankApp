@@ -5,13 +5,13 @@ using System.Text;
 namespace BankApp
 {
     //This class has more to do with the account itself on the bank than the bank balance.
-    internal class BankAccount : AccountManager
+    internal class BankAccount
     {
         private string stringInput;
         private int convertedInput;
 
         //Constructor
-        public BankAccount(string passWord, string emailAddress, int phoneNumber, int bankID, string stringInput, int convertedInput) : base(passWord, emailAddress, phoneNumber, bankID)
+        public BankAccount( string stringInput, int convertedInput)
         {
             this.stringInput = stringInput;
             this.convertedInput = convertedInput;

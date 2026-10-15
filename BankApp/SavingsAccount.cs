@@ -12,8 +12,8 @@ namespace BankApp
         private double balance; //Ammount in the account.
         private float interest;
 
-        //Constructor of class to assure ourselves that we're filling the variables with something before we use the methods.
-        public SavingsAccount (string passWord, string emailAddress, int phoneNumber, int bankID, double balance, float interest) : base (passWord, emailAddress, phoneNumber, bankID)
+        //The constructor does no longer serve as clear of a purpose as before. Still I'll keep it for now.
+        public SavingsAccount (string stringInput, int convertedInput, double balance, float interest) : base ( stringInput, convertedInput)
         {
             this.balance = balance;
             this.interest = interest;
