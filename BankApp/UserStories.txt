@@ -1,0 +1,128 @@
+﻿OBLIGATORISKA UPPGIFTER:
+
+1. Som systemägare vill jag att alla användare ska logga in med ett unikt användarnamn och lösenord.
+-> Maria: Huvudansvar
+--> Robin: Inloggningsmeny och felmeddelanden
+--> Gustaf: Koppling mellan användare och bankkonton
+
+2. Som administratör på banken vill jag kunna skapa nya användare i systemet.
+-> Maria: Huvudansvar
+--> Robin: Administratörmeny
+--> Gustaf: Koppling till kundens konton
+
+3. Som systemägare vill jag att användare som misslyckas med inloggningen tre gånger ska låsas ute från att logga in i systemet.
+-> Maria: Huvudansvar
+--> Robin: Visa låsningsstatus och felmeddelande
+
+4. Som användare vill jag kunna se en lista med alla mina bankkonton och saldot på dessa.
+-> Gustaf: Huvudansvar
+--> Maria: Identifiera inloggad användare
+--> Alex: Genomförda överföringar påverkar saldon
+--> Jonathan: Saldon används för lånegränsen
+--> Robin: Visa kontolista och saldon i menyn
+
+5. Som användare vill jag kunna föra över pengar mellan två av mina konton.
+-> Alex: Huvudansvar
+--> Maria: Kontrollera kontoinnehav
+--> Gustaf: Hämta konton och uppdatera saldon
+--> Robin: Överföringsmeny och historik
+
+6. Som användare vill jag kunna föra över pengar till andra kunder i banken.
+-> Alex: Huvudansvar
+--> Maria: Identifiera avsändare och mottagare
+--> Gustaf: Hämta mottagarkonto och hantera saldon
+--> Robin: Mottagarval och transaktionshistorik
+
+7. Som användare vill jag kunna öppna upp nya konton i banken.
+-> Gustaf: Huvudansvar
+--> Maria: Koppla kontot till rätt användare
+--> Robin: Meny för kontoöppning
+--> Alex: Nya konton kan användas för överföringar
+
+8. Som användare vill jag kunna ha ett visst konto i en annan valuta.
+-> Gustaf: Huvudansvar
+--> Alex: Valutakoder, växling och växelkurser
+--> Robin: Visa valuta och valutaval i menyer
+--> Jonathan: Valutaomräkning vid beräkning av lånegräns
+
+9. Som bankägare vill jag att överföringar mellan konton med olika valutor växlas enligt rätt växelkurs, vilken uppdateras dagligen av administratören på banken.
+-> Alex: Huvudansvar
+--> Gustaf: Kontonas valutor och saldon
+--> Maria: Kontroll av administratörsbehörighet
+--> Robin: Administratörsmeny för kurser
+--> Jonathan: Kurser kan användas vid lånegränsberäkning
+
+10. Som användare vill jag kunna öppna sparkonto i banken och när jag sätter in dem få se hur mycket ränta jag kommer kunna få på pengarna jag sätter in.
+-> Gustaf: Huvudansvar
+--> Alex: Insättningar och överföringar till sparkonto
+--> Robin: Visa beräknad sparränta
+--> Jonathan: Gemensamma beräkningsprinciper kan återanvändas
+
+11. Som användare vill jag kunna låna pengar av banken och direkt få se hur mycket ränta jag kommer behöva betala på det lånet.
+-> Jonathan: Huvudansvar
+--> Gustaf: Tillgång till kundens bankkonton
+--> Alex: Utbetalning av lån och eventuella återbetalningar
+--> Maria: Identifiera låntagaren
+--> Robin: Lånemeny och visning av ränta
+
+12. Som bankägare vill jag begränsa hur mycket varje kund kan låna av banken så att de maximalt kan låna 5 ggr de pengar de redan har hos banken.
+-> Jonathan: Huvudansvar
+--> Gustaf: Sammanlagda kontosaldon
+--> Alex: Valutaväxling och genomförda transaktioner
+--> Maria: Koppla lån till rätt kund
+--> Robin: Visa maximalt lånebelopp och avslag
+
+13. Som användare vill jag kunna se en logg på alla överföringar m.m. som skett på mina konton.
+-> Robin: Huvudansvar
+--> Gustaf: Koppla transaktioner till konton
+--> Jonathan: Låneutbetalningar och amorteringar
+--> Maria: Begränsa åtkomst till egna konton
+
+14. Som bankägare vill jag att appen ser snygg ut med tydliga menyer, färgsättning och en snygg logga i ASCII art som syns när användaren loggar in.
+-> Robin: Huvudansvar
+--> Maria: Inloggningsflöde och behörigheter
+--> Gustaf: Kontomenyer
+--> Alex: Överföringsmenyer
+--> Jonathan: Lånemenyer
+
+15. Som bankägare vill jag inte att transaktioner sker direkt när användarna lägger in dem utan i stället var 15:e minut så att vi har kontroll på när de sker.
+-> Alex: Huvudansvar
+--> Gustaf: Saldon ändras när transaktioner genomförst
+--> Robin: Visa väntande och genomförda transaktioner
+--> Jonathan: Avgör om låneutbetalningar och amorteringar omfattas
+
+EXTRA UPPGIFTER:
+
+16. Som systemägare vill jag att varje användare ska kunna uppdatera sina personliga uppgifter (t.ex. e-postadress, telefonnummer).
+-> Maria: Huvudansvar
+--> Robin: Profilmeny för redigering och visning
+
+17. Som bankägare vill jag kunna se statistik om användarnas transaktioner (t.ex. totala belopp överförda, mest populära konton, etc.).
+-> Robin: Huvudansvar
+--> Alex: Transaktionsdata och belopp
+--> Gustaf: Kontodata och kontotyper
+--> Maria: Administratörsbehörighet
+--> Jonathan: Lånestatistik om den ska ingå
+
+18. Som användare vill jag kunna få notifieringar via e-post eller SMS när stora transaktioner sker (över en viss summa) på mitt konto.
+-> Robin: Huvudansvar
+--> Alex: Signalera genomförda transaktioner och belopp
+--> Maria: Kontaktuppgifter och notifieringsinställningar
+--> Gustaf: Identifiera kontoinnehavare
+--> Jonathan: Låneutbetalningar om de omfattas
+
+19. Som administratör vill jag kunna sätta regler för hur låneräntor ska beräknas beroende på olika faktorer (t.ex. användarens kreditvärdighet).
+-> Jonathan: Huvudansvar
+--> Maria: Administratörsbehörighet och eventuell kreditinformation
+--> Robin: Administratörsmeny för ränteregler
+--> Gustaf: Kontodata om den används i ränteregler
+
+
+Most important collaborations:
+
+Maria <-> Everyone - User identity and permission checks
+Gustaf <-> Alex - Account balances, currencies and transfers
+Gustaf <-> Jonathan - Account balances and borrowing limits
+Alex <-> Jonathan - Loan payouts, repayments and exchange rates
+Alex <-> Robin - Transaction history, statuses and notifications
+Jonathan <-> Robin - Loan application menus, interest estimates and repayment schedules
