@@ -5,8 +5,8 @@ using System.Text;
 namespace BankApp
 {
     
-    /*I have decided to make this class directly below the AccountManager class in it's relationship, but I will change it I'm told. I'm not sure about the structure.*/
-    internal class SavingsAccount : AccountManager
+    /*The place in the class hierarchy has been changed so that SavingsAccount is now a lower class of BankAccount.*/
+    internal class SavingsAccount : BankAccount
     {
         //Properties.
         private double balance; //Ammount in the account.
