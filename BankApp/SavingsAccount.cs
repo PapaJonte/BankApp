@@ -20,17 +20,13 @@ namespace BankApp
         }
 
         //Method that returns account balance.
-        public decimal DisplayBalance()
+        public decimal GetBalance()
         {
-            /*Error. Cannot implicitly convert 'decimal' to 'double'.
-             * An explicit conversion exists (Are you missing a cast?)*/
             return balance;
         }
         //Method that returns interest.
-        public decimal DisplayInterest()
+        public decimal GetInterest()
         {
-            /*Error. Cannot implicitly convert 'decimal' to 'double'.
-             * An explicit conversion exists (Are you missing a cast?)*/
             return interest;
         }
     }
