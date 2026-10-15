@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BankApp
 {
-    //This class has more to do with the account itself on the bank than the bank balance.
+    //Upper class of SavingsAccount
     internal class BankAccount
     {
         private string stringInput;
