@@ -9,11 +9,11 @@ namespace BankApp
     internal class SavingsAccount : BankAccount
     {
         //Properties.
-        private double balance; //Ammount in the account.
-        private float interest;
+        private decimal balance; //Ammount in the account.
+        private decimal interest;
 
         //The constructor does no longer serve as clear of a purpose as before. Still I'll keep it for now.
-        public SavingsAccount (string stringInput, int convertedInput, double balance, float interest) : base ( stringInput, convertedInput)
+        public SavingsAccount (string stringInput, int convertedInput, decimal balance, decimal interest) : base ( stringInput, convertedInput)
         {
             this.balance = balance;
             this.interest = interest;
