@@ -221,6 +221,22 @@ namespace BankApp.Jonathan
             return customerLoans;
         }
 
+        // Returns all pending loan applications
+        public List<Loan> GetPendingLoans()
+        {
+            List<Loan> pendingLoans = new List<Loan>();
+
+            foreach (Loan loan in loans)
+            {
+                if (loan.Status == LoanStatus.Pending)
+                {
+                    pendingLoans.Add(loan);
+                }
+            }
+
+            return pendingLoans;
+        }
+
         public bool ChangeLoanStatus(int loanId, LoanStatus newStatus, decimal totalAccountBalance)
         {
             foreach (Loan loan in loans)
