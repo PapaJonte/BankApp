@@ -1,4 +1,6 @@
-﻿namespace BankApp
+﻿using BankApp.Jonathan;
+
+namespace BankApp
 {
     internal class Program
     {
@@ -6,6 +8,8 @@
         {
             Console.WriteLine("Hello, World!");
             Console.WriteLine("hejhej");
+
+
 
 
         }

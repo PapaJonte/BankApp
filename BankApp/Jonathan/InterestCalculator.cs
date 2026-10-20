@@ -69,9 +69,35 @@ namespace BankApp.Jonathan
             return Math.Round((remainingBalance * annualInterestRate) / (100 * 12), 2);
         }
 
-        public decimal CalculateMonthlyPayment(decimal amount, int duration, decimal remainingBalance, decimal annualInterestRate)
+        public decimal CalculateMonthlyPayment(decimal amount, int duration, decimal remainingBalance, decimal annualInterestRate, int currentMonth)
         {
+            // Checks that the remaining balance isn't negative
+            if (remainingBalance < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(remainingBalance), "The remaining balance cannot be negative.");
+            }
+
+            // Check that the current month is within the loan duration
+            if (currentMonth < 1 || currentMonth > duration)
+            {
+                throw new ArgumentOutOfRangeException(nameof(currentMonth), "Current month must be within the loan duration.");
+            }
+
+            // Calculates the normal monthly amortization
             decimal amortization = CalculateMonthlyAmortization(amount, duration);
+
+            // Makes sure the final payment clears the remaining loan balance
+            if (currentMonth == duration)
+            {
+                amortization = remainingBalance;
+            }
+            else
+            {
+                // Prevents amortization from exceeding the remaining balance
+                amortization = Math.Min(amortization, remainingBalance);
+            }
+
+            // Calculates the interest based on the remaining loan balance
             decimal interest = CalculateMonthlyInterest(remainingBalance, annualInterestRate);
 
             // Adds the interest on top of the amortization to get the monthly payment
@@ -83,17 +109,25 @@ namespace BankApp.Jonathan
             // Starts with the full loan amount and no accumulated interest
             decimal remainingBalance = amount;
             decimal totalInterest = 0m;
+            decimal monthlyAmortization = CalculateMonthlyAmortization(amount, duration);
 
             // Loops through every month of the loan
             for (int month = 1; month <= duration; month++)
             {
                 decimal monthlyInterest = CalculateMonthlyInterest(remainingBalance, annualInterestRate);
-                decimal monthlyAmortization = CalculateMonthlyAmortization(amount, duration);
 
                 // Adds the monthly interest and subtracts the amortization from the remaining balance
                 totalInterest += monthlyInterest;
-                // Math.Min prevents the remaining balance from becoming negative
-                remainingBalance -= Math.Min(monthlyAmortization, remainingBalance);
+
+                if (month == duration)
+                {
+                    remainingBalance = 0m;
+                }
+                else
+                {
+                    // Math.Min prevents the remaining balance from becoming negative
+                    remainingBalance -= Math.Min(monthlyAmortization, remainingBalance);
+                }
             }
 
             // Returns the total interest paid over the entire loan
