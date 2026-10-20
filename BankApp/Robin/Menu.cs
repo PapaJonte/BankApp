@@ -8,52 +8,55 @@ namespace BankApp.Robin
     {
         public void ShowMainMenu()
         {
-            Console.WriteLine("Välkommen till banken!" +
-                "\n1. Logga in" +
-                "\n2. Visa konton" +
-                "\n3. Överför pengar" +
-                "\n4. Avsluta.");
+            MenuChoice menuOptions = new MenuChoice("1. Logga in");
+            MenuChoice menuOptions2 = new MenuChoice("2. Skapa ett konto");
+            MenuChoice menuOptions3 = new MenuChoice("3. Avsluta");
 
-            int.TryParse(Console.ReadLine(), out int userInput);
-            //while (!int.TryParse(), out userInput))
+            List<MenuChoice> menus = new List<MenuChoice>();
+            menus.Add(menuOptions);
+            menus.Add(menuOptions2);
+            menus.Add(menuOptions3);
+
+            bool userMenu = true;
+
+            while (userMenu)
             {
-                Console.Clear();
-                Console.WriteLine("\nVänligen välj 1-4");
-                Console.WriteLine("\nVälkommen till banken!" +
-               "\n1. Logga in" +
-               "\n2. Visa konton" +
-               "\n3. Överför pengar" +
-               "\n4. Avsluta.");
-            }
-            //bool userMenu = true;
+                foreach (var m in menus)
+                {
+                    Console.WriteLine(m.MenuOption);
+                }
 
-            switch (userInput)
-            {
-                case 1:
-                    Console.Clear();
-                    Console.WriteLine("Ange personnummer :");
-                    int.TryParse(Console.ReadLine(), out int userNumber);
-                    Console.WriteLine(userNumber);
-                    Console.WriteLine("Ange lösenord : ");
-                    string userPassword = Console.ReadLine();
-                    break;
+                int.TryParse(Console.ReadLine(), out int userInput);
 
-                case 2:
+                switch (userInput)
+                {
+                    case 1:
+                        Console.Clear();
+                        Console.WriteLine("Ange personnummer :");
+                        string userNumber = Console.ReadLine();
+                        Console.WriteLine(userNumber);
+                        Console.WriteLine("Ange lösenord : ");
+                        string userPassword = Console.ReadLine();
+                        break;
 
-                    break;
+                    case 2:
+                        Console.WriteLine("Case 2");
+                        break;
 
-                case 3:
+                    case 3:
+                        Console.Clear();
+                        Console.WriteLine("Du valde att avsluta");
+                        userMenu = false;
+                        break;
 
-                    break;
-
-                case 4:
-
-                    break;
-
-                default:
-
-                    break;
+                    default:
+                        Console.Clear();
+                        Console.WriteLine("\nVänligen välj 1-3!");
+                        break;
+                }
             }
         }
     }
 }
+
+

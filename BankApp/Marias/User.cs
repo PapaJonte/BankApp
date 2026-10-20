@@ -7,7 +7,8 @@ namespace BankApp
     public enum UserRole
     {
         Customer,
-        Admin
+        Admin,
+        Owner
     }
     internal class User
     {
@@ -43,12 +44,19 @@ namespace BankApp
 
         }
 
-        // Extra uppgift, uppdatera personuppgifter.
+        // Registrera misslycakt försök.
         public void RegisterFailedLogin()
         {
             FailedLoginAttempts++;
             if (FailedLoginAttempts >= 3)
                 IsLockedOut = true;
+        }
+
+        //Uppdatera personuppgifter.
+        public void UpdateUserInfo(string newEmail, string NewPhone)
+        {
+            Email = newEmail;
+                PhoneNumber = NewPhone;
         }
 
 
