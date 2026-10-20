@@ -1,11 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BankApp.Jonathan
 {
     internal class InterestCalculator
     {
+        //
+        // INTEREST RATES
+        //
+
         public decimal GetInterestRate(int duration)
         {
             // Failsafe if months are incorrect for our 1-12 year long loans
@@ -14,7 +16,7 @@ namespace BankApp.Jonathan
                 throw new ArgumentOutOfRangeException(nameof(duration), "Loan duration must be between 12 and 144 months.");
             }
 
-            // Interest rates for the different durations of the loans, based on the starting duration
+            // Interest rates for different loan durations
 
             if (duration <= 24) // 1-2 years
                 return 6.5m;
@@ -34,6 +36,11 @@ namespace BankApp.Jonathan
             return 9.25m; // 11-12 years
 
         }
+
+
+        //
+        // MONTHLY CALCULATIONS
+        //
 
         public decimal CalculateMonthlyAmortization(decimal amount, int duration)
         {
@@ -103,6 +110,11 @@ namespace BankApp.Jonathan
             // Adds the interest on top of the amortization to get the monthly payment
             return amortization + interest;
         }
+
+
+        //
+        // TOTAL LOAN CALCULATIONS
+        //
 
         public decimal CalculateTotalInterest(decimal amount, int duration, decimal annualInterestRate)
         {
