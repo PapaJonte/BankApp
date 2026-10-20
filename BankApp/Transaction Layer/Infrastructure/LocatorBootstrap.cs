@@ -1,6 +1,7 @@
 using System;
 using BankApp.Transaction_Layer.API;
 using BankApp.Transaction_Layer.Controller;
+using BankApp.Transaction_Layer.Data;
 using BankApp.Transaction_Layer.Service;
 using BankApp.Transaction_Layer.Service_Locators;
 
@@ -17,8 +18,13 @@ public static class LocatorBootstrap
     /// <returns></returns>
     public static void RegisterAll(BankTransactionServiceLocator serviceLocator)
     {
+        
         BankTransaction bankTransactionModule = new();
-        ExchangeRate exchangeRateModule = new();
+        #region  ExchangeRate Module
+        ExchangeRateRegistry exchangeRegistry = new();
+        ExchangeRateCalculator exchangeCalculator = new();
+        ExchangeRate exchangeRateModule = new(exchangeRegistry, exchangeCalculator);
+        #endregion
         BankTransfer bankTransferModule = new(bankTransactionModule, exchangeRateModule);
         StageTransaction transactionStaging = new();
         TransactionExecutor transactionExecutor = new();

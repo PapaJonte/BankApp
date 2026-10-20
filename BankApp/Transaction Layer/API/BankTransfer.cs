@@ -6,8 +6,6 @@ namespace BankApp.Transaction_Layer.API;
 
 public class BankTransfer(BankTransaction bankTransaction, ExchangeRate exchangeRateModule)
 {
-    private readonly BankTransaction _bankTransactionModule = bankTransaction;
-    private readonly ExchangeRate _exchangeRateModule = exchangeRateModule;
 
     /// <summary>
     /// Responsible for staging requested transfer of money. Handles and setup data so it is ready for transfer.
@@ -22,15 +20,40 @@ public class BankTransfer(BankTransaction bankTransaction, ExchangeRate exchange
     /// <returns>
     /// StatusCode representing result of transfer
     /// </returns>
-    public StatusCode TransferMoney(AccountData originAccount, AccountData targetAccount, float transferAmount, Currency transferCurrency)
+    public StatusCode TransferMoney(AccountData originAccount, AccountData targetAccount, decimal transferAmount, Currency transferCurrency)
     {
-        //fetch exchange rate value from exhangerate module
-        //Verify account balance
-        //Request transaction
-        //return StatusCode
-        return StatusCode.Successful;
+        decimal withdrawalAmount, depositAmount;
+        StatusCode statusCode;
+
+        if (originAccount.Currency == transferCurrency) //calculate how much we will deposit
+        {
+            statusCode = exchangeRateModule.TryCalculateExchangeValue(transferCurrency, targetAccount.Currency, transferAmount, out depositAmount);
+            withdrawalAmount = transferAmount;
+        }
+        else if (targetAccount.Currency == transferCurrency) //calculate how much we will withdraw
+        {
+            statusCode = exchangeRateModule.TryCalculateExchangeValue(targetAccount.Currency, originAccount.Currency, transferAmount, out withdrawalAmount);
+            depositAmount = transferAmount;
+        }
+        else//if transfer currency is outside both of accounts it is invalid.
+        {
+            statusCode = StatusCode.Invalid;
+        }
+
+        if (statusCode == StatusCode.Successful)
+        {
+            //verify account balance
+            //request transaction
+        }
+
+        return statusCode;
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public StatusCode DepositMoney(string accountNumber, float depositAmount)
     {
         //request deposition
