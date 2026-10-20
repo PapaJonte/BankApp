@@ -24,6 +24,11 @@ namespace BankApp.Jonathan
 
         public Loan? ApplyForLoan(int customerId, decimal requestedAmount, int duration, decimal totalAccountBalance)
         {
+            // Rejects loan durations outside the allowed range
+            if (duration < 12 || duration > 144)
+            {
+                return null;
+            }
             // Fetch the approved and pending loans
             decimal outstandingLoans = CalculateOutstandingLoans(customerId);
             decimal pendingLoans = CalculatePendingLoans(customerId);
@@ -53,7 +58,7 @@ namespace BankApp.Jonathan
             decimal totalRepayment = requestedAmount + totalInterest;
 
             // Creates a new loan
-            Loan newLoan = new Loan();
+            Loan newLoan = new Loan(requestedAmount);
 
             // Customer and loan identification
             newLoan.CustomerId = customerId;
@@ -61,8 +66,6 @@ namespace BankApp.Jonathan
             nextLoandId++;
 
             // Loan details
-            newLoan.LoanAmount = requestedAmount;
-            newLoan.RemainingLoanBalance = requestedAmount;
             newLoan.Duration = duration;
 
             // Interest and repayment details
@@ -79,6 +82,12 @@ namespace BankApp.Jonathan
         {
             // Checks that the requested amount isn't negative
             if (requestedAmount <= 0)
+            {
+                return false;
+            }
+
+            // Rejects loan amounts with fractions of an öre
+            if (requestedAmount != decimal.Round(requestedAmount, 2))
             {
                 return false;
             }
@@ -247,7 +256,7 @@ namespace BankApp.Jonathan
                             }
 
                             // Updates the loan status
-                            loan.Status = newStatus;
+                            loan.UpdateStatus(newStatus);
                             return true;
                         }
                     }
@@ -284,7 +293,7 @@ namespace BankApp.Jonathan
                     }
 
                     // Subtracts the payment from the remaining loan balance
-                    loan.RemainingLoanBalance -= paymentAmount;
+                    loan.ReduceBalance(paymentAmount);
 
                     return true;
                 }

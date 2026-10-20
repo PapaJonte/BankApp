@@ -8,7 +8,7 @@ namespace BankApp
         {
             Console.WriteLine("Hello, World!");
 
-            
+            LoanTests.RunTests();
         }
     }
 }
