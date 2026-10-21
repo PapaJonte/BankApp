@@ -81,6 +81,21 @@ namespace BankApp
 
         }
 
+        //
+        public bool UpdateUserInfo(User user, string newEmail, string newPhone)
+        {
+            if (user == null)
+                return false;
+
+            if (string.IsNullOrWhiteSpace(newEmail) || !newEmail.Contains("@"))
+                return false;
+
+            if (string.IsNullOrWhiteSpace(newPhone))
+                return false;
+
+            user.UpdateUserInfo(newEmail, newPhone);
+            return true;
+        }
 
         }
        
