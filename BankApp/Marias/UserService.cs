@@ -20,6 +20,13 @@ namespace BankApp
             AddUser("000000-0000", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
         }
 
+        private void AddUser (string username, string password, string email, string PhoneNumber, UserRole role)
+        {
+            User newUser = new User(_nextUserId, username, password, email, phoneNumber, role);
+            _users.Add(newUser);
+            _nextUserId++;
+        }
+
 
         }
        
