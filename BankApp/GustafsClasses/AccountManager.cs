@@ -12,8 +12,8 @@ namespace BankApp
         //We'll keep our savingsAccounts here.
         List<SavingsAccount> savingAccounts = new List<SavingsAccount>();
 
-
-        public Currency CheckCurrency()
+        //This method is intended to support the CreateAccount() method below. It will be called upon when CreateAccount needs it. Don't call upon this method!
+        private Currency CheckCurrency()
         {
             //while loop around to make sure the user gives a correct value as currency.
             while ( true)
@@ -55,7 +55,7 @@ namespace BankApp
             //Safety system against incorrect input.
             if (Int32.TryParse(stringInput, out convertedInput))
             {
-                SavingsAccount savingsAccount = new SavingsAccount(convertedInput, CheckCurrency().parsedCurrency, interest);
+                SavingsAccount savingsAccount = new SavingsAccount(convertedInput, CheckCurrency(), interest);
 
                 //Adding the newly created account to the list.
                 savingAccounts.Add(savingsAccount);
@@ -74,8 +74,8 @@ namespace BankApp
             {
                 foreach (var account in savingAccounts)
                 {
-                    
-                    Console.WriteLine(account.GetBalance());
+                    //Displays balance and currency of account.
+                    Console.WriteLine(account.GetBalance() + " " + account.GetCurrency());
                 }
             }
             else
