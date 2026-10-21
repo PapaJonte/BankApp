@@ -8,6 +8,15 @@ namespace BankApp.Robin
     {
         User? user = null;
 
+        public void ShowCreatedUser()
+        {
+              Console.WriteLine($"\nDina uppgifter" +
+                $"\n{user.Username}" +
+                $"\n{user.Password}" +
+                $"\n{user.Email}" +
+                $"\n{user.PhoneNumber}" +
+                $"\n{user.Role}");
+        }
         public User CreateUser()
         {
             Console.Clear();
@@ -30,6 +39,8 @@ namespace BankApp.Robin
                 $"\n{user.PhoneNumber}" +
                 $"\n{user.Role}");
 
+
+
             return user;
         }
 
@@ -48,12 +59,11 @@ namespace BankApp.Robin
                 {
                     case 1:
                         Console.Clear();
-                        Console.WriteLine("Lista");
+                        ShowCreatedUser();
                         break;
 
                     case 2:
                         Console.Clear();
-                        //Console.WriteLine("Gå tillbaka till startsida");
                         userMenu = false;
                         break;
 
@@ -83,15 +93,35 @@ namespace BankApp.Robin
                         Console.Clear();
                         Console.Write("\nAnge personnummer :");
                         string userNumber = Console.ReadLine();
+                        if(userNumber == user.Username)
+                        {
+                            Console.WriteLine("Korrekt");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Fel");
+                            userMenu = false;
+                        }
                         Console.Write(userNumber);
                         Console.Write("\nAnge lösenord : ");
                         string userPassword = Console.ReadLine();
+                        if(userPassword == user.Password)
+                        {
+                            Console.WriteLine("Korrekt!");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Fel");
+                            userMenu = false;
+                        }
                         ShowUserMenu();
                         break;
 
                     case 2:
 
+                        Console.Clear();
                         user = CreateUser();
+                        ShowCreatedUser();
 
                         //Fråga användaren om den vill bekräfta kontot.
                         break;
