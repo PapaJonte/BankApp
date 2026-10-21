@@ -5,31 +5,35 @@ using System.Text;
 
 namespace BankApp
 {
-    /*This class is the upper class of BankAccount and SavingsAccount. Changed into abstract since this class is for inheritance purposes.
-     Do correct me if I'm wrong.*/
-    internal abstract class AccountManager
+    /*This class is the upper class of BankAccount and SavingsAccount.*/
+    internal class AccountManager
     {
         //We'll keep our savingsAccounts here.
         List<SavingsAccount> savingAccounts = new List<SavingsAccount>();
 
-        public void CheckCurrency()
-        {
-            Console.WriteLine("Skriv vilken valuta du vill sätta i ditt sparkonto.");
-            string currencyString = Console.ReadLine();
 
-            if(Enum.TryParse(currencyString, true, out Currency parsedCurrency))
+        public Currency CheckCurrency()
+        {
+            //while loop around to make sure the user gives a correct value as currency.
+            while ( true)
             {
-                foreach(var c in Enum.GetValues<Currency>())
+                Console.WriteLine("Skriv vilken valuta du vill sätta i ditt sparkonto.");
+                string currencyString = Console.ReadLine();
+
+                Enum.GetValues<Currency>();
+
+                if (Enum.TryParse(currencyString, true, out Currency parsedCurrency))
                 {
-                    if(c == parsedCurrency)
+                    foreach (var c in Enum.GetValues<Currency>())
                     {
-                        Console.WriteLine("Valutan är registrerad.");
+                        if (c == parsedCurrency)
+                        {
+                            Console.WriteLine("Valutan är registrerad.");
+
+                            return parsedCurrency;
+                        }
                     }
                 }
-            }
-            else
-            {
-                Console.WriteLine("Error! Valutan hittades inte. Väljer SEK som standardval.");
             }
         }
 
