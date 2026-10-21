@@ -27,6 +27,7 @@ namespace BankApp
             _nextUserId++;
         }
 
+        //
         public User? GetUserByUsername(string username)
         {
             return _users.FirstOrDefault(u => u.Username == username);
@@ -34,13 +35,32 @@ namespace BankApp
 
         public User? GetUserById(int userId)
         {
-            return _users.FirstOrDefault(u => u.userId == userId)
+            return _users.FirstOrDefault(u => u.UserId == userId);
         }
 
-        public IReadOnlyList<Úser> GetAllUsers()
+        public IReadOnlyList<User> GetAllUsers()
         {
             return _users.AsReadOnly();
         }
+
+        //
+        public bool UsernameExists(string username)
+        {
+            return GetUserByUsername(username) != null;
+        }
+
+        public bool ValidPersonalNumberFormat(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return false;
+            string digitsOnly = username.Replace("-", "");
+
+            if (digitsOnly.Length != 10 && digitsOnly.Length != 12)
+                return false;
+            return digitsOnly.All(char.IsDigit);
+        }
+
+
 
         }
        
