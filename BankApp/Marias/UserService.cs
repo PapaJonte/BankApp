@@ -4,8 +4,12 @@ using System.Text;
 
 namespace BankApp.Marias
 {
-    internal class UserService
+    public enum LoginResult
     {
-
+        Success,
+        WrongCredentials,
+        LockedOut
     }
+
+   
 }
