@@ -39,23 +39,14 @@ namespace BankApp.Robin
         }
         public void ShowMainMenu()
         {
-            MenuChoice menuOptions = new MenuChoice("1. Logga in");
-            MenuChoice menuOptions2 = new MenuChoice("2. Skapa ett konto");
-            MenuChoice menuOptions3 = new MenuChoice("3. Avsluta");
-
-            List<MenuChoice> menus = new List<MenuChoice>();
-            menus.Add(menuOptions);
-            menus.Add(menuOptions2);
-            menus.Add(menuOptions3);
-
             bool userMenu = true;
 
             while (userMenu)
             {
-                foreach (var m in menus)
-                {
-                    Console.WriteLine(m.MenuOption);
-                }
+
+                Console.WriteLine("\n1. Logga in" +
+                    "\n2. Skapa konto" +
+                    "\n3. Avsluta");
 
                 int.TryParse(Console.ReadLine(), out int userInput);
 
@@ -68,9 +59,11 @@ namespace BankApp.Robin
                         Console.WriteLine(userNumber);
                         Console.WriteLine("Ange lösenord : ");
                         string userPassword = Console.ReadLine();
+                        ShowUserMenu();
                         break;
 
                     case 2:
+                        Console.Clear();
                         Console.WriteLine("Case 2");
                         break;
 
