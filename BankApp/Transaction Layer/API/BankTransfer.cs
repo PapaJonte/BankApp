@@ -22,7 +22,7 @@ public class BankTransfer(BankTransaction bankTransaction, ExchangeRate exchange
     /// </returns>
     public StatusCode TransferMoney(AccountData originAccount, AccountData targetAccount, decimal transferAmount, Currency transferCurrency)
     {
-        decimal withdrawalAmount, depositAmount;
+        decimal withdrawalAmount = 0m, depositAmount = 0m;
         StatusCode statusCode;
 
         if (originAccount.Currency == transferCurrency) //calculate how much we will deposit
@@ -43,7 +43,8 @@ public class BankTransfer(BankTransaction bankTransaction, ExchangeRate exchange
         if (statusCode == StatusCode.Successful)
         {
             //verify account balance
-            //request transaction
+            bankTransaction.RequestDeposit(targetAccount.AccountNumber, depositAmount);
+            bankTransaction.RequestWithdrawal(originAccount.AccountNumber, withdrawalAmount);
         }
 
         return statusCode;
