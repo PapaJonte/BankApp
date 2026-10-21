@@ -6,12 +6,6 @@ using System.Linq;
 
 namespace BankApp
 {
-    public enum LoginResult
-    {
-        Success,
-        WrongCredentials,
-        LockedOut
-    }
 
    internal class UserService
     {
