@@ -5,11 +5,18 @@ using BankApp.Transaction_Layer.Service;
 
 namespace BankApp.Transaction_Layer.API;
 
-public class ExchangeRate(ExchangeRateRegistry exchangeRateRegistry, ExchangeRateCalculator exchangeRateCalculator)
+public class ExchangeRate
 {
+    private readonly ExchangeRateRegistry exchangeRateRegistry;
+
+    public ExchangeRate()
+    {
+        exchangeRateRegistry = new();
+    }
 
     public StatusCode SetExchangeRate(Currency cur1, Currency cur2, decimal exchangeRate)
     {
+        exchangeRateRegistry.SetExchangeRate(cur1, cur2, exchangeRate);
         return StatusCode.Successful;
     }
 
@@ -41,7 +48,7 @@ public class ExchangeRate(ExchangeRateRegistry exchangeRateRegistry, ExchangeRat
         calculatedAmount = 0;
         if (exchangeRateRegistry.TryGetExchangeRate(cur1, cur2, out decimal exchangeRate))
         {
-            calculatedAmount = exchangeRateCalculator.CalculateWithExchangeRate(value, exchangeRate);
+            calculatedAmount = ExchangeRateCalculator.CalculateWithExchangeRate(value, exchangeRate);
             return StatusCode.Successful;
         }
         else

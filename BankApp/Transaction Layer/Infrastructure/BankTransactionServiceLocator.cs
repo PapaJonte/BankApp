@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BankApp.Transaction_Layer.Infrastructure;
 
 namespace BankApp.Transaction_Layer.Service_Locators;
 
@@ -15,7 +16,7 @@ public sealed class BankTransactionServiceLocator
     /// </summary>
     /// <param name=""></param>
     /// <returns></returns>
-    private BankTransactionServiceLocator() { }
+    private BankTransactionServiceLocator() { LocatorBootstrap.RegisterAll(this);}
 
     public void RegisterService(object o) => _services.Add(o.GetType(), o);
     public bool TryGetService(Type t, out object? o) => _services.TryGetValue(t, out o);
