@@ -27,6 +27,20 @@ namespace BankApp
             _nextUserId++;
         }
 
+        public User? GetUserByUsername(string username)
+        {
+            return _users.FirstOrDefault(u => u.Username == username);
+        }
+
+        public User? GetUserById(int userId)
+        {
+            return _users.FirstOrDefault(u => u.userId == userId)
+        }
+
+        public IReadOnlyList<Úser> GetAllUsers()
+        {
+            return _users.AsReadOnly();
+        }
 
         }
        
