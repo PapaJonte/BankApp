@@ -1,4 +1,5 @@
 ﻿using BankApp.Transaction_Layer.Enum;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -36,7 +37,7 @@ namespace BankApp
                 }
             }
         }
-
+        //Used for creating accounts.
         public void CreateAccount()
         {
             //This is a placeholder value until we have properly connected eachothers code.
@@ -48,6 +49,7 @@ namespace BankApp
 
             string stringInput = Console.ReadLine();
             int convertedInput;
+
             //Safety system against incorrect input.
             if (Int32.TryParse(stringInput, out convertedInput))
             {
@@ -57,6 +59,24 @@ namespace BankApp
             else
             {
                 Console.WriteLine("Error! Du måste skriva en siffra.");
+            }
+        }
+
+        //Method for accessing the savingsaccounts.
+        public void GetAccounts()
+        {
+            //if statement as a safety measure to assure ourselves that the list is not null.
+            if (savingAccounts.Count > 0 )
+            {
+                foreach (var account in savingAccounts)
+                {
+                    
+                    Console.WriteLine(account.GetBalance());
+                }
+            }
+            else
+            {
+                Console.WriteLine("Error! Du har inga konton på banken.");
             }
         }
     }
