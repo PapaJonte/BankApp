@@ -7,7 +7,7 @@ namespace BankApp.Robin
 {
     internal class Menu
     {
-        public List<User> users = new List<User> { new User(1, "test", "123", "Robin@outlook.com", "076918", UserRole.Customer) };
+        public List<User> users = new List<User> { new User(1, "0204", "123", "Robin@outlook.com", "076918", UserRole.Customer) };
         public void ShowCreatedUser()
         {
             foreach (var user in users)
@@ -97,34 +97,23 @@ namespace BankApp.Robin
                             break;
                         }
                         Console.Write("\nAnge personnummer :");
-
                         string userNumber = Console.ReadLine();
-                        //if (userNumber == user.Username)
-                        //{
-                        //    Console.WriteLine("Korrekt");
-                        //}
-                        //else
-                        //{
-                        //    Console.WriteLine("Fel");
-                        //    userMenu = false;
-                        //}
-                        foreach (var user in users)
-                        {
-                            Console.WriteLine(user);
-                        }
-                        Console.Write(userNumber);
                         Console.Write("\nAnge lösenord : ");
                         string userPassword = Console.ReadLine();
-                        //if (userPassword == users.Password)
-                        //{
-                        //    Console.WriteLine("Korrekt!");
-                        //}
-                        //else
-                        //{
-                        //    Console.WriteLine("Fel");
-                        //    userMenu = false;
-                        //}
-                        ShowUserMenu();
+
+                        foreach (var user in users)
+                        {
+                            if (userNumber == user.Username && userPassword == user.Password)
+                            {
+                                Console.WriteLine("Korrekt!");
+                                ShowUserMenu();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Fel!");
+                                userMenu = false;
+                            }
+                        }
                         break;
 
                     case 2:
