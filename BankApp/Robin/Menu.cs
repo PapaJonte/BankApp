@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BankApp.Marias;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,8 +7,19 @@ namespace BankApp.Robin
 {
     internal class Menu
     {
-        User? user = null;
-
+        public List<User> users = new List<User> { new User(1, "test", "123", "Robin@outlook.com", "076918", UserRole.Customer) };
+        public void ShowCreatedUser()
+        {
+            foreach (var user in users)
+            {
+                Console.WriteLine($"\nDina uppgifter" +
+                  $"\n{user.Username}" +
+                  $"\n{user.Password}" +
+                  $"\n{user.Email}" +
+                  $"\n{user.PhoneNumber}" +
+                  $"\n{user.Role}");
+            }
+        }
         public User CreateUser()
         {
             Console.Clear();
@@ -32,7 +44,6 @@ namespace BankApp.Robin
 
             return user;
         }
-
         public void ShowUserMenu()
         {
             Console.Clear();
@@ -48,12 +59,11 @@ namespace BankApp.Robin
                 {
                     case 1:
                         Console.Clear();
-                        Console.WriteLine("Lista");
+                        ShowCreatedUser();
                         break;
 
                     case 2:
                         Console.Clear();
-                        //Console.WriteLine("Gå tillbaka till startsida");
                         userMenu = false;
                         break;
 
@@ -70,7 +80,6 @@ namespace BankApp.Robin
 
             while (userMenu)
             {
-
                 Console.WriteLine("\n1. Logga in" +
                     "\n2. Skapa konto" +
                     "\n3. Avsluta");
@@ -81,19 +90,48 @@ namespace BankApp.Robin
                 {
                     case 1:
                         Console.Clear();
+                        if (users.Count < 1)
+                        {
+                            Console.WriteLine("Fel");
+                            userMenu = false;
+                            break;
+                        }
                         Console.Write("\nAnge personnummer :");
+
                         string userNumber = Console.ReadLine();
+                        //if (userNumber == user.Username)
+                        //{
+                        //    Console.WriteLine("Korrekt");
+                        //}
+                        //else
+                        //{
+                        //    Console.WriteLine("Fel");
+                        //    userMenu = false;
+                        //}
+                        foreach (var user in users)
+                        {
+                            Console.WriteLine(user);
+                        }
                         Console.Write(userNumber);
                         Console.Write("\nAnge lösenord : ");
                         string userPassword = Console.ReadLine();
+                        //if (userPassword == users.Password)
+                        //{
+                        //    Console.WriteLine("Korrekt!");
+                        //}
+                        //else
+                        //{
+                        //    Console.WriteLine("Fel");
+                        //    userMenu = false;
+                        //}
                         ShowUserMenu();
                         break;
 
                     case 2:
 
-                        user = CreateUser();
-
-                        //Fråga användaren om den vill bekräfta kontot.
+                        Console.Clear();
+                        users.Add(CreateUser());
+                        ShowCreatedUser();
                         break;
 
                     case 3:
