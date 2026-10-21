@@ -43,6 +43,8 @@ namespace BankApp
             //This is a placeholder value until we have properly connected eachothers code.
             decimal interest = 4.1m;
 
+            
+
             //Communication is needed before I adapt this one further.
             Console.WriteLine("Du får " + interest + " i ränta på kontot.");
             Console.WriteLine("Skriv hur mycket pengar som ska finnas i kontot.");
@@ -53,7 +55,9 @@ namespace BankApp
             //Safety system against incorrect input.
             if (Int32.TryParse(stringInput, out convertedInput))
             {
-                SavingsAccount savingsAccount = new SavingsAccount(convertedInput, interest);
+                SavingsAccount savingsAccount = new SavingsAccount(convertedInput, CheckCurrency().parsedCurrency, interest);
+
+                //Adding the newly created account to the list.
                 savingAccounts.Add(savingsAccount);
             }
             else
