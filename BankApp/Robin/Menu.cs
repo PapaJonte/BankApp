@@ -4,9 +4,35 @@ using System.Text;
 
 namespace BankApp.Robin
 {
-    internal class Menu 
+    internal class Menu
     {
-        //User user = new User();
+        User? user = null;
+
+        public User CreateUser()
+        {
+            Console.Clear();
+            Console.Write("\nVänligen ange uppgifter.");
+            Console.Write("\nPersonnummer : ");
+            string userName = Console.ReadLine();
+            Console.Write("\nLösenord : ");
+            string userPass = Console.ReadLine();
+            Console.Write("\nEmail : ");
+            string userEmail = Console.ReadLine();
+            Console.Write("\nTelefonnummer : ");
+            string userPhoneNumber = Console.ReadLine();
+
+            User user = new User(1, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
+            Console.WriteLine($"\nDu skapade ett konto!" +
+                $"\nDina uppgifter." +
+                $"\n{user.Username}" +
+                $"\n{user.Password}" +
+                $"\n{user.Email}" +
+                $"\n{user.PhoneNumber}" +
+                $"\n{user.Role}");
+
+            return user;
+        }
+
         public void ShowUserMenu()
         {
             Console.Clear();
@@ -64,25 +90,8 @@ namespace BankApp.Robin
                         break;
 
                     case 2:
-                        Console.Clear();
-                        Console.Write("\nVänligen ange uppgifter.");
-                        Console.Write("\nPersonnummer : ");
-                        string userName = Console.ReadLine();
-                        Console.Write("\nLösenord : ");
-                        string userPass = Console.ReadLine();
-                        Console.Write("\nEmail : ");
-                        string userEmail = Console.ReadLine();
-                        Console.Write("\nTelefonnummer : ");
-                        string userPhoneNumber = Console.ReadLine();
 
-                        User user = new User(1, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
-                        Console.WriteLine($"\nDu skapade ett konto!" +
-                            $"\nDina uppgifter." +
-                            $"\n{user.Username}" +
-                            $"\n{user.Password}" +
-                            $"\n{user.Email}" +
-                            $"\n{user.PhoneNumber}" +
-                            $"\n{user.Role}");
+                        user = CreateUser();
 
                         //Fråga användaren om den vill bekräfta kontot.
                         break;
