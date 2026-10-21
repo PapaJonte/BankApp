@@ -12,5 +12,5 @@ public class ExchangeRateCalculator
     /// float exchangeRate current exchangeRate
     /// </param>
     /// <returns></returns>
-    public decimal CalculateWithExchangeRate(decimal val, decimal exchangeRate) => val * exchangeRate; 
+    public static decimal CalculateWithExchangeRate(decimal val, decimal exchangeRate) => val * exchangeRate; 
 }
