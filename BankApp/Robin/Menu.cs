@@ -6,6 +6,37 @@ namespace BankApp.Robin
 {
     internal class Menu
     {
+        public void ShowUserMenu()
+        {
+            Console.Clear();
+            bool userMenu = true;
+
+            while (userMenu)
+            {
+                Console.WriteLine("\n1. Se konton" +
+                    "\n2. Gå tillbaka till startsida");
+                int.TryParse(Console.ReadLine(), out int userInput);
+
+                switch (userInput)
+                {
+                    case 1:
+                        Console.Clear();
+                        Console.WriteLine("Lista");
+                        break;
+
+                    case 2:
+                        Console.Clear();
+                        //Console.WriteLine("Gå tillbaka till startsida");
+                        userMenu = false;
+                        break;
+
+                    default:
+                        Console.Clear();
+                        Console.WriteLine("\nVänligen välj 1-2!");
+                        break;
+                }
+            }
+        }
         public void ShowMainMenu()
         {
             MenuChoice menuOptions = new MenuChoice("1. Logga in");
