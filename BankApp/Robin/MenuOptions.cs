@@ -4,13 +4,13 @@ using System.Text;
 
 namespace BankApp.Robin
 {
-    internal class MenuChoice
-    {
-        public string MenuOption { get; set; }
+    //internal class MenuChoice
+    //{
+    //    public string MenuOption { get; set; }
 
-        public MenuChoice(string menuOptions)
-        {
-            MenuOption = menuOptions;
-        }
-    }
+    //    public MenuChoice(string menuOptions)
+    //    {
+    //        MenuOption = menuOptions;
+    //    }
+    //}
 }
