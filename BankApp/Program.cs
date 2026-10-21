@@ -1,4 +1,5 @@
 ﻿using BankApp.Jonathan;
+using BankApp.Robin;
 
 namespace BankApp
 {
@@ -6,8 +7,11 @@ namespace BankApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            Menu menu = new Menu();
 
+            menu.ShowMainMenu();
+
+            LoanTests.RunTests();
         }
     }
 }

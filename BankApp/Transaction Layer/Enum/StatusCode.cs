@@ -4,5 +4,6 @@ public enum StatusCode
 {
     Successful,
     Aborted,
-    Failed
+    Failed,
+    Invalid,
 }

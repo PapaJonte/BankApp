@@ -9,38 +9,85 @@ namespace BankApp.Jonathan
         // decimal balance will eventually come from Gustaf
         // It needs to combine all the of the customer's bank accounts
         // The balance need to be converted to SEK if they're in a foreign currency
-        public decimal CalculateMaxLoanAmount(decimal balance)
+
+        //
+        // CLASS FIELDS
+        //
+
+        private readonly List<Loan> loans = new List<Loan>();
+        private int nextLoandId = 1;
+
+
+        //
+        // LOAN APPLICATIONS
+        //
+
+        public Loan? ApplyForLoan(int customerId, decimal requestedAmount, int duration, decimal totalAccountBalance)
         {
-            if (balance < 0)
+            // Rejects loan durations outside the allowed range
+            if (duration < 12 || duration > 144)
             {
-                throw new ArgumentOutOfRangeException(nameof(balance), "The balance cannot be negative.");
+                return null;
+            }
+            // Fetch the approved and pending loans
+            decimal outstandingLoans = CalculateOutstandingLoans(customerId);
+            decimal pendingLoans = CalculatePendingLoans(customerId);
+
+            // Adds the approved and pending loans together
+            decimal totalCommittedLoans = outstandingLoans + pendingLoans;
+
+            // Calculates how much of the customer's account balance can be used to qualify for a loan.
+            decimal eligibleBalance = CalculateEligibleBalance(totalAccountBalance, outstandingLoans);
+
+            // Checks if the customer is eligible for a loan
+            bool validLoan = ValidateLoanApplication(requestedAmount, eligibleBalance, totalCommittedLoans);
+
+            // If not then the application is denied
+            if (!validLoan)
+            {
+                return null;
             }
 
-            // Balance should be total balance across accounts, but excluding loans
-            decimal maxLoanAmount = balance * 5;
-            return maxLoanAmount;
-        }
+            // Fetch calculators from our InterestCalculator class
+            InterestCalculator calculator = new InterestCalculator();
 
-        public decimal CalculateAvailableCredit(decimal eligibleBalance, decimal totalCommittedLoans)
-        {
-            if (totalCommittedLoans < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(totalCommittedLoans), "Outstanding loans cannot be negative");
-            }
+            decimal interestRate = calculator.GetInterestRate(duration);
+            decimal totalInterest = calculator.CalculateTotalInterest(requestedAmount, duration, interestRate);
 
-            // Gets the total amount the customer can borrow
-            decimal maxLoanAmount = CalculateMaxLoanAmount(eligibleBalance);
+            // Calculates the total amount the customer will repay, including interest.
+            decimal totalRepayment = requestedAmount + totalInterest;
 
-            // Subtract the already existing loans from the max loan amount
-            decimal availableCredit = Math.Max(0m, maxLoanAmount - totalCommittedLoans);
+            // Creates a new loan
+            Loan newLoan = new Loan(requestedAmount);
 
-            return availableCredit;
+            // Customer and loan identification
+            newLoan.CustomerId = customerId;
+            newLoan.LoanId = nextLoandId;
+            nextLoandId++;
+
+            // Loan details
+            newLoan.Duration = duration;
+
+            // Interest and repayment details
+            newLoan.InterestRate = interestRate;
+            newLoan.TotalInterest = totalInterest;
+            newLoan.TotalRepayment = totalRepayment;
+
+            loans.Add(newLoan);
+
+            return newLoan;
         }
 
         public bool ValidateLoanApplication(decimal requestedAmount, decimal eligibleBalance, decimal totalCommittedLoans)
         {
             // Checks that the requested amount isn't negative
             if (requestedAmount <= 0)
+            {
+                return false;
+            }
+
+            // Rejects loan amounts with fractions of an öre
+            if (requestedAmount != decimal.Round(requestedAmount, 2))
             {
                 return false;
             }
@@ -57,68 +104,55 @@ namespace BankApp.Jonathan
                 return false;
             }
         }
-        
-        private readonly List<Loan> loans = new List<Loan>();
-        private int nextLoandId = 1;
 
-        public Loan? ApplyForLoan(int customerId, decimal requestedAmount, int duration, decimal eligibleBalance)
+
+        //
+        // LOAN CALCULATIONS
+        //
+
+        public decimal CalculateEligibleBalance(decimal totalAccountBalance, decimal outstandingLoans)
         {
-            // Fetch the approved and pending loans
-            decimal outstandingLoans = CalculateOutstandingLoans(customerId);
-            decimal pendingLoans = CalculatePendingLoans(customerId);
-
-            // Adds the approved and pending loans together
-            decimal totalCommittedLoans = outstandingLoans + pendingLoans;
-            
-            // Checks if the customer is eligible for a loan
-            bool validLoan = ValidateLoanApplication(requestedAmount, eligibleBalance, totalCommittedLoans);
-
-            // If not then the application is denied
-            if (!validLoan)
+            if (totalAccountBalance < 0)
             {
-                return null;
+                throw new ArgumentOutOfRangeException(nameof(totalAccountBalance), "The balance cannot be negative.");
+            }
+            if (outstandingLoans < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(outstandingLoans), "The loan balance cannot be negative.");
             }
 
-            // Fetch calculators from our InterestCalculator class
-            InterestCalculator calculator = new InterestCalculator();
+            // Calculates the customer's eligible balance by subtracting outstanding loans from their total account balance.
+            decimal eligibleBalance = Math.Max(0m, totalAccountBalance - outstandingLoans);
 
-            decimal interestRate = calculator.GetInterestRate(duration);
-            decimal totalInterest = calculator.CalculateTotalInterest(requestedAmount, duration, interestRate);
-
-            // Creates a new loan
-            Loan newLoan = new Loan();
-            newLoan.CustomerId = customerId;
-            newLoan.LoanId = nextLoandId;
-            nextLoandId++;
-            newLoan.LoanAmount = requestedAmount;
-            newLoan.RemainingLoanBalance = requestedAmount;
-            newLoan.TotalInterest = totalInterest;
-            newLoan.InterestRate = interestRate;
-            newLoan.Duration = duration;
-            // Not done yet, it still needs: LoanId, Storage, Approval and Disbursment
-
-            loans.Add(newLoan);
-
-            return newLoan;
+            return eligibleBalance;
         }
 
-        public List<Loan> GetCustomersLoan(int customerId)
+        public decimal CalculateMaxLoanAmount(decimal balance)
         {
-            // Creates a list to store the customer's loans
-            List<Loan> customerLoans = new List<Loan>();
-
-            // Goes through all existing loans
-            foreach (Loan loan in loans)
+            if (balance < 0)
             {
-                // Checks if the loan belongs to the customer
-                if (loan.CustomerId == customerId)
-                {
-                    customerLoans.Add(loan);
-                }
+                throw new ArgumentOutOfRangeException(nameof(balance), "The balance cannot be negative.");
             }
 
-            // Returns all loans belonging to the customer
-            return customerLoans;
+            // Balance should be total balance across accounts, but excluding loans
+            decimal maxLoanAmount = balance * 5;
+            return maxLoanAmount;
+        }
+
+        public decimal CalculateAvailableCredit(decimal eligibleBalance, decimal totalCommittedLoans)
+        {
+            if (totalCommittedLoans < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(totalCommittedLoans), "The total committed loan amount cannot be negative.");
+            }
+
+            // Gets the total amount the customer can borrow
+            decimal maxLoanAmount = CalculateMaxLoanAmount(eligibleBalance);
+
+            // Subtract the already existing loans from the max loan amount
+            decimal availableCredit = Math.Max(0m, maxLoanAmount - totalCommittedLoans);
+
+            return availableCredit;
         }
 
         public decimal CalculateOutstandingLoans(int customerId)
@@ -132,7 +166,7 @@ namespace BankApp.Jonathan
             // Goes through each approved loan and adds its remaining balance
             foreach (Loan loan in customerLoans)
             {
-                if (loan.Status == "Approved")
+                if (loan.Status == LoanStatus.Approved)
                 {
                     outstandingLoans += loan.RemainingLoanBalance;
                 }
@@ -153,7 +187,7 @@ namespace BankApp.Jonathan
             // Goes through each pending loan and adds its requested amount
             foreach (Loan loan in customerLoans)
             {
-                if (loan.Status == "Pending")
+                if (loan.Status == LoanStatus.Pending)
                 {
                     pendingLoans += loan.LoanAmount;
                 }
@@ -163,7 +197,47 @@ namespace BankApp.Jonathan
             return pendingLoans;
         }
 
-        public bool ChangeLoanStatus(int loanId, string newStatus, decimal eligibleBalance)
+
+        //
+        // LOAN MANAGEMENT
+        //
+
+        public List<Loan> GetCustomersLoan(int customerId)
+        {
+            // Creates a list to store the customer's loans
+            List<Loan> customerLoans = new List<Loan>();
+
+            // Goes through all existing loans
+            foreach (Loan loan in loans)
+            {
+                // Checks if the loan belongs to the customer
+                if (loan.CustomerId == customerId)
+                {
+                    customerLoans.Add(loan);
+                }
+            }
+
+            // Returns all loans belonging to the customer
+            return customerLoans;
+        }
+
+        // Returns all pending loan applications
+        public List<Loan> GetPendingLoans()
+        {
+            List<Loan> pendingLoans = new List<Loan>();
+
+            foreach (Loan loan in loans)
+            {
+                if (loan.Status == LoanStatus.Pending)
+                {
+                    pendingLoans.Add(loan);
+                }
+            }
+
+            return pendingLoans;
+        }
+
+        public bool ChangeLoanStatus(int loanId, LoanStatus newStatus, decimal totalAccountBalance)
         {
             foreach (Loan loan in loans)
             {
@@ -171,13 +245,13 @@ namespace BankApp.Jonathan
                 if (loan.LoanId == loanId)
                 {
                     // Checks if the loan is still pending
-                    if (loan.Status == "Pending")
+                    if (loan.Status == LoanStatus.Pending)
                     {
                         // Checks if the new status is valid
-                        if (newStatus == "Approved" || newStatus == "Rejected")
+                        if (newStatus == LoanStatus.Approved || newStatus == LoanStatus.Rejected)
                         {
                             // Checks the borrowing limit before approving the loan
-                            if (newStatus == "Approved")
+                            if (newStatus == LoanStatus.Approved)
                             {
                                 // Gets the customer's approved and pending loans
                                 decimal outstandingLoans = CalculateOutstandingLoans(loan.CustomerId);
@@ -185,6 +259,9 @@ namespace BankApp.Jonathan
 
                                 // Calculates the total loans and maximum allowed loan amount
                                 decimal totalCommittedLoans = outstandingLoans + pendingLoans;
+
+                                // Calculates the customer's eligible balance before approving the loan.
+                                decimal eligibleBalance = CalculateEligibleBalance(totalAccountBalance, outstandingLoans);
                                 decimal maxLoanAmount = CalculateMaxLoanAmount(eligibleBalance);
 
                                 // Prevents approval if the customer exceeds the loan limit
@@ -195,7 +272,7 @@ namespace BankApp.Jonathan
                             }
 
                             // Updates the loan status
-                            loan.Status = newStatus;
+                            loan.UpdateStatus(newStatus);
                             return true;
                         }
                     }
@@ -203,6 +280,41 @@ namespace BankApp.Jonathan
             }
 
             // Returns false if the status couldn't be changed
+            return false;
+        }
+
+        public bool RepayLoan(int loanId, decimal paymentAmount)
+        {
+            // Find the loan
+            foreach (Loan loan in loans)
+            {
+                if (loan.LoanId == loanId)
+                {
+                    // Checks if the loan has been approved
+                    if (loan.Status != LoanStatus.Approved)
+                    {
+                        return false;
+                    }
+
+                    // Checks if the payment amount is greater than zero
+                    if (paymentAmount <= 0)
+                    {
+                        return false;
+                    }
+
+                    // Checks if the payment exceeds the remaining loan balance
+                    if (paymentAmount > loan.RemainingLoanBalance)
+                    {
+                        return false;
+                    }
+
+                    // Subtracts the payment from the remaining loan balance
+                    loan.ReduceBalance(paymentAmount);
+
+                    return true;
+                }
+            }
+
             return false;
         }
     }
