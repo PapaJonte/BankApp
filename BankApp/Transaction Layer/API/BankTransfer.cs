@@ -50,15 +50,16 @@ public class BankTransfer(BankTransaction bankTransaction, ExchangeRate exchange
     }
     
     /// <summary>
-    /// 
+    /// Request a deposition of money based on params, return status code
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="">
+    /// string accountNumber, number of account we deposit money to
+    /// decimal depositAmount, value we add to bank account.
+    /// </param>
     /// <returns></returns>
-    public StatusCode DepositMoney(string accountNumber, float depositAmount)
+    public StatusCode DepositMoney(string accountNumber, decimal depositAmount)
     {
-        //request deposition
-        //return StatusCode
-
+        bankTransaction.RequestDeposit(accountNumber, depositAmount);
         return StatusCode.Successful;
     }
 }

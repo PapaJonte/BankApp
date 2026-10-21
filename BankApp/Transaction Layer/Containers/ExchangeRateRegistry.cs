@@ -27,6 +27,15 @@ public class ExchangeRateRegistry
             throw new ArgumentException("Cannot set exchange rate between same currencies.");
         }
 
+        /*
+        instead of inverting exchange value for ssot and risk losing value due to
+        precision error, we'll just flip the keys. this way ssot is maintained with minimal data loss
+        */
+        if(exchangeRates.ContainsKey((cur2,cur1)))
+        {
+            exchangeRates.Remove((cur2,cur1));
+        }
+
         exchangeRates[(cur1, cur2)] = exchangeRate;
     }
 
