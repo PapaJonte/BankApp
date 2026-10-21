@@ -20,14 +20,19 @@ namespace BankApp
             AddUser("000000-0000", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
         }
 
-        private void AddUser (string username, string password, string email, string PhoneNumber, UserRole role)
+        //Privat hjälpmetod som skapar och lagrar en ny User. Används av konstruktorn (default-admin) och av CreateUser.
+        private void AddUser (string username, string password, string email, string phoneNumber, UserRole role)
         {
             User newUser = new User(_nextUserId, username, password, email, phoneNumber, role);
             _users.Add(newUser);
             _nextUserId++;
         }
 
-        //
+        /* Hämta användare.
+         Uppfyller: user story 1 (unikt användarnamn), används av
+         Gustaf/Alex/Jonathan för att koppla konton/lån till rätt
+        UserID, och av Robin i menyerna.
+            */
         public User? GetUserByUsername(string username)
         {
             return _users.FirstOrDefault(u => u.Username == username);
@@ -35,22 +40,23 @@ namespace BankApp
 
         public User? GetUserById(int userId)
         {
-            return _users.FirstOrDefault(u => u.UserId == userId);
+            return _users.FirstOrDefault(u => u.UserID == userId);
         }
 
+        //Readonly så att ingen utanför kan lägga till/ ta bort direkt i listan.
         public IReadOnlyList<User> GetAllUsers()
         {
             return _users.AsReadOnly();
         }
 
-        //
+        //Validering. Kollar om personnummret redan finns registrerade bland användare.
         public bool UsernameExists(string username)
         {
             return GetUserByUsername(username) != null;
         }
 
-        //
-        public bool ValidPersonalNumberFormat(string username)
+        //Formatkontroll av personnumret: inte tomt, rätt antal siffror (10 eller 12) och bara siffror inga bokstäver.
+        public bool IsValidPersonalNumberFormat(string username)
         {
             if (string.IsNullOrWhiteSpace(username))
                 return false;
@@ -61,9 +67,17 @@ namespace BankApp
             return digitsOnly.All(char.IsDigit);
         }
 
-        //
+        /*SKAPA ANVÄNDARE
+       Uppfyller: user story 2 ("administratören ska kunna skapa
+       nya användare i systemet"). callerIsAdmin skickas in utifrån
+         (från AuthService), eftersom UserService inte vet vem som
+         är inloggad.
+        */
+
+        //returnerar true om användaren skapades, annars false.
         public bool CreateUser(bool callerIsAdmin, string username, string password, string email, string phoneNumber, UserRole role = UserRole.Customer)
         {
+            //bara admin får skapa nya användare.
             if (!callerIsAdmin)
                 return false;
 
@@ -72,16 +86,22 @@ namespace BankApp
 
             if (!IsValidPersonalNumberFormat(username))
                 return false;
-
+            //Personumret måste vara unikt (vilket det är, kanske kommer justera? men ville uppfylla krav)
             if (UsernameExists(username))
                 return false;
 
-            Adduser(username, password, email, phoneNumber, role);
+            AddUser(username, password, email, phoneNumber, role);
             return true;
 
         }
 
-        //
+        /*
+          UPPDATERA PERSONUPPGIFTER
+         Uppfyller: user story 16, extra ("uppdatera sina personliga
+         uppgifter, t.ex. e-postadress, telefonnummer").
+         user skickas in direkt (från AuthService.LoggedInUser i Main),
+         eftersom UserService inte vet vem som är inloggad.
+        */
         public bool UpdateUserInfo(User user, string newEmail, string newPhone)
         {
             if (user == null)
