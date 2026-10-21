@@ -49,6 +49,7 @@ namespace BankApp
             return GetUserByUsername(username) != null;
         }
 
+        //
         public bool ValidPersonalNumberFormat(string username)
         {
             if (string.IsNullOrWhiteSpace(username))
@@ -60,6 +61,25 @@ namespace BankApp
             return digitsOnly.All(char.IsDigit);
         }
 
+        //
+        public bool CreateUser(bool callerIsAdmin, string username, string password, string email, string phoneNumber, UserRole role = UserRole.Customer)
+        {
+            if (!callerIsAdmin)
+                return false;
+
+            if (string.IsNullOrWhiteSpace(password))
+                return false;
+
+            if (!IsValidPersonalNumberFormat(username))
+                return false;
+
+            if (UsernameExists(username))
+                return false;
+
+            Adduser(username, password, email, phoneNumber, role);
+            return true;
+
+        }
 
 
         }
