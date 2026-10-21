@@ -29,31 +29,26 @@ namespace BankApp
             AddUser("000000-0000", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
         }
 
-
-        public LoginResult Login(string username, string password)
+        //Skapa användare
+        public bool UsernameExists(string username)
         {
-            User? user = GetUserByUsername(username);
+            return GetUserByUsername(username) != null;
+        }
 
-            if (user == null)
-                return LoginResult.WrongCredentials;
+        public bool IsValidPersonalNumberFormat (string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return false;
 
-            if (user.IsLockedOut)
-                return LoginResult.LockedOut;
+            string digitsOnly = username.Replace("-", ""); // tar bort - för att räkna hur många siffror totalt
 
-            if(user.Password != password)
-            {
-                user.RegisterFailedLogin();
+            //Giltiga längder
+            if (digitsOnly.Length != 10 && digitsOnly.Length != 12)
+                return false;
 
-                if (user.IsLockedOut)
-                    return LoginResult.LockedOut;
+            return digitsOnly.All(char.IsDigit);
+        }
 
-                return LoginResult.WrongCredentials;
-                }
-            user.FailedLoginAttempts = 0;
-            LoggedInUser = user;
-            return LoginResult.Success;
-             
-            }
         }
        
 
