@@ -9,7 +9,6 @@ public class StageTransaction
 {
     private readonly TransactionScheduler transactionScheduler;
     private readonly TransactionRegistry transactionRegistry;
-    private readonly Lock transactionLock = new();
 
     public StageTransaction(TransactionScheduler transactionScheduler, TransactionRegistry transactionRegistry)
     {
@@ -48,15 +47,12 @@ public class StageTransaction
     /// </summary>
     private void OnSchedule()
     {
-        lock (transactionLock)
+        var stagedTransactions = transactionRegistry.GetAllStagedTransactions();
+        foreach (var s in stagedTransactions)
         {
-            var stagedTransactions = transactionRegistry.GetAllStagedTransactions();
-            foreach (var s in stagedTransactions)
-            {
-                //deposit and withdraw money
-            }
-            transactionRegistry.ClearStagedTransactions();
+            //deposit and withdraw money
         }
+        transactionRegistry.ClearStagedTransactions();
     }
     #endregion
 
