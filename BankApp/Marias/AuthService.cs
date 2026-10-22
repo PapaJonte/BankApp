@@ -12,6 +12,18 @@ namespace BankApp
     }
     internal class AuthService
     {
+        private readonly UserService _userService;
+        public User? LoggedInUser { get; private set; }
 
+        public AuthService(UserService userService)
+        {
+            _userService = userService;
+        }
+
+
+        public LoginResult Login(string username, string password)
+        {
+            LoginResult result = _userService.ValidateCredentials(username, password);
+        }
     }
 }
