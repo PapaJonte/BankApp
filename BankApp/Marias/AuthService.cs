@@ -20,5 +20,10 @@ namespace BankApp
             _userService = userService;
         }
 
+
+        public LoginResult Login(string username, string password)
+        {
+            LoginResult result = _userService.ValidateCredentials(username, password);
+        }
     }
 }
