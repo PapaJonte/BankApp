@@ -23,7 +23,43 @@ namespace BankApp.Robin
 
         public void ShowAdminMenu()
         {
+            Console.Clear();
+            bool userMenu = true;
 
+            int selectedIndex = 0;
+
+            while (userMenu)
+            {
+                Console.WriteLine("\n Skapa nya användare" +
+                    "Lån" +
+                    "Växelkurser" +
+                    "Gå tillbaka till startsidan");
+                ConsoleKey key = Console.ReadKey(true).Key;
+
+
+                switch (key)
+                {
+                    case ConsoleKey.UpArrow:
+                        selectedIndex = (selectedIndex - 1 + 4) % 4;
+
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        selectedIndex = (selectedIndex + 1) % 4;
+                        break;
+
+                    case ConsoleKey.Enter:
+
+                        break;
+
+                    case ConsoleKey.Escape:
+                        userMenu = false;
+
+                        break;
+
+                }
+
+            }
         }
         public User CreateUser()
         {
