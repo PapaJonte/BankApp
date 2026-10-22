@@ -10,7 +10,8 @@ namespace BankApp
    internal class UserService
     {
         //alla användare sparas i en lista i minnet.
-        private readonly List<User> _users = new List<User>();
+        private readonly Dictionary<int, User> _users =
+             new Dictionary<int, User>();
         //Ger varje ny användare ett unikt internt ID (1, 2, 3 ...).
         private int _nextUserId = 1;
 
@@ -21,10 +22,10 @@ namespace BankApp
         }
 
         //Privat hjälpmetod som skapar och lagrar en ny User. Används av konstruktorn (default-admin) och av CreateUser.
-        private void AddUser (string username, string password, string email, string phoneNumber, UserRole role)
+ private void AddUser(string username, string password, string email, string phoneNumber, UserRole role)
         {
             User newUser = new User(_nextUserId, username, password, email, phoneNumber, role);
-            _users.Add(newUser);
+            _users.Add(newUser.UserID, newUser);
             _nextUserId++;
         }
 
@@ -35,12 +36,18 @@ namespace BankApp
             */
         public User? GetUserByUsername(string username)
         {
-            return _users.FirstOrDefault(u => u.Username == username);
+            return _users.Values.FirstOrDefault(u => u.Username == username);
         }
 
+        //Använder TryGetValue
         public User? GetUserById(int userId)
         {
-            return _users.FirstOrDefault(u => u.UserID == userId);
+            if (_users.TryGetValue(userId, out User? user))
+            {
+                return user;
+            }
+
+            return null;
         }
 
         //Readonly så att ingen utanför kan lägga till/ ta bort direkt i listan.
@@ -117,33 +124,6 @@ namespace BankApp
             return true;
         }
 
-        //Kollar om personummer + lösenord stämmer och hanterar misslycakde försök.
-        public LoginResult ValidateCredentials(string username, string password)
-        {
-            User? user = GetUserByUsername(username);
-
-            if (user == null)
-                return LoginResult.WrongCredentials;
-
-            if (user.IsLockedOut)
-                return LoginResult.LockedOut;
-
-            if (user.Password != password)
-            {
-                user.RegisterFailedLogin();
-
-                if (user.IsLockedOut)
-                    return LoginResult.LockedOut;
-
-                return LoginResult.WrongCredentials;
-
-            }
-
-            user.FailedLoginAttempts = 0;
-            return LoginResult.Success;
-
-
-        }
 
 
 

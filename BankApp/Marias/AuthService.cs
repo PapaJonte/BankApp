@@ -21,9 +21,34 @@ namespace BankApp
         }
 
 
-        public LoginResult Login(string username, string password)
+        //Kollar om personummer + lösenord stämmer och hanterar misslycakde försök.
+        public LoginResult ValidateCredentials(string username, string password)
         {
-            LoginResult result = _userService.ValidateCredentials(username, password);
+            User? user = GetUserByUsername(username);
+
+            if (user == null)
+                return LoginResult.WrongCredentials;
+
+            if (user.IsLockedOut)
+                return LoginResult.LockedOut;
+
+            if (user.Password != password)
+            {
+                user.RegisterFailedLogin();
+
+                if (user.IsLockedOut)
+                    return LoginResult.LockedOut;
+
+                return LoginResult.WrongCredentials;
+
+            }
+
+            user.FailedLoginAttempts = 0;
+            return LoginResult.Success;
+
+
         }
+
     }
+}
 }
