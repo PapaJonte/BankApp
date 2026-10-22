@@ -25,13 +25,13 @@ namespace BankApp.Robin
             Console.Clear();
             Console.Write("\nVänligen ange uppgifter.");
             Console.Write("\nPersonnummer : ");
-            string userName = Console.ReadLine();
+            string userName = Console.ReadLine() ?? "";
             Console.Write("\nLösenord : ");
-            string userPass = Console.ReadLine();
+            string userPass = Console.ReadLine() ?? "";
             Console.Write("\nEmail : ");
-            string userEmail = Console.ReadLine();
+            string userEmail = Console.ReadLine() ?? "";
             Console.Write("\nTelefonnummer : ");
-            string userPhoneNumber = Console.ReadLine();
+            string userPhoneNumber = Console.ReadLine() ?? "";
 
             User user = new User(1, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
             Console.WriteLine($"\nDu skapade ett konto!" +
@@ -97,9 +97,9 @@ namespace BankApp.Robin
                             break;
                         }
                         Console.Write("\nAnge personnummer :");
-                        string userNumber = Console.ReadLine();
+                        string userNumber = Console.ReadLine() ?? "";
                         Console.Write("\nAnge lösenord : ");
-                        string userPassword = Console.ReadLine();
+                        string userPassword = Console.ReadLine() ?? "";
 
                         foreach (var user in users)
                         {
