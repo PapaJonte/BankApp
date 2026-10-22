@@ -20,6 +20,11 @@ namespace BankApp.Robin
                   $"\n{user.Role}");
             }
         }
+
+        public void ShowAdminMenu()
+        {
+
+        }
         public User CreateUser()
         {
             Console.Clear();
@@ -74,7 +79,7 @@ namespace BankApp.Robin
                 }
             }
         }
-        public void ShowMainMenu()
+        public void LoginMenu()
         {
             bool userMenu = true;
 
