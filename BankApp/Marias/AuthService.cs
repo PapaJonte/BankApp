@@ -21,9 +21,9 @@ namespace BankApp
         }
 
 
-        public LoginResult Login(string username, string password)
-        {
-            LoginResult result = _userService.ValidateCredentials(username, password);
-        }
+        //public LoginResult Login(string username, string password)
+        //{
+        //    LoginResult result = _userService.ValidateCredentials(username, password);
+        //}
     }
 }
