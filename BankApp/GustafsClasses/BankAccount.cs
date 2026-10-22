@@ -11,14 +11,9 @@ namespace BankApp
         private int convertedInput;
 
         //Constructor
-        public BankAccount( string stringInput, int convertedInput)
+        public BankAccount( )
         {
-            this.stringInput = stringInput;
-            this.convertedInput = convertedInput;
+            
         }
-        //Log in method here.
-
-        //Converter Method here
-
     }
 }

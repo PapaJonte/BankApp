@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BankApp.Transaction_Layer.Enum;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,12 +11,14 @@ namespace BankApp
     {
         //Properties.
         private decimal balance; //Ammount in the account.
+        private Currency currency; //Currency of Account.
         private decimal interest;
 
         //The constructor does no longer serve as clear of a purpose as before. Still I'll keep it for now.
-        public SavingsAccount (string stringInput, int convertedInput, decimal balance, decimal interest) : base ( stringInput, convertedInput)
+        public SavingsAccount (decimal balance, Currency currency, decimal interest) : base ( )
         {
             this.balance = balance;
+            this.currency = currency;
             this.interest = interest;
         }
 
@@ -23,6 +26,10 @@ namespace BankApp
         public decimal GetBalance()
         {
             return balance;
+        }
+        public Currency GetCurrency()
+        {
+            return currency;
         }
         //Method that returns interest.
         public decimal GetInterest()
