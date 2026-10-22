@@ -29,9 +29,15 @@ public class TransactionRegistry
     public List<TransactionDataObject> GetAllStagedTransactions()
     {
         List<TransactionDataObject> transactions = [.. stagedTransactions];
-        stagedTransactions.Clear();
         return transactions;
     }
+
+    /// <summary>
+    /// Clears current staged transaction queue
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    public void ClearStagedTransactions() => stagedTransactions.Clear();
 
     /// <summary>
     /// Responsible for retrieving the next staged transaction in order.

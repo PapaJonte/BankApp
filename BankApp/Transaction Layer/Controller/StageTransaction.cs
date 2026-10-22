@@ -51,10 +51,11 @@ public class StageTransaction
         lock (transactionLock)
         {
             var stagedTransactions = transactionRegistry.GetAllStagedTransactions();
-            foreach(var s in stagedTransactions)
+            foreach (var s in stagedTransactions)
             {
                 //deposit and withdraw money
             }
+            transactionRegistry.ClearStagedTransactions();
         }
     }
     #endregion
