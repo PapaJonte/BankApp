@@ -22,6 +22,7 @@ namespace BankApp.Robin
         }
         public void ShowAdminMenu()
         {
+
             Console.Clear();
             bool userMenu = true;
 
@@ -30,9 +31,9 @@ namespace BankApp.Robin
             while (userMenu)
             {
                 Console.WriteLine("\n Skapa nya användare" +
-                    "Lån" +
-                    "Växelkurser" +
-                    "Gå tillbaka till startsidan");
+                    "\nLån" +
+                    "\nVäxelkurser" +
+                    "\nGå tillbaka till startsidan");
                 ConsoleKey key = Console.ReadKey(true).Key;
 
                 switch (key)
@@ -50,7 +51,7 @@ namespace BankApp.Robin
                         switch (selectedIndex)
                         {
                             case 0:
-                                // Skapa användare
+                                CreateUser();
                                 break;
 
                             case 1:
@@ -74,6 +75,8 @@ namespace BankApp.Robin
                 }
             }
         }
+
+        //public void 
         public User CreateUser()
         {
             Console.Clear();
@@ -187,7 +190,8 @@ namespace BankApp.Robin
 
             while (userMenu)
             {
-                Console.WriteLine("\n Logga in" +
+                Console.Clear();
+                Console.WriteLine("\nLogga in" +
                     "\nSkapa konto" +
                     "\nAvsluta");
 
