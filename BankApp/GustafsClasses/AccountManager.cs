@@ -41,7 +41,7 @@ namespace BankApp
         public void CreateAccount()
         {
             //This is a placeholder value until we have properly connected eachothers code.
-            decimal interest = 4.1m;
+            decimal interest = 0.5m;
 
             
 
