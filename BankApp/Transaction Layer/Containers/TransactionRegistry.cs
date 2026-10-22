@@ -25,21 +25,32 @@ public class TransactionRegistry
     }
 
     /// <summary>
-    /// Responsible for atomically retrieving and clearing all staged transactions at once.
-    /// Returns a copy of the queue contents and empties the queue in a single locked operation,
-    /// so no transaction staged during processing can be lost.
-    /// Thread-safe: acquires the registry lock for the whole get-and-clear operation.
+    /// Responsible for retrieving all staged transactions at once.
+    /// Returns a copy of the queue contents, leaving the queue unchanged.
+    /// Thread-safe: acquires the registry lock while copying the queue.
     /// </summary>
     /// <returns>
     /// List of TransactionDataObject representing all currently staged transactions
     /// </returns>
-    public List<TransactionDataObject> DrainStagedTransactions()
+    public List<TransactionDataObject> GetAllStagedTransactions()
     {
         lock (registryLock)
         {
             List<TransactionDataObject> transactions = [.. stagedTransactions];
-            stagedTransactions.Clear();
             return transactions;
+        }
+    }
+
+    /// <summary>
+    /// Responsible for clearing the current staged transaction queue.
+    /// Removes all staged transactions from the queue.
+    /// Thread-safe: acquires the registry lock while clearing the queue.
+    /// </summary>
+    public void ClearStagedTransactions()
+    {
+        lock (registryLock)
+        {
+            stagedTransactions.Clear();
         }
     }
 
@@ -61,6 +72,4 @@ public class TransactionRegistry
     }
 
 }
-
-
 
