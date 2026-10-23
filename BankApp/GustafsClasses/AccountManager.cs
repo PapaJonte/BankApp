@@ -40,8 +40,8 @@ namespace BankApp
         //Used for creating accounts.
         public void CreateAccount()
         {
-            //This is a placeholder value until we have properly connected eachothers code.
-            decimal interest = 4.1m;
+            //Interest for savings accounts.
+            decimal interest = 0.5m;
 
             //Communication is needed before I adapt this one further.
             Console.WriteLine("Du får " + interest + " i ränta på kontot.");
