@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
 using System.Linq;
 
 namespace BankApp
@@ -22,7 +20,7 @@ namespace BankApp
         }
 
         //Privat hjälpmetod som skapar och lagrar en ny User. Används av konstruktorn (default-admin) och av CreateUser.
- private void AddUser(string username, string password, string email, string phoneNumber, UserRole role)
+        private void AddUser(string username, string password, string email, string phoneNumber, UserRole role)
         {
             User newUser = new User(_nextUserId, username, password, email, phoneNumber, role);
             _users.Add(newUser.UserID, newUser);
@@ -50,11 +48,12 @@ namespace BankApp
             return null;
         }
 
-        //Readonly så att ingen utanför kan lägga till/ ta bort direkt i listan.
+        //
         public IReadOnlyList<User> GetAllUsers()
         {
-            return _users.AsReadOnly();
+            return _users.Values.ToList().AsReadOnly();
         }
+
 
         //Validering. Kollar om personnummret redan finns registrerade bland användare.
         public bool UsernameExists(string username)
