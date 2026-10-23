@@ -31,7 +31,6 @@ namespace BankApp.Robin
         }
         public void ShowAdminMenu()
         {
-
             Console.Clear();
             bool userMenu = true;
 
@@ -86,9 +85,8 @@ namespace BankApp.Robin
         }
 
         //public void 
-        public User CreateUser()
+        public bool CreateUser()
         {
-
             Console.Clear();
             Console.Write("\nVänligen ange uppgifter.");
             Console.Write("\nPersonnummer : ");
@@ -97,7 +95,7 @@ namespace BankApp.Robin
             {
                 Console.WriteLine("\nFel: Personnumret är redan registrerat!");
                 Console.ReadKey();
-                return null;
+                return false;
             }
             Console.Write("\nLösenord : ");
             string userPass = Console.ReadLine() ?? "";
@@ -107,7 +105,8 @@ namespace BankApp.Robin
             string userPhoneNumber = Console.ReadLine() ?? "";
 
             //User user = new User(1, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
-            User user = _userService.CreateUser(userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
+            bool succesCeatedUser = _userService.CreateUser(true, userName, userPass ,userEmail, userPhoneNumber, UserRole.Customer);
+            User? user = _userService.GetUserByUsername(userName);
 
             Console.WriteLine($"\nDu skapade ett konto!" +
                 $"\nDina uppgifter." +
@@ -116,8 +115,9 @@ namespace BankApp.Robin
                 $"\n{user.Email}" +
                 $"\n{user.PhoneNumber}" +
                 $"\n{user.Role}");
+            
 
-            return user;
+            return true;
         }
         public void ShowUserMenu()
         {
@@ -182,9 +182,9 @@ namespace BankApp.Robin
             while (userMenu)
             {
                 Console.Clear();
-                Console.WriteLine("\nLogga in" +
-                    "\nSkapa konto" +
-                    "\nAvsluta");
+                Console.WriteLine("\n[ ] Logga in" +
+                    "\n[ ] Skapa konto" +
+                    "\n[ ] Avsluta");
 
                 ConsoleKey key = Console.ReadKey(true).Key;
 

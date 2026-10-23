@@ -7,7 +7,8 @@ namespace BankApp
     {
         static void Main(string[] args)
         {
-            Menu menu = new Menu();
+            UserService userService = new UserService();
+            Menu menu = new Menu(userService);
 
             menu.LoginMenu();
 
