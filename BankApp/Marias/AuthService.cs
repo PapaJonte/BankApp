@@ -53,7 +53,16 @@ namespace BankApp
         }
 
         //Behörighet
+        public bool IsAdmin(User? user)
+        {
+            return user != null &&
+                (user.Role == UserRole.Admin || user.Role == UserRole.Owner);
+        }
 
+        public bool IsLoggedInUserAdmin()
+        {
+            return IsAdmin(LoggedInUser);
+        }
 
     }
 }
