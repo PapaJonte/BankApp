@@ -64,6 +64,14 @@ namespace BankApp
             return IsAdmin(LoggedInUser);
         }
 
+        //Bara Owner (bankägaren) får skapa nya Admin Konton. Förhindrar andra från att skapa fler admin-konto.
+        public bool CanCreateAdminAccount()
+        {
+            return LoggedInUser != null && LoggedInUser.Role == UserRole.Owner;
+        }
+
+
+        
     }
 }
-}
+
