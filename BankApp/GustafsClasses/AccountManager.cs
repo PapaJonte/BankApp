@@ -83,5 +83,28 @@ namespace BankApp
                 Console.WriteLine("Error! Du har inga konton på banken.");
             }
         }
+
+        /*Method for getting the total balance of all accounts put together. However the method does not yet convert between currencies.*/
+        public decimal GetTotalBalance( )
+        {
+
+            //Where we together all of the money into a total value.
+            decimal totalBalance = 0;
+            Enum.GetValues<Currency>();
+
+            if (savingAccounts.Count > 0)
+            {
+                foreach (SavingsAccount account in savingAccounts)
+                {
+                    totalBalance = totalBalance + account.GetBalance();
+                }
+                return totalBalance;
+            }
+            else
+            {
+                Console.WriteLine("Error! Du har inga sparkonton på denna bank. Ditt totala saldo är alltså " + totalBalance);
+                return totalBalance;
+            }
+        }
     }
 }
