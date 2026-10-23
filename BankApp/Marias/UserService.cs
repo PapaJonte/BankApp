@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
 using System.Linq;
 
 namespace BankApp
 {
 
-   internal class UserService
+    internal class UserService
     {
         //alla användare sparas i en lista i minnet.
-        private readonly List<User> _users = new List<User>();
+        private readonly Dictionary<int, User> _users =
+             new Dictionary<int, User>();
         //Ger varje ny användare ett unikt internt ID (1, 2, 3 ...).
         private int _nextUserId = 1;
 
@@ -21,33 +20,57 @@ namespace BankApp
         }
 
         //Privat hjälpmetod som skapar och lagrar en ny User. Används av konstruktorn (default-admin) och av CreateUser.
-        private void AddUser (string username, string password, string email, string phoneNumber, UserRole role)
+        private void AddUser(string username, string password, string email, string phoneNumber, UserRole role)
         {
-            User newUser = new User(_nextUserId, username, password, email, phoneNumber, role);
-            _users.Add(newUser);
+            string normalizedUsername = NormalizeUsername(username);
+
+            User newUser = new User(_nextUserId, normalizedUsername, password, email, phoneNumber, role);
+            _users.Add(newUser.UserID, newUser);
             _nextUserId++;
         }
 
+        /*
+         NORMALISERA ANVÄNDARNAMN (personnummer)
+         Tar bort bindestreck och mellanslag så att "900101-1234",
+         "9001011234" och liknande skrivsätt alltid blir samma text
+         internt. Används varje gång vi sparar eller letar efter en
+         användare, så att samma person inte kan registreras flera
+         gånger med olika skrivsätt.
+        */
+        private string NormalizeUsername(string username)
+        {
+            if (username == null)
+                return string.Empty;
+
+            return username.Replace("-", "").Trim();
+        }
+
         /* Hämta användare.
-         Uppfyller: user story 1 (unikt användarnamn), används av
-         Gustaf/Alex/Jonathan för att koppla konton/lån till rätt
-        UserID, och av Robin i menyerna.
+         Uppfyller: user story 1 (unikt användarnamn)
             */
         public User? GetUserByUsername(string username)
         {
-            return _users.FirstOrDefault(u => u.Username == username);
+            string normalizedUsername = NormalizeUsername(username);
+            return _users.Values.FirstOrDefault(u => NormalizeUsername(u.Username) == normalizedUsername);
         }
 
+        //Använder TryGetValue
         public User? GetUserById(int userId)
         {
-            return _users.FirstOrDefault(u => u.UserID == userId);
+            if (_users.TryGetValue(userId, out User? user))
+            {
+                return user;
+            }
+
+            return null;
         }
 
-        //Readonly så att ingen utanför kan lägga till/ ta bort direkt i listan.
+        //
         public IReadOnlyList<User> GetAllUsers()
         {
-            return _users.AsReadOnly();
+            return _users.Values.ToList().AsReadOnly();
         }
+
 
         //Validering. Kollar om personnummret redan finns registrerade bland användare.
         public bool UsernameExists(string username)
@@ -55,15 +78,17 @@ namespace BankApp
             return GetUserByUsername(username) != null;
         }
 
-        //Formatkontroll av personnumret: inte tomt, rätt antal siffror (10 eller 12) och bara siffror inga bokstäver.
+        //Formatkontroll av personnumret: inte tomt, exakt 12 siffror och bara siffror inga bokstäver.
         public bool IsValidPersonalNumberFormat(string username)
         {
             if (string.IsNullOrWhiteSpace(username))
                 return false;
-            string digitsOnly = username.Replace("-", "");
 
-            if (digitsOnly.Length != 10 && digitsOnly.Length != 12)
+            string digitsOnly = NormalizeUsername(username);
+
+            if (digitsOnly.Length != 12)
                 return false;
+
             return digitsOnly.All(char.IsDigit);
         }
 
@@ -86,7 +111,7 @@ namespace BankApp
 
             if (!IsValidPersonalNumberFormat(username))
                 return false;
-            //Personumret måste vara unikt (vilket det är, kanske kommer justera? men ville uppfylla krav)
+            //Personumret måste vara unikt (normaliserat, se NormalizeUsername)
             if (UsernameExists(username))
                 return false;
 
@@ -117,38 +142,6 @@ namespace BankApp
             return true;
         }
 
-        //Kollar om personummer + lösenord stämmer och hanterar misslycakde försök.
-        public LoginResult ValidateCredentials(string username, string password)
-        {
-            User? user = GetUserByUsername(username);
-
-            if (user == null)
-                return LoginResult.WrongCredentials;
-
-            if (user.IsLockedOut)
-                return LoginResult.LockedOut;
-
-            if (user.Password != password)
-            {
-                user.RegisterFailedLogin();
-
-                if (user.IsLockedOut)
-                    return LoginResult.LockedOut;
-
-                return LoginResult.WrongCredentials;
-
-            }
-
-            user.FailedLoginAttempts = 0;
-            return LoginResult.Success;
-
-
-        }
-
-
-
-        }
-       
-
     }
 
+}
