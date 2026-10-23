@@ -43,8 +43,6 @@ namespace BankApp
             //This is a placeholder value until we have properly connected eachothers code.
             decimal interest = 4.1m;
 
-            
-
             //Communication is needed before I adapt this one further.
             Console.WriteLine("Du får " + interest + " i ränta på kontot.");
             Console.WriteLine("Skriv hur mycket pengar som ska finnas i kontot.");
@@ -84,26 +82,33 @@ namespace BankApp
             }
         }
 
-        /*Method for getting the total balance of all accounts put together. However the method does not yet convert between currencies.*/
+        /*Method for getting the total balance of all accounts put together. However the method does not yet convert between currencies.
+         * For that I need the ExchangeRate class to be filled first, so that I may convert currencies by the exchange rate.
+         * Pherhaps the method may still be used for testing purposes though?*/
         public decimal GetTotalBalance( )
         {
 
-            //Where we together all of the money into a total value.
+            //Where we put together all of the money into a total value.
             decimal totalBalance = 0;
+            
+            //Will use this when ExchangeRate either gets filled in, or explained to me.
             Enum.GetValues<Currency>();
 
+            //Security measure preventing the code from running if there is no content in the list.
             if (savingAccounts.Count > 0)
             {
+                //Making sure all of the accounts are combined into a total balance.
                 foreach (SavingsAccount account in savingAccounts)
                 {
+                    //Combining balance of accounts here.
                     totalBalance = totalBalance + account.GetBalance();
                 }
-                return totalBalance;
+                return totalBalance; //Returns balance.
             }
             else
             {
                 Console.WriteLine("Error! Du har inga sparkonton på denna bank. Ditt totala saldo är alltså " + totalBalance);
-                return totalBalance;
+                return totalBalance; //Defaulting to 0  in total balance in the event that the user has no accounts.
             }
         }
     }
