@@ -81,5 +81,35 @@ namespace BankApp
                 Console.WriteLine("Error! Du har inga konton på banken.");
             }
         }
+
+        /*Method for getting the total balance of all accounts put together. However the method does not yet convert between currencies.
+         * For that I need the ExchangeRate class to be filled first, so that I may convert currencies by the exchange rate.
+         * Pherhaps the method may still be used for testing purposes though?*/
+        public decimal GetTotalBalance( )
+        {
+
+            //Where we put together all of the money into a total value.
+            decimal totalBalance = 0;
+            
+            //Will use this when ExchangeRate either gets filled in, or explained to me.
+            Enum.GetValues<Currency>();
+
+            //Security measure preventing the code from running if there is no content in the list.
+            if (savingAccounts.Count > 0)
+            {
+                //Making sure all of the accounts are combined into a total balance.
+                foreach (SavingsAccount account in savingAccounts)
+                {
+                    //Combining balance of accounts here.
+                    totalBalance = totalBalance + account.GetBalance();
+                }
+                return totalBalance; //Returns balance.
+            }
+            else
+            {
+                Console.WriteLine("Error! Du har inga sparkonton på denna bank. Ditt totala saldo är alltså " + totalBalance);
+                return totalBalance; //Defaulting to 0  in total balance in the event that the user has no accounts.
+            }
+        }
     }
 }
