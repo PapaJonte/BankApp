@@ -41,6 +41,8 @@ namespace BankApp
 
                 if (user.IsLockedOut)
                     return LoginResult.LockedOut;
+
+                return LoginResult.WrongCredentials; //fixar bugg.
             }
 
             user.FailedLoginAttempts = 0;
