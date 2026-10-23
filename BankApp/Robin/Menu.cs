@@ -5,11 +5,20 @@ using System.Text;
 
 namespace BankApp.Robin
 {
-    internal class Menu
+    internal class Menu 
     {
+        private readonly UserService _userService;
+
+        // CONSTRUCTOR INJECTION: Vi kräver att UserService skickas in när Menu skapas
+        public Menu(UserService userService)
+        {
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        }
+
         public List<User> users = new List<User> { new User(1, "0204", "123", "Robin@outlook.com", "076918", UserRole.Customer) };
         public void ShowCreatedUser()
         {
+            var users = _userService.GetAllUsers();
             foreach (var user in users)
             {
                 Console.WriteLine($"\nDina uppgifter" +
@@ -30,10 +39,10 @@ namespace BankApp.Robin
 
             while (userMenu)
             {
-                Console.WriteLine("\n Skapa nya användare" +
-                    "\nLån" +
-                    "\nVäxelkurser" +
-                    "\nGå tillbaka till startsidan");
+                Console.WriteLine("\n[ ] Skapa nya användare" +
+                    "\n[ ] Lån" +
+                    "\n[ ] Växelkurser" +
+                    "\n[ ] Gå tillbaka till startsidan");
                 ConsoleKey key = Console.ReadKey(true).Key;
 
                 switch (key)
@@ -79,10 +88,17 @@ namespace BankApp.Robin
         //public void 
         public User CreateUser()
         {
+
             Console.Clear();
             Console.Write("\nVänligen ange uppgifter.");
             Console.Write("\nPersonnummer : ");
             string userName = Console.ReadLine() ?? "";
+            if (_userService.UsernameExists(userName))
+            {
+                Console.WriteLine("\nFel: Personnumret är redan registrerat!");
+                Console.ReadKey();
+                return null;
+            }
             Console.Write("\nLösenord : ");
             string userPass = Console.ReadLine() ?? "";
             Console.Write("\nEmail : ");
@@ -90,7 +106,9 @@ namespace BankApp.Robin
             Console.Write("\nTelefonnummer : ");
             string userPhoneNumber = Console.ReadLine() ?? "";
 
-            User user = new User(1, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
+            //User user = new User(1, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
+            User user = _userService.CreateUser(userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
+
             Console.WriteLine($"\nDu skapade ett konto!" +
                 $"\nDina uppgifter." +
                 $"\n{user.Username}" +
@@ -153,33 +171,6 @@ namespace BankApp.Robin
                         break;
                 }
             }
-            //Console.Clear();
-            //bool userMenu = true;
-
-            //while (userMenu)
-            //{
-            //    Console.WriteLine("\n1. Se konton" +
-            //        "\n2. Gå tillbaka till startsida");
-            //    int.TryParse(Console.ReadLine(), out int userInput);
-
-            //    switch (userInput)
-            //    {
-            //        case 1:
-            //            Console.Clear();
-            //            ShowCreatedUser();
-            //            break;
-
-            //        case 2:
-            //            Console.Clear();
-            //            userMenu = false;
-            //            break;
-
-            //        default:
-            //            Console.Clear();
-            //            Console.WriteLine("\nVänligen välj 1-2!");
-            //            break;
-            //    }
-            //}
         }
         public void LoginMenu()
         {
