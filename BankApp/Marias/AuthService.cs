@@ -71,7 +71,20 @@ namespace BankApp
         }
 
 
-        
+        //Låser upp ett låst konto.
+        public bool UnlockUser(string username)
+        {
+            if (!IsLoggedInUserAdmin()) //Kollar att den som försöker låsa upp är admin.
+                return false;
+
+            User? user = _userService.GetUserByUsername(username); //Hittar personen som ska låsas upp.
+            if (user == null)
+                return false;
+
+            user.IsLockedOut = false; //Upplåsningen.
+            user.FailedLoginAttempts = 0; //nollställer räknaren.
+            return true;
+        }
     }
 }
 
