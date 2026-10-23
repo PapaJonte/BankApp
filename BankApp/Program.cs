@@ -9,7 +9,7 @@ namespace BankApp
         {
             Menu menu = new Menu();
 
-            menu.ShowMainMenu();
+            menu.LoginMenu();
 
             LoanTests.RunTests();
         }

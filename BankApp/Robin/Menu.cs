@@ -1,4 +1,4 @@
-﻿using BankApp.Marias;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,6 +20,63 @@ namespace BankApp.Robin
                   $"\n{user.Role}");
             }
         }
+        public void ShowAdminMenu()
+        {
+
+            Console.Clear();
+            bool userMenu = true;
+
+            int selectedIndex = 0;
+
+            while (userMenu)
+            {
+                Console.WriteLine("\n Skapa nya användare" +
+                    "\nLån" +
+                    "\nVäxelkurser" +
+                    "\nGå tillbaka till startsidan");
+                ConsoleKey key = Console.ReadKey(true).Key;
+
+                switch (key)
+                {
+                    case ConsoleKey.UpArrow:
+                        selectedIndex = (selectedIndex - 1 + 4) % 4;
+
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        selectedIndex = (selectedIndex + 1) % 4;
+                        break;
+
+                    case ConsoleKey.Enter:
+                        switch (selectedIndex)
+                        {
+                            case 0:
+                                CreateUser();
+                                break;
+
+                            case 1:
+                                // Acceptera eller avböja lån
+                                break;
+
+                            case 2:
+                                // Växelkurser
+                                break;
+
+                            case 3:
+                                userMenu = false;
+                                break;
+                        }
+                        break;
+
+                    case ConsoleKey.Escape:
+                        userMenu = false;
+
+                        break;
+                }
+            }
+        }
+
+        //public void 
         public User CreateUser()
         {
             Console.Clear();
@@ -49,89 +106,132 @@ namespace BankApp.Robin
             Console.Clear();
             bool userMenu = true;
 
+            int selectedIndex = 0;
+
             while (userMenu)
             {
-                Console.WriteLine("\n1. Se konton" +
-                    "\n2. Gå tillbaka till startsida");
-                int.TryParse(Console.ReadLine(), out int userInput);
+                Console.WriteLine("\n Se Konton" +
+                    "Gå tillbaka till startsida");
 
-                switch (userInput)
+                ConsoleKey key = Console.ReadKey(true).Key;
+
+                switch (key)
                 {
-                    case 1:
-                        Console.Clear();
-                        ShowCreatedUser();
+                    case ConsoleKey.UpArrow:
+                        selectedIndex = (selectedIndex - 1 + 4) % 4;
+
                         break;
 
-                    case 2:
-                        Console.Clear();
+                    case ConsoleKey.DownArrow:
+                        selectedIndex = (selectedIndex + 1) % 4;
+                        break;
+
+                    case ConsoleKey.Enter:
+                        switch (selectedIndex)
+                        {
+                            case 0:
+                                // Skapa användare
+                                break;
+
+                            case 1:
+                                // Acceptera eller avböja lån
+                                break;
+
+                            case 2:
+                                // Växelkurser
+                                break;
+
+                            case 3:
+                                userMenu = false;
+                                break;
+                        }
+                        break;
+
+                    case ConsoleKey.Escape:
                         userMenu = false;
-                        break;
 
-                    default:
-                        Console.Clear();
-                        Console.WriteLine("\nVänligen välj 1-2!");
                         break;
                 }
             }
+            //Console.Clear();
+            //bool userMenu = true;
+
+            //while (userMenu)
+            //{
+            //    Console.WriteLine("\n1. Se konton" +
+            //        "\n2. Gå tillbaka till startsida");
+            //    int.TryParse(Console.ReadLine(), out int userInput);
+
+            //    switch (userInput)
+            //    {
+            //        case 1:
+            //            Console.Clear();
+            //            ShowCreatedUser();
+            //            break;
+
+            //        case 2:
+            //            Console.Clear();
+            //            userMenu = false;
+            //            break;
+
+            //        default:
+            //            Console.Clear();
+            //            Console.WriteLine("\nVänligen välj 1-2!");
+            //            break;
+            //    }
+            //}
         }
-        public void ShowMainMenu()
+        public void LoginMenu()
         {
+            Console.Clear();
             bool userMenu = true;
+
+            int selectedIndex = 0;
 
             while (userMenu)
             {
-                Console.WriteLine("\n1. Logga in" +
-                    "\n2. Skapa konto" +
-                    "\n3. Avsluta");
+                Console.Clear();
+                Console.WriteLine("\nLogga in" +
+                    "\nSkapa konto" +
+                    "\nAvsluta");
 
-                int.TryParse(Console.ReadLine(), out int userInput);
+                ConsoleKey key = Console.ReadKey(true).Key;
 
-                switch (userInput)
+                switch (key)
                 {
-                    case 1:
-                        Console.Clear();
-                        if (users.Count < 1)
-                        {
-                            Console.WriteLine("Fel");
-                            userMenu = false;
-                            break;
-                        }
-                        Console.Write("\nAnge personnummer :");
-                        string userNumber = Console.ReadLine() ?? "";
-                        Console.Write("\nAnge lösenord : ");
-                        string userPassword = Console.ReadLine() ?? "";
+                    case ConsoleKey.UpArrow:
+                        selectedIndex = (selectedIndex - 1 + 4) % 4;
 
-                        foreach (var user in users)
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        selectedIndex = (selectedIndex + 1) % 4;
+                        break;
+
+                    case ConsoleKey.Enter:
+                        switch (selectedIndex)
                         {
-                            if (userNumber == user.Username && userPassword == user.Password)
-                            {
-                                Console.WriteLine("Korrekt!");
-                                ShowUserMenu();
-                            }
-                            else
-                            {
-                                Console.WriteLine("Fel!");
+                            case 0:
+                                // Skapa användare
+                                break;
+
+                            case 1:
+                                // Acceptera eller avböja lån
+                                break;
+
+                            case 2:
+                                // Växelkurser
+                                break;
+
+                            case 3:
                                 userMenu = false;
-                            }
+                                break;
                         }
                         break;
 
-                    case 2:
-
-                        Console.Clear();
-                        users.Add(CreateUser());
-                        ShowCreatedUser();
-                        break;
-
-                    case 3:
-                        Console.Clear();
-                        Console.WriteLine("Du valde att avsluta");
+                    case ConsoleKey.Escape:
                         userMenu = false;
-                        break;
 
-                    default:
-                        Console.Clear();
-                        Console.WriteLine("\nVänligen välj 1-3!");
                         break;
                 }
             }
