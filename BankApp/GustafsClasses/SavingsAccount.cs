@@ -14,7 +14,9 @@ namespace BankApp
         private Currency currency; //Currency of Account.
         private decimal interest;
 
-        //The constructor does no longer serve as clear of a purpose as before. Still I'll keep it for now.
+        /*I will have to change the constructor in order to better connect together with the BankTransfer class,
+         * for the structure of that other class uses properties with uppercase letters instead of accessing properties with "this." the way that I have chosen to do.
+         I must change my outgoing properties to Uppercase letters in order to better connect with the necessary class for conversion of currency.*/
         public SavingsAccount (decimal balance, Currency currency, decimal interest) : base ( )
         {
             this.balance = balance;

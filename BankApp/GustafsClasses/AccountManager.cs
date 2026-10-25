@@ -1,4 +1,5 @@
-﻿using BankApp.Transaction_Layer.Enum;
+﻿using BankApp.Transaction_Layer.API;
+using BankApp.Transaction_Layer.Enum;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
@@ -82,16 +83,15 @@ namespace BankApp
             }
         }
 
-        /*Method for getting the total balance of all accounts put together. However the method does not yet convert between currencies.
-         * For that I need the ExchangeRate class to be filled first, so that I may convert currencies by the exchange rate.
-         * Pherhaps the method may still be used for testing purposes though?*/
+        /*Method for getting the total balance of all accounts put together.
+         * However the method does not yet convert between currencies.
+         * 
+         * In order to do that I need to connect this method with an object of the BankTransfer class,
+         * and additionally the Currency Enum.*/
         public decimal GetTotalBalance( )
         {
+            decimal totalBalance = 0; //Where we put together all of the money into a total value.
 
-            //Where we put together all of the money into a total value.
-            decimal totalBalance = 0;
-            
-            //Will use this when ExchangeRate either gets filled in, or explained to me.
             Enum.GetValues<Currency>();
 
             //Security measure preventing the code from running if there is no content in the list.
@@ -103,7 +103,8 @@ namespace BankApp
                     //Combining balance of accounts here.
                     totalBalance = totalBalance + account.GetBalance();
                 }
-                return totalBalance; //Returns balance.
+                //Returns balance.
+                return totalBalance;
             }
             else
             {
