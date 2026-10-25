@@ -7,30 +7,30 @@ namespace BankApp
 {
     internal class SavingsAccount : BankAccount
     {
-        private decimal balance; //Ammount in the account.
-        private Currency currency; //Currency of Account.
-        private decimal interest;
+        private decimal Balance; //Ammount in the account.
+        private Currency Currency; //Currency of Account.
+        private decimal Interest;
 
-        public SavingsAccount (decimal Balance, Currency Currency, decimal Interest) : base ( )
+        public SavingsAccount (decimal balance, Currency currency, decimal interest) : base ( )
         {
-            Balance = balance;
-            Currency = currency;
-            Interest = interest;
+            balance = Balance;
+            currency = Currency;
+            interest = Interest;
         }
 
         //Method that returns account balance.
         public decimal GetBalance()
         {
-            return balance;
+            return Balance;
         }
         public Currency GetCurrency()
         {
-            return currency;
+            return Currency;
         }
         //Method that returns interest.
         public decimal GetInterest()
         {
-            return interest;
+            return Interest;
         }
     }
 }
