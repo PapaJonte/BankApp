@@ -5,11 +5,11 @@ using System.Text;
 
 namespace BankApp
 {
-    
-    /*The place in the class hierarchy has been changed so that SavingsAccount is now a lower class of BankAccount.*/
+
+    /*The place in the class hierarchy has been changed so that SavingsAccount is now a lower class of BankAccount.
+     * Must be adapted to fit with the code of the API-folder.*/
     internal class SavingsAccount : BankAccount
     {
-        //Properties.
         private decimal balance; //Ammount in the account.
         private Currency currency; //Currency of Account.
         private decimal interest;
