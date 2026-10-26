@@ -1,4 +1,5 @@
-﻿using BankApp.Transaction_Layer.Enum;
+﻿using BankApp.Transaction_Layer.API;
+using BankApp.Transaction_Layer.Enum;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace BankApp
             //while loop around to make sure the user gives a correct value as currency.
             while ( true)
             {
-                Console.WriteLine("Skriv vilken valuta du vill sätta i ditt sparkonto.");
+                Console.WriteLine("Skriv vilken valuta du vill använda dig av.");
                 string currencyString = Console.ReadLine();
 
                 Enum.GetValues<Currency>();
@@ -82,34 +83,35 @@ namespace BankApp
             }
         }
 
-        /*Method for getting the total balance of all accounts put together. However the method does not yet convert between currencies.
-         * For that I need the ExchangeRate class to be filled first, so that I may convert currencies by the exchange rate.
-         * Pherhaps the method may still be used for testing purposes though?*/
+        //Puts balance of all savngs accounts together into a total value after converting them.
         public decimal GetTotalBalance( )
         {
+            decimal totalBalance = 0; //Where we put together all of the money into a total value.
+            decimal additionValue = 0;
 
-            //Where we put together all of the money into a total value.
-            decimal totalBalance = 0;
-            
-            //Will use this when ExchangeRate either gets filled in, or explained to me.
             Enum.GetValues<Currency>();
 
-            //Security measure preventing the code from running if there is no content in the list.
-            if (savingAccounts.Count > 0)
+            //Here we decide which currency to convert to.
+            Currency chosenValue = CheckCurrency();
+
+            ExchangeRate conversionTool = new ExchangeRate();
+
+            //Making sure the balance of all of the accounts are combined into a total balance.
+            foreach (var account in savingAccounts)
             {
-                //Making sure all of the accounts are combined into a total balance.
-                foreach (SavingsAccount account in savingAccounts)
+                if (account.GetCurrency() != chosenValue)
                 {
-                    //Combining balance of accounts here.
+                    conversionTool.TryCalculateExchangeValue(account.GetCurrency(),
+                        chosenValue, account.GetBalance(), out additionValue); //Don't be fooled, this is the same line of code.
+
+                    totalBalance = totalBalance + additionValue;
+                }
+                else
+                {
                     totalBalance = totalBalance + account.GetBalance();
                 }
-                return totalBalance; //Returns balance.
             }
-            else
-            {
-                Console.WriteLine("Error! Du har inga sparkonton på denna bank. Ditt totala saldo är alltså " + totalBalance);
-                return totalBalance; //Defaulting to 0  in total balance in the event that the user has no accounts.
-            }
+            return totalBalance;
         }
     }
 }

@@ -5,36 +5,32 @@ using System.Text;
 
 namespace BankApp
 {
-    
-    /*The place in the class hierarchy has been changed so that SavingsAccount is now a lower class of BankAccount.*/
     internal class SavingsAccount : BankAccount
     {
-        //Properties.
-        private decimal balance; //Ammount in the account.
-        private Currency currency; //Currency of Account.
-        private decimal interest;
+        private decimal Balance; //Ammount in the account.
+        private Currency Currency; //Currency of Account.
+        private decimal Interest;
 
-        //The constructor does no longer serve as clear of a purpose as before. Still I'll keep it for now.
-        public SavingsAccount (decimal balance, Currency currency, decimal interest) : base ( )
+        public SavingsAccount (decimal Balance, Currency Currency, decimal Interest) : base ( )
         {
-            this.balance = balance;
-            this.currency = currency;
-            this.interest = interest;
+            this.Balance = Balance;
+            this.Currency = Currency;
+            this.Interest = Interest;
         }
 
         //Method that returns account balance.
         public decimal GetBalance()
         {
-            return balance;
+            return Balance;
         }
         public Currency GetCurrency()
         {
-            return currency;
+            return Currency;
         }
         //Method that returns interest.
         public decimal GetInterest()
         {
-            return interest;
+            return Interest;
         }
     }
 }
