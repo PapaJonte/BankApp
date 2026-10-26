@@ -7,16 +7,19 @@ namespace BankApp.Robin
 {
     internal class Menu
     {
-        private readonly UserService _userService;
 
+        // Skapar privata fält av userservice och authservice
+        private readonly UserService _userService;
+        private readonly AuthService _authService;
         // CONSTRUCTOR INJECTION: Vi kräver att UserService skickas in när Menu skapas
-        public Menu(UserService userService)
+
+        // Skickar in båda fälten i vår constructor för att kunna använda metoderna från marias klass.
+        public Menu(UserService userService, AuthService authService)
         {
+            _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
         //public List<User> users = new List<User> { new User(1, "0204", "123", "Robin@outlook.com", "076918", UserRole.Customer) };
-
-
         public void ShowCreatedUser()
         {
             var users = _userService.GetAllUsers();
@@ -103,7 +106,7 @@ namespace BankApp.Robin
             Console.Write("\nTelefonnummer : ");
             string userPhoneNumber = Console.ReadLine() ?? "";
 
-            bool succesCeatedUser = _userService.CreateUser(true, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
+            bool succesCreatedUser = _userService.CreateUser(true, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
             User? user = _userService.GetUserByUsername(userName);
 
             return true;
@@ -164,7 +167,6 @@ namespace BankApp.Robin
         }
         public void LoginMenu()
         {
-            
             Console.Clear();
             bool userMenu = true;
 
@@ -210,7 +212,7 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 3) % 3;
+                        selectedIndex = (selectedIndex - 0 + 3) % 3;
 
                         break;
 
@@ -224,7 +226,7 @@ namespace BankApp.Robin
                             case 0:
                                 // Skapa användare
                                 Console.CursorVisible = true;
-                                Console.WriteLine("Skapa användare");
+                                
                                 Console.ReadKey();
                                 break;
 
@@ -248,7 +250,6 @@ namespace BankApp.Robin
 
                     case ConsoleKey.Escape:
                         userMenu = false;
-
                         break;
                 }
             }
