@@ -91,26 +91,31 @@ namespace BankApp
         public decimal GetTotalBalance( )
         {
             decimal totalBalance = 0; //Where we put together all of the money into a total value.
+            decimal additionValue = 0;
 
             Enum.GetValues<Currency>();
 
-            //Security measure preventing the code from running if there is no content in the list.
-            if (savingAccounts.Count > 0)
+            //Here we decide which currency to convert to.
+            Currency chosenValue = CheckCurrency();
+
+            ExchangeRate conversionTool = new ExchangeRate();
+
+            //Making sure the balance of all of the accounts are combined into a total balance.
+            foreach (var account in savingAccounts)
             {
-                //Making sure all of the accounts are combined into a total balance.
-                foreach (SavingsAccount account in savingAccounts)
+                if (account.GetCurrency() != chosenValue)
                 {
-                    //Combining balance of accounts here.
+                    conversionTool.TryCalculateExchangeValue(account.GetCurrency(),
+                        chosenValue, account.GetBalance(), out additionValue); //Don't be fooled, this is the same line of code.
+
+                    totalBalance = totalBalance + additionValue;
+                }
+                else
+                {
                     totalBalance = totalBalance + account.GetBalance();
                 }
-                //Returns balance.
-                return totalBalance;
             }
-            else
-            {
-                Console.WriteLine("Error! Du har inga sparkonton på denna bank. Ditt totala saldo är alltså " + totalBalance);
-                return totalBalance; //Defaulting to 0  in total balance in the event that the user has no accounts.
-            }
+            return totalBalance;
         }
     }
 }
