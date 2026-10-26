@@ -15,7 +15,7 @@ namespace BankApp.Robin
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        public List<User> users = new List<User> { new User(1, "0204", "123", "Robin@outlook.com", "076918", UserRole.Customer) };
+        //public List<User> users = new List<User> { new User(1, "0204", "123", "Robin@outlook.com", "076918", UserRole.Customer) };
         public void ShowCreatedUser()
         {
             var users = _userService.GetAllUsers();
@@ -107,24 +107,11 @@ namespace BankApp.Robin
             bool succesCeatedUser = _userService.CreateUser(true, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
             User? user = _userService.GetUserByUsername(userName);
 
-            if (!succesCeatedUser)
-            {
-                Console.WriteLine("Error!");
-                return false;
-            }
-
-            Console.WriteLine($"\nDu skapade ett konto!" +
-                $"\nDina uppgifter." +
-                $"\n{user.Username}" +
-                $"\n{user.Password}" +
-                $"\n{user.Email}" +
-                $"\n{user.PhoneNumber}" +
-                $"\n{user.Role}");
-
             return true;
         }
         public void ShowUserMenu()
         {
+            
             Console.Clear();
             bool userMenu = true;
 
@@ -178,6 +165,7 @@ namespace BankApp.Robin
         }
         public void LoginMenu()
         {
+            Console.CursorVisible = false;
             Console.Clear();
             bool userMenu = true;
 
@@ -235,16 +223,21 @@ namespace BankApp.Robin
                         {
                             case 0:
                                 // Skapa användare
+                                Console.CursorVisible = true;
                                 Console.WriteLine("Skapa användare");
                                 break;
 
                             case 1:
                                 // Acceptera eller avböja lånx§
+                                Console.CursorVisible = true;
+                                CreateUser();
+                                ShowCreatedUser();
                                 Console.WriteLine("Lån");
                                 break;
 
                             case 2:
                                 // Växelkurser
+                                Console.CursorVisible = true;
                                 Console.WriteLine("Avsluta");
                                 userMenu = false;
                                 break;
