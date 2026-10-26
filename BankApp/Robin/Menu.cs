@@ -103,10 +103,15 @@ namespace BankApp.Robin
             string userEmail = Console.ReadLine() ?? "";
             Console.Write("\nTelefonnummer : ");
             string userPhoneNumber = Console.ReadLine() ?? "";
-
-            //User user = new User(1, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
+            
             bool succesCeatedUser = _userService.CreateUser(true, userName, userPass ,userEmail, userPhoneNumber, UserRole.Customer);
             User? user = _userService.GetUserByUsername(userName);
+
+            if(!succesCeatedUser)
+            {
+                Console.WriteLine("Error!");
+                return false;
+            }
 
             Console.WriteLine($"\nDu skapade ett konto!" +
                 $"\nDina uppgifter." +
@@ -115,7 +120,6 @@ namespace BankApp.Robin
                 $"\n{user.Email}" +
                 $"\n{user.PhoneNumber}" +
                 $"\n{user.Role}");
-            
 
             return true;
         }
@@ -204,17 +208,21 @@ namespace BankApp.Robin
                         {
                             case 0:
                                 // Skapa användare
+                                Console.WriteLine("Skapa användare");
                                 break;
 
                             case 1:
                                 // Acceptera eller avböja lån
+                                Console.WriteLine("Lån");
                                 break;
 
                             case 2:
                                 // Växelkurser
+                                Console.WriteLine("Växelkurser");
                                 break;
 
                             case 3:
+                                Console.WriteLine("Detta körs!");
                                 userMenu = false;
                                 break;
                         }
