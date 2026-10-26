@@ -111,7 +111,7 @@ namespace BankApp.Robin
         }
         public void ShowUserMenu()
         {
-            
+
             Console.Clear();
             bool userMenu = true;
 
@@ -165,7 +165,7 @@ namespace BankApp.Robin
         }
         public void LoginMenu()
         {
-            Console.CursorVisible = false;
+            
             Console.Clear();
             bool userMenu = true;
 
@@ -173,9 +173,10 @@ namespace BankApp.Robin
 
             while (userMenu)
             {
+                Console.CursorVisible = false;
                 Console.Clear();
 
-                if(selectedIndex == 0)
+                if (selectedIndex == 0)
                 {
                     Console.WriteLine("[X] Logga in");
                 }
@@ -185,7 +186,7 @@ namespace BankApp.Robin
                     Console.WriteLine("[ ] Logga in");
                 }
 
-                if(selectedIndex == 1)
+                if (selectedIndex == 1)
                 {
                     Console.WriteLine("[X] Skapa konto");
                 }
@@ -195,7 +196,7 @@ namespace BankApp.Robin
                     Console.WriteLine("[ ] Skapa konto");
                 }
 
-                if(selectedIndex == 2)
+                if (selectedIndex == 2)
                 {
                     Console.WriteLine("[X] Avsluta");
                 }
@@ -241,6 +242,7 @@ namespace BankApp.Robin
                                 Console.WriteLine("Avsluta");
                                 userMenu = false;
                                 break;
+
                         }
                         break;
 
