@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BankApp.Robin
 {
-    internal class Menu 
+    internal class Menu
     {
         private readonly UserService _userService;
 
@@ -15,7 +15,7 @@ namespace BankApp.Robin
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        public List<User> users = new List<User> { new User(1, "0204", "123", "Robin@outlook.com", "076918", UserRole.Customer) };
+        //public List<User> users = new List<User> { new User(1, "0204", "123", "Robin@outlook.com", "076918", UserRole.Customer) };
         public void ShowCreatedUser()
         {
             var users = _userService.GetAllUsers();
@@ -104,23 +104,14 @@ namespace BankApp.Robin
             Console.Write("\nTelefonnummer : ");
             string userPhoneNumber = Console.ReadLine() ?? "";
 
-            //User user = new User(1, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
-            bool succesCeatedUser = _userService.CreateUser(true, userName, userPass ,userEmail, userPhoneNumber, UserRole.Customer);
+            bool succesCeatedUser = _userService.CreateUser(true, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
             User? user = _userService.GetUserByUsername(userName);
-
-            Console.WriteLine($"\nDu skapade ett konto!" +
-                $"\nDina uppgifter." +
-                $"\n{user.Username}" +
-                $"\n{user.Password}" +
-                $"\n{user.Email}" +
-                $"\n{user.PhoneNumber}" +
-                $"\n{user.Role}");
-            
 
             return true;
         }
         public void ShowUserMenu()
         {
+            
             Console.Clear();
             bool userMenu = true;
 
@@ -136,12 +127,12 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 4) % 4;
+                        selectedIndex = (selectedIndex - 1 + 2) % 2;
 
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 4;
+                        selectedIndex = (selectedIndex + 1) % 2;
                         break;
 
                     case ConsoleKey.Enter:
@@ -174,6 +165,7 @@ namespace BankApp.Robin
         }
         public void LoginMenu()
         {
+            Console.CursorVisible = false;
             Console.Clear();
             bool userMenu = true;
 
@@ -182,21 +174,48 @@ namespace BankApp.Robin
             while (userMenu)
             {
                 Console.Clear();
-                Console.WriteLine("\n[ ] Logga in" +
-                    "\n[ ] Skapa konto" +
-                    "\n[ ] Avsluta");
+
+                if(selectedIndex == 0)
+                {
+                    Console.WriteLine("[X] Logga in");
+                }
+
+                else
+                {
+                    Console.WriteLine("[ ] Logga in");
+                }
+
+                if(selectedIndex == 1)
+                {
+                    Console.WriteLine("[X] Skapa konto");
+                }
+
+                else
+                {
+                    Console.WriteLine("[ ] Skapa konto");
+                }
+
+                if(selectedIndex == 2)
+                {
+                    Console.WriteLine("[X] Avsluta");
+                }
+
+                else
+                {
+                    Console.WriteLine("[ ] Avsluta");
+                }
 
                 ConsoleKey key = Console.ReadKey(true).Key;
 
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 4) % 4;
+                        selectedIndex = (selectedIndex - 1 + 3) % 3;
 
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 4;
+                        selectedIndex = (selectedIndex + 1) % 3;
                         break;
 
                     case ConsoleKey.Enter:
@@ -204,17 +223,22 @@ namespace BankApp.Robin
                         {
                             case 0:
                                 // Skapa användare
+                                Console.CursorVisible = true;
+                                Console.WriteLine("Skapa användare");
                                 break;
 
                             case 1:
-                                // Acceptera eller avböja lån
+                                // Acceptera eller avböja lånx§
+                                Console.CursorVisible = true;
+                                CreateUser();
+                                ShowCreatedUser();
+                                Console.WriteLine("Lån");
                                 break;
 
                             case 2:
                                 // Växelkurser
-                                break;
-
-                            case 3:
+                                Console.CursorVisible = true;
+                                Console.WriteLine("Avsluta");
                                 userMenu = false;
                                 break;
                         }
