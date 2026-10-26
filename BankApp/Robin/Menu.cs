@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BankApp.Robin
 {
-    internal class Menu 
+    internal class Menu
     {
         private readonly UserService _userService;
 
@@ -103,11 +103,11 @@ namespace BankApp.Robin
             string userEmail = Console.ReadLine() ?? "";
             Console.Write("\nTelefonnummer : ");
             string userPhoneNumber = Console.ReadLine() ?? "";
-            
-            bool succesCeatedUser = _userService.CreateUser(true, userName, userPass ,userEmail, userPhoneNumber, UserRole.Customer);
+
+            bool succesCeatedUser = _userService.CreateUser(true, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
             User? user = _userService.GetUserByUsername(userName);
 
-            if(!succesCeatedUser)
+            if (!succesCeatedUser)
             {
                 Console.WriteLine("Error!");
                 return false;
@@ -140,12 +140,12 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 4) % 4;
+                        selectedIndex = (selectedIndex - 1 + 2) % 2;
 
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 4;
+                        selectedIndex = (selectedIndex + 1) % 2;
                         break;
 
                     case ConsoleKey.Enter:
@@ -186,21 +186,48 @@ namespace BankApp.Robin
             while (userMenu)
             {
                 Console.Clear();
-                Console.WriteLine("\n[ ] Logga in" +
-                    "\n[ ] Skapa konto" +
-                    "\n[ ] Avsluta");
+
+                if(selectedIndex == 0)
+                {
+                    Console.WriteLine("[X] Logga in");
+                }
+
+                else
+                {
+                    Console.WriteLine("[ ] Logga in");
+                }
+
+                if(selectedIndex == 1)
+                {
+                    Console.WriteLine("[X] Skapa konto");
+                }
+
+                else
+                {
+                    Console.WriteLine("[ ] Skapa konto");
+                }
+
+                if(selectedIndex == 2)
+                {
+                    Console.WriteLine("[X] Avsluta");
+                }
+
+                else
+                {
+                    Console.WriteLine("[ ] Avsluta");
+                }
 
                 ConsoleKey key = Console.ReadKey(true).Key;
 
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 4) % 4;
+                        selectedIndex = (selectedIndex - 1 + 3) % 3;
 
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 4;
+                        selectedIndex = (selectedIndex + 1) % 3;
                         break;
 
                     case ConsoleKey.Enter:
@@ -212,17 +239,13 @@ namespace BankApp.Robin
                                 break;
 
                             case 1:
-                                // Acceptera eller avböja lån
+                                // Acceptera eller avböja lånx§
                                 Console.WriteLine("Lån");
                                 break;
 
                             case 2:
                                 // Växelkurser
-                                Console.WriteLine("Växelkurser");
-                                break;
-
-                            case 3:
-                                Console.WriteLine("Detta körs!");
+                                Console.WriteLine("Avsluta");
                                 userMenu = false;
                                 break;
                         }
