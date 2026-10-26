@@ -11,11 +11,11 @@ namespace BankApp
         private Currency Currency; //Currency of Account.
         private decimal Interest;
 
-        public SavingsAccount (decimal balance, Currency currency, decimal interest) : base ( )
+        public SavingsAccount (decimal Balance, Currency Currency, decimal Interest) : base ( )
         {
-            balance = Balance;
-            currency = Currency;
-            interest = Interest;
+            this.Balance = Balance;
+            this.Currency = Currency;
+            this.Interest = Interest;
         }
 
         //Method that returns account balance.
