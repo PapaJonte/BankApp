@@ -14,8 +14,9 @@ namespace BankApp.Robin
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
-
         //public List<User> users = new List<User> { new User(1, "0204", "123", "Robin@outlook.com", "076918", UserRole.Customer) };
+
+
         public void ShowCreatedUser()
         {
             var users = _userService.GetAllUsers();
@@ -83,8 +84,6 @@ namespace BankApp.Robin
                 }
             }
         }
-
-        //public void 
         public bool CreateUser()
         {
             Console.Clear();
@@ -226,6 +225,7 @@ namespace BankApp.Robin
                                 // Skapa användare
                                 Console.CursorVisible = true;
                                 Console.WriteLine("Skapa användare");
+                                Console.ReadKey();
                                 break;
 
                             case 1:
@@ -233,7 +233,7 @@ namespace BankApp.Robin
                                 Console.CursorVisible = true;
                                 CreateUser();
                                 ShowCreatedUser();
-                                Console.WriteLine("Lån");
+                                Console.ReadKey();
                                 break;
 
                             case 2:
