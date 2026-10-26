@@ -19,7 +19,7 @@ namespace BankApp
             //while loop around to make sure the user gives a correct value as currency.
             while ( true)
             {
-                Console.WriteLine("Skriv vilken valuta du vill sätta i ditt sparkonto.");
+                Console.WriteLine("Skriv vilken valuta du vill använda dig av.");
                 string currencyString = Console.ReadLine();
 
                 Enum.GetValues<Currency>();
