@@ -83,11 +83,7 @@ namespace BankApp
             }
         }
 
-        /*Method for getting the total balance of all accounts put together.
-         * However the method does not yet convert between currencies.
-         * 
-         * In order to do that I need to connect this method with an object of the BankTransfer class,
-         * and additionally the Currency Enum.*/
+        //Puts balance of all savngs accounts together into a total value after converting them.
         public decimal GetTotalBalance( )
         {
             decimal totalBalance = 0; //Where we put together all of the money into a total value.
