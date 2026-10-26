@@ -14,8 +14,9 @@ namespace BankApp.Robin
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
-
         //public List<User> users = new List<User> { new User(1, "0204", "123", "Robin@outlook.com", "076918", UserRole.Customer) };
+
+
         public void ShowCreatedUser()
         {
             var users = _userService.GetAllUsers();
@@ -83,8 +84,6 @@ namespace BankApp.Robin
                 }
             }
         }
-
-        //public void 
         public bool CreateUser()
         {
             Console.Clear();
@@ -111,7 +110,7 @@ namespace BankApp.Robin
         }
         public void ShowUserMenu()
         {
-            
+
             Console.Clear();
             bool userMenu = true;
 
@@ -165,7 +164,7 @@ namespace BankApp.Robin
         }
         public void LoginMenu()
         {
-            Console.CursorVisible = false;
+            
             Console.Clear();
             bool userMenu = true;
 
@@ -173,9 +172,10 @@ namespace BankApp.Robin
 
             while (userMenu)
             {
+                Console.CursorVisible = false;
                 Console.Clear();
 
-                if(selectedIndex == 0)
+                if (selectedIndex == 0)
                 {
                     Console.WriteLine("[X] Logga in");
                 }
@@ -185,7 +185,7 @@ namespace BankApp.Robin
                     Console.WriteLine("[ ] Logga in");
                 }
 
-                if(selectedIndex == 1)
+                if (selectedIndex == 1)
                 {
                     Console.WriteLine("[X] Skapa konto");
                 }
@@ -195,7 +195,7 @@ namespace BankApp.Robin
                     Console.WriteLine("[ ] Skapa konto");
                 }
 
-                if(selectedIndex == 2)
+                if (selectedIndex == 2)
                 {
                     Console.WriteLine("[X] Avsluta");
                 }
@@ -225,6 +225,7 @@ namespace BankApp.Robin
                                 // Skapa användare
                                 Console.CursorVisible = true;
                                 Console.WriteLine("Skapa användare");
+                                Console.ReadKey();
                                 break;
 
                             case 1:
@@ -232,7 +233,7 @@ namespace BankApp.Robin
                                 Console.CursorVisible = true;
                                 CreateUser();
                                 ShowCreatedUser();
-                                Console.WriteLine("Lån");
+                                Console.ReadKey();
                                 break;
 
                             case 2:
@@ -241,6 +242,7 @@ namespace BankApp.Robin
                                 Console.WriteLine("Avsluta");
                                 userMenu = false;
                                 break;
+
                         }
                         break;
 
