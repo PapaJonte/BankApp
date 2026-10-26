@@ -7,11 +7,16 @@ namespace BankApp.Robin
 {
     internal class Menu
     {
-        private readonly UserService _userService;
 
+        // Skapar privata fält av userservice och authservice
+        private readonly UserService _userService;
+        private readonly AuthService _authService;
         // CONSTRUCTOR INJECTION: Vi kräver att UserService skickas in när Menu skapas
-        public Menu(UserService userService)
+
+        // Skickar in båda fälten i vår constructor för att kunna använda metoderna från marias klass.
+        public Menu(UserService userService, AuthService authService)
         {
+            _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
         //public List<User> users = new List<User> { new User(1, "0204", "123", "Robin@outlook.com", "076918", UserRole.Customer) };
@@ -221,7 +226,7 @@ namespace BankApp.Robin
                             case 0:
                                 // Skapa användare
                                 Console.CursorVisible = true;
-                                Console.WriteLine("Skapa användare");
+                                
                                 Console.ReadKey();
                                 break;
 
