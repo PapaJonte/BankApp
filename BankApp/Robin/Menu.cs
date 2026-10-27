@@ -287,7 +287,6 @@ namespace BankApp.Robin
                 Console.CursorVisible = false;
                 Console.Clear();
 
-
                 if (selectedIndex == 0)
                 {
                     Console.WriteLine("\n[X] Logga in");
@@ -397,7 +396,6 @@ namespace BankApp.Robin
                                 Console.WriteLine("Avsluta");
                                 userMenu = false;
                                 break;
-
                         }
                         break;
 
