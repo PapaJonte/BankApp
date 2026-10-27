@@ -13,8 +13,8 @@ namespace BankApp
         List<BankAccount> BankAccountList = 
         new List<BankAccount>();
 
-        Dictionary<id, BankAccountList> BankAccountDictionary = 
-        new Dictionary<id, BankAccountList>();
+        Dictionary<int, BankAccountList> BankAccountDictionary = 
+        new Dictionary<int, BankAccountList>();
 
         //This method is intended to support the CreateAccount() method below. It will be called upon when CreateAccount needs it. Don't call upon this method!
         private Currency CheckCurrency()
