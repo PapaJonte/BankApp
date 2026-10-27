@@ -30,6 +30,7 @@ namespace BankApp.Robin
             if (loan is null)
             {
                 Console.WriteLine("Loan application rejected.");
+                return;
             }
 
             // Display the loan details
