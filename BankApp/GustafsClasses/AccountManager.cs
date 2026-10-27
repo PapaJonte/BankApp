@@ -13,6 +13,8 @@ namespace BankApp
         //We'll keep our savingsAccounts here.
         List<SavingsAccount> savingAccounts = new List<SavingsAccount>();
 
+        List<List> AccountListCollection = new List<List>();
+
         //This method is intended to support the CreateAccount() method below. It will be called upon when CreateAccount needs it. Don't call upon this method!
         private Currency CheckCurrency()
         {
@@ -40,7 +42,7 @@ namespace BankApp
             }
         }
         //Used for creating accounts.
-        public void CreateAccount()
+        public void CreateAccount(int userId)
         {
             //Interest for savings accounts.
             decimal interest = 0.5m;
@@ -70,7 +72,7 @@ namespace BankApp
         }
 
         //Method for accessing the savingsaccounts.
-        public void GetAccounts()
+        public void GetAccounts( int userId)
         {
             //if statement as a safety measure to assure ourselves that the list is not null.
             if (savingAccounts.Count > 0 )
