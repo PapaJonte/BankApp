@@ -16,7 +16,7 @@ namespace BankApp
         //Det måste finnas minst en admin från start, skapar med testvärden för den enda admin-användaren som skapas automatiskt när programmet startar.
         public UserService()
         {
-            AddUser("000000-0000", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Owner);
+            AddUser("000000-0000", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
         }
 
         //Privat hjälpmetod som skapar och lagrar en ny User. Används av konstruktorn (default-admin) och av CreateUser.
@@ -42,7 +42,7 @@ namespace BankApp
             if (username == null)
                 return string.Empty;
 
-            return username.Replace("-", "").Replace(" ", "");
+            return username.Replace("-", "").Trim();
         }
 
         /* Hämta användare.
@@ -78,7 +78,7 @@ namespace BankApp
             return GetUserByUsername(username) != null;
         }
 
-        //Formatkontroll av personnumret: inte tomt, exakt 10 siffror och bara siffror inga bokstäver.
+        //Formatkontroll av personnumret: inte tomt, exakt 12 siffror och bara siffror inga bokstäver.
         public bool IsValidPersonalNumberFormat(string username)
         {
             if (string.IsNullOrWhiteSpace(username))
@@ -86,7 +86,7 @@ namespace BankApp
 
             string digitsOnly = NormalizeUsername(username);
 
-            if (digitsOnly.Length != 10)
+            if (digitsOnly.Length != 12)
                 return false;
 
             return digitsOnly.All(char.IsDigit);
@@ -99,30 +99,11 @@ namespace BankApp
          är inloggad.
         */
 
-        public bool CreateUser(
-            User? caller,
-            string username,
-            string password,
-            string email,
-            string phoneNumber,
-            UserRole role = UserRole.Customer)
+        //returnerar true om användaren skapades, annars false.
+        public bool CreateUser(bool callerIsAdmin, string username, string password, string email, string phoneNumber, UserRole role = UserRole.Customer)
         {
-            // Det måste finnas en inloggad användare.
-            if (caller == null)
-                return false;
-
-            // Endast Admin och Owner får skapa kundkonton.
-            if (caller.Role != UserRole.Admin &&
-                caller.Role != UserRole.Owner)
-                return false;
-
-            // Endast Owner får skapa Admin-konton.
-            if (role == UserRole.Admin &&
-                caller.Role != UserRole.Owner)
-                return false;
-
-            // Owner-konton skapas inte via denna metod.
-            if (role == UserRole.Owner)
+            //bara admin får skapa nya användare.
+            if (!callerIsAdmin)
                 return false;
 
             if (string.IsNullOrWhiteSpace(password))
@@ -130,14 +111,14 @@ namespace BankApp
 
             if (!IsValidPersonalNumberFormat(username))
                 return false;
-
+            //Personumret måste vara unikt (normaliserat, se NormalizeUsername)
             if (UsernameExists(username))
                 return false;
 
             AddUser(username, password, email, phoneNumber, role);
             return true;
-        }
 
+        }
 
         /*
           UPPDATERA PERSONUPPGIFTER
@@ -146,7 +127,7 @@ namespace BankApp
          user skickas in direkt (från AuthService.LoggedInUser i Main),
          eftersom UserService inte vet vem som är inloggad.
         */
-        public bool UpdateUserInfo(User? user, string newEmail, string newPhone)
+        public bool UpdateUserInfo(User user, string newEmail, string newPhone)
         {
             if (user == null)
                 return false;
@@ -161,9 +142,6 @@ namespace BankApp
             return true;
         }
 
-        // Gäller Admin och Owner. Alla använder denna för adminkontroller.
-        public static bool HasAdminRights(User? user) =>
-            user != null && (user.Role == UserRole.Admin || user.Role == UserRole.Owner);
     }
 
 }
