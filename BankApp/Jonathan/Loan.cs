@@ -6,7 +6,7 @@ namespace BankApp.Jonathan
 {
     internal class Loan
     {
-        public int CustomerId { get; set; } // References the customer's UserID
+        public int UserId { get; set; }
         public int LoanId { get; set; }
         public decimal LoanAmount { get; private set; }
         public decimal RemainingLoanBalance { get; private set; }

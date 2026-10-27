@@ -11,11 +11,13 @@ namespace BankApp.Robin
         // Skapar privata fält av userservice och authservice
         private readonly UserService _userService;
         private readonly AuthService _authService;
+        //private readonly User _user;
         // CONSTRUCTOR INJECTION: Vi kräver att UserService skickas in när Menu skapas
 
         // Skickar in båda fälten i vår constructor för att kunna använda metoderna från marias klass.
         public Menu(UserService userService, AuthService authService)
         {
+            //_user = user ?? throw new ArgumentNullException(nameof(user));
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
@@ -121,8 +123,8 @@ namespace BankApp.Robin
 
             while (userMenu)
             {
-                Console.WriteLine("\n Se Konton" +
-                    "Gå tillbaka till startsida");
+                Console.WriteLine("\nSe Konton" +
+                    "\nGå tillbaka till startsida");
 
                 ConsoleKey key = Console.ReadKey(true).Key;
 
@@ -177,6 +179,7 @@ namespace BankApp.Robin
                 Console.CursorVisible = false;
                 Console.Clear();
 
+
                 if (selectedIndex == 0)
                 {
                     Console.WriteLine("[X] Logga in");
@@ -212,7 +215,7 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 0 + 3) % 3;
+                        selectedIndex = (selectedIndex - 1 + 3) % 3;
 
                         break;
 
@@ -224,14 +227,60 @@ namespace BankApp.Robin
                         switch (selectedIndex)
                         {
                             case 0:
-                                // Skapa användare
                                 Console.CursorVisible = true;
-                                
+                                bool wrongUserInfo = true;
+
+                                while (wrongUserInfo)
+                                {
+                                    Console.Clear();
+                                    Console.Write("\nPersonnummer : ");
+                                    string userName = Console.ReadLine() ?? "";
+                                    Console.Write("\nLösenord : ");
+                                    string userPassword = Console.ReadLine() ?? "";
+                                    LoginResult userLoggedIn = _authService.Login(userName, userPassword);
+
+                                    if (userLoggedIn == LoginResult.WrongCredentials)
+                                    {
+                                        Console.CursorVisible = false;
+                                        Console.WriteLine("\nFelaktiga uppgifter!" +
+                                            "\nTryck valfri knapp för att fortsätta." +
+                                            "\nTryck Esc för att avsluta");
+                                        key = Console.ReadKey(true).Key;
+
+                                        if (key == ConsoleKey.Escape)
+                                        {
+                                            wrongUserInfo = false;
+                                        }
+                                    }
+
+                                    if (userLoggedIn == LoginResult.Success)
+                                    {
+
+                                        Console.WriteLine("\nInloggning lyckades!");
+                                        if (_authService.IsLoggedInUserAdmin())
+                                        {
+                                            ShowAdminMenu();
+                                        }
+
+                                        else
+                                        {
+                                            ShowUserMenu();
+                                        }
+                                        wrongUserInfo = false;
+                                    }
+
+                                    else if (userLoggedIn == LoginResult.LockedOut)
+                                    {
+                                        Console.WriteLine("Ditt konto är låst!");
+                                        wrongUserInfo = false;
+                                    }
+                                }
+
+
                                 Console.ReadKey();
                                 break;
 
                             case 1:
-                                // Acceptera eller avböja lånx§
                                 Console.CursorVisible = true;
                                 CreateUser();
                                 ShowCreatedUser();
@@ -239,7 +288,6 @@ namespace BankApp.Robin
                                 break;
 
                             case 2:
-                                // Växelkurser
                                 Console.CursorVisible = true;
                                 Console.WriteLine("Avsluta");
                                 userMenu = false;
