@@ -32,7 +32,7 @@ namespace BankApp.Jonathan
         // LOAN APPLICATIONS
         //
 
-        public Loan? ApplyForLoan(int customerId, decimal requestedAmount, int duration, decimal totalAccountBalance, int creditScore)
+        public Loan? ApplyForLoan(int customerId, decimal requestedAmount, int duration, decimal totalAccountBalance, int creditScore = 100)
         {
             // Rejects loan durations outside the allowed range
             if (duration < 12 || duration > 144)

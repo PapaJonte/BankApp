@@ -18,7 +18,7 @@ namespace BankApp.Robin
         }
 
         // Handles loan applications
-        public Loan? ApplyForLoan(int customerId, decimal requestedAmount, int duration, int creditScore)
+        public Loan? ApplyForLoan(int customerId, decimal requestedAmount, int duration, int creditScore = 100)
         {
             // Gets the customers combined total balance
             decimal totalAccountBalance = accountManager.GetTotalBalance();
