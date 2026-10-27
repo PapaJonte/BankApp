@@ -74,17 +74,25 @@ namespace BankApp
 
 
         //Låser upp ett låst konto.
+        //Låser upp ett låst konto.
         public bool UnlockUser(string username)
         {
-            if (!IsLoggedInUserAdmin()) //Kollar att den som försöker låsa upp är admin.
+            User? caller = LoggedInUser;
+
+            //Måste vara inloggad och ha admin- eller ownerrättigheter.
+            if (caller == null || !IsAdmin(caller))
                 return false;
 
-            User? user = _userService.GetUserByUsername(username); //Hittar personen som ska låsas upp.
-            if (user == null)
+            User? target = _userService.GetUserByUsername(username);
+            if (target == null)
                 return false;
 
-            user.IsLockedOut = false; //Upplåsningen.
-            user.FailedLoginAttempts = 0; //nollställer räknaren.
+            //Admin får bara låsa upp kunder. Owner får låsa upp Admin också.
+            if (target.Role != UserRole.Customer && caller.Role != UserRole.Owner)
+                return false;
+
+            target.IsLockedOut = false;
+            target.FailedLoginAttempts = 0;
             return true;
         }
     }

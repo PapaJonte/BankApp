@@ -42,7 +42,7 @@ namespace BankApp
             if (username == null)
                 return string.Empty;
 
-            return username.Replace("-", "").Trim();
+            return username.Replace("-", "").Replace(" ", "");
         }
 
         /* Hämta användare.
@@ -86,7 +86,7 @@ namespace BankApp
 
             string digitsOnly = NormalizeUsername(username);
 
-            if (digitsOnly.Length != 12)
+            if (digitsOnly.Length != 10)
                 return false;
 
             return digitsOnly.All(char.IsDigit);
@@ -161,6 +161,9 @@ namespace BankApp
             return true;
         }
 
+        // Gäller Admin och Owner. Alla använder denna för adminkontroller.
+        public static bool HasAdminRights(User? user) =>
+            user != null && (user.Role == UserRole.Admin || user.Role == UserRole.Owner);
     }
 
 }
