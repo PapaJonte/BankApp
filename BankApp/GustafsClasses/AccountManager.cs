@@ -112,6 +112,11 @@ namespace BankApp
                     }
                 }
             }
+            else if (savingAccounts.Count == 1)
+            {
+                Console.WriteLine("Du har bara ett sparkonto.");
+            }
+
             else
             {
                 Console.WriteLine("Error! Du har inga sparkonton på banken.");
