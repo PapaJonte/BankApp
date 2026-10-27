@@ -11,11 +11,13 @@ namespace BankApp.Robin
         // Skapar privata fält av userservice och authservice
         private readonly UserService _userService;
         private readonly AuthService _authService;
+        //private readonly User _user;
         // CONSTRUCTOR INJECTION: Vi kräver att UserService skickas in när Menu skapas
 
         // Skickar in båda fälten i vår constructor för att kunna använda metoderna från marias klass.
         public Menu(UserService userService, AuthService authService)
         {
+            //_user = user ?? throw new ArgumentNullException(nameof(user));
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
@@ -121,8 +123,8 @@ namespace BankApp.Robin
 
             while (userMenu)
             {
-                Console.WriteLine("\n Se Konton" +
-                    "Gå tillbaka till startsida");
+                Console.WriteLine("\nSe Konton" +
+                    "\nGå tillbaka till startsida");
 
                 ConsoleKey key = Console.ReadKey(true).Key;
 
@@ -232,12 +234,35 @@ namespace BankApp.Robin
                                 Console.Write("\nLösenord : ");
                                 string userPassword = Console.ReadLine() ?? "";
                                 LoginResult userLoggedIn = _authService.Login(userName, userPassword);
-                                Console.WriteLine(userLoggedIn);
+
+                                if (userLoggedIn == LoginResult.Success)
+                                {
+                                    Console.WriteLine("\nInloggning lyckades!");
+                                    if (_authService.IsLoggedInUserAdmin())
+                                    {
+                                        ShowAdminMenu();
+                                    }
+
+                                    else
+                                    {
+                                        ShowUserMenu();
+                                    }
+                                }
+                                else if (userLoggedIn == LoginResult.LockedOut)
+                                {
+
+                                    Console.WriteLine("Ditt konto är låst!");
+                                }
+
+                                else
+                                {
+                                    Console.WriteLine("Fel försök igen!");
+                                }
+
                                 Console.ReadKey();
                                 break;
 
                             case 1:
-                                // Acceptera eller avböja lånx§
                                 Console.CursorVisible = true;
                                 CreateUser();
                                 ShowCreatedUser();
@@ -245,7 +270,6 @@ namespace BankApp.Robin
                                 break;
 
                             case 2:
-                                // Växelkurser
                                 Console.CursorVisible = true;
                                 Console.WriteLine("Avsluta");
                                 userMenu = false;
