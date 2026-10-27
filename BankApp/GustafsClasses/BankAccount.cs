@@ -19,5 +19,10 @@ namespace BankApp
         {
             this.userId = userId;
         }
+
+        public int GetUserId()
+        {
+            return userId;
+        }
     }
 }

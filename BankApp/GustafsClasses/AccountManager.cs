@@ -55,7 +55,7 @@ namespace BankApp
             {
                 foreach (var account in bankAccountList)
                 {
-                    if (account.userId == userId)
+                    if (account.GetUserId() == userId)
                     {
                         //Interest for savings accounts.
                         decimal interest = 0.5m;
