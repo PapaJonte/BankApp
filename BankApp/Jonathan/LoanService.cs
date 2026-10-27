@@ -289,6 +289,12 @@ namespace BankApp.Jonathan
 
                             // Updates the loan status
                             loan.UpdateStatus(newStatus);
+
+                            // Starts the monthly repayment schedule if the loan was approved
+                            if (newStatus == LoanStatus.Approved)
+                            {
+                                loan.StartRepaymentSchedule(DateTime.Today);
+                            }
                             return true;
                         }
                     }
@@ -312,6 +318,12 @@ namespace BankApp.Jonathan
                         return false;
                     }
 
+                    // Checks that the repayment schedule has started
+                    if (!loan.NextPaymentDate.HasValue)
+                    {
+                        return false;
+                    }
+
                     // Checks if the payment amount is greater than zero
                     if (paymentAmount <= 0)
                     {
@@ -324,14 +336,66 @@ namespace BankApp.Jonathan
                         return false;
                     }
 
-                    // Subtracts the payment from the remaining loan balance
-                    loan.ReduceBalance(paymentAmount);
+                    // Gets the current month of the loan
+                    int currentMonth = loan.PaymentsCompleted + 1;
+
+                    // Calculates the monthly amortization
+                    decimal amortization = calculator.CalculateMonthlyAmortization(loan.LoanAmount, loan.Duration);
+
+                    // Make sure the final payment clears the remaining loan balance
+                    if (currentMonth == loan.Duration)
+                    {
+                        amortization = loan.RemainingLoanBalance;
+                    }
+                    else
+                    {
+                        amortization = Math.Min(amortization, loan.RemainingLoanBalance);
+                    }
+
+                    // Calculates the interest based on the remaining loan balance
+                    decimal interest = calculator.CalculateMonthlyInterest(loan.RemainingLoanBalance, loan.InterestRate);
+
+                    // Calculates the total monthly payment
+                    decimal monthlyPayment = amortization + interest;
+
+                    // Checks that the payment matches the required total payment
+                    if (paymentAmount != monthlyPayment)
+                    {
+                        return false;
+                    }
+
+                    // Records the payment and updates the repayment schedule
+                    loan.RecordMonthlyPayment(interest, amortization);
 
                     return true;
                 }
             }
 
             return false;
+        }
+
+        public decimal GetMonthlyPayment(int loanId)
+        {
+            // Goes through the loans to find the correct loan
+            foreach (Loan loan in loans)
+            {
+                if (loan.LoanId == loanId)
+                {
+                    // Checks that the loan is approved and has remaining payments
+                    if (loan.Status != LoanStatus.Approved || !loan.NextPaymentDate.HasValue)
+                    {
+                        return 0m;
+                    }
+
+                    // Gets the current month of the loan
+                    int currentMonth = loan.PaymentsCompleted + 1;
+
+                    // Calculates the monthly payment
+                    return calculator.CalculateMonthlyPayment(loan.LoanAmount, loan.Duration, loan.RemainingLoanBalance, loan.InterestRate, currentMonth);
+                }
+            }
+
+            return 0m;
         }
 
         public void UpdateInterestRule(int minimumCreditScore, int maximumCreditScore, decimal newAdjustment)
