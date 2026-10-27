@@ -19,7 +19,8 @@ namespace BankApp
             //while loop around to make sure the user gives a correct value as currency.
             while ( true)
             {
-                Console.WriteLine("Skriv vilken valuta du vill använda dig av.");
+                Console.WriteLine(
+                    "Write which currency you want in your account.");
                 string currencyString = Console.ReadLine();
 
                 Enum.GetValues<Currency>();
@@ -30,7 +31,7 @@ namespace BankApp
                     {
                         if (c == parsedCurrency)
                         {
-                            Console.WriteLine("Valutan är registrerad.");
+                            Console.WriteLine("Currency is registered.");
 
                             return parsedCurrency;
                         }
@@ -45,8 +46,10 @@ namespace BankApp
             decimal interest = 0.5m;
 
             //Communication is needed before I adapt this one further.
-            Console.WriteLine("Du får " + interest + " i ränta på kontot.");
-            Console.WriteLine("Skriv hur mycket pengar som ska finnas i kontot.");
+            Console.WriteLine("You get "
+            + interest + " in interest.");
+            Console.WriteLine(
+                "Write how much money you want in the account.");
 
             string stringInput = Console.ReadLine();
             int convertedInput;
@@ -54,14 +57,15 @@ namespace BankApp
             //Safety system against incorrect input.
             if (Int32.TryParse(stringInput, out convertedInput))
             {
-                SavingsAccount savingsAccount = new SavingsAccount(convertedInput, CheckCurrency(), interest);
+                SavingsAccount savingsAccount = new SavingsAccount(
+                    convertedInput, CheckCurrency(), interest);
 
                 //Adding the newly created account to the list.
                 savingAccounts.Add(savingsAccount);
             }
             else
             {
-                Console.WriteLine("Error! Du måste skriva en siffra.");
+                Console.WriteLine("Error! You must write a number.");
             }
         }
 
@@ -79,7 +83,7 @@ namespace BankApp
             }
             else
             {
-                Console.WriteLine("Error! Du har inga konton på banken.");
+                Console.WriteLine("Error! You have no accounts in the bank.");
             }
         }
 
@@ -101,8 +105,11 @@ namespace BankApp
                 {
                     if (account.GetCurrency() != chosenValue)
                     {
-                        conversionTool.TryCalculateExchangeValue(account.GetCurrency(),
-                            chosenValue, account.GetBalance(), out additionValue); //Don't be fooled, this is the same line of code.
+                        //Don't be fooled, this is the same line of code.
+                        conversionTool.TryCalculateExchangeValue(
+                            account.GetCurrency(),
+                            chosenValue, account.GetBalance(),
+                            out additionValue);
 
                         totalBalance = totalBalance + additionValue;
                     }
@@ -114,12 +121,12 @@ namespace BankApp
             }
             else if (savingAccounts.Count == 1)
             {
-                Console.WriteLine("Du har bara ett sparkonto.");
+                Console.WriteLine("You only have one savings account.");
             }
 
             else
             {
-                Console.WriteLine("Error! Du har inga sparkonton på banken.");
+                Console.WriteLine("Error! You have no savings accounts on the bank.");
             }
             
             return totalBalance;
