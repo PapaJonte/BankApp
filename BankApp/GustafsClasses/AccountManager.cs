@@ -10,11 +10,6 @@ namespace BankApp
     /*This class is the upper class of BankAccount and SavingsAccount.*/
     internal class AccountManager
     {
-        //We'll keep our savingsAccounts here.
-        List<SavingsAccount> savingAccounts = new List<SavingsAccount>();
-
-        List<List> AccountListCollection = new List<List>();
-
         //This method is intended to support the CreateAccount() method below. It will be called upon when CreateAccount needs it. Don't call upon this method!
         private Currency CheckCurrency()
         {
@@ -80,17 +75,21 @@ namespace BankApp
                 foreach (var account in savingAccounts)
                 {
                     //Displays balance and currency of account.
-                    Console.WriteLine(account.GetBalance() + " " + account.GetCurrency());
+                    Console.WriteLine(
+                        account.GetBalance()
+                        + " " + account.GetCurrency());
                 }
             }
             else
             {
-                Console.WriteLine("Error! You have no accounts in the bank.");
+                Console.WriteLine(
+                    "Error!
+                    You have no accounts in the bank.");
             }
         }
 
         //Puts balance of all savngs accounts together into a total value after converting them.
-        public decimal GetTotalBalance( )
+        public decimal GetTotalBalance( userId)
         {
             decimal totalBalance = 0; //Where we put together all of the money into a total value.
             decimal additionValue = 0;
