@@ -10,6 +10,12 @@ namespace BankApp
     /*This class is the upper class of BankAccount and SavingsAccount.*/
     internal class AccountManager
     {
+        List<BankAccount> BankAccountList = 
+        new List<BankAccount>();
+
+        Dictionary<id, BankAccountList> BankAccountDictionary = 
+        new Dictionary<id, BankAccountList>();
+
         //This method is intended to support the CreateAccount() method below. It will be called upon when CreateAccount needs it. Don't call upon this method!
         private Currency CheckCurrency()
         {
