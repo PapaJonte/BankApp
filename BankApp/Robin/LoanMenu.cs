@@ -18,25 +18,46 @@ namespace BankApp.Robin
         }
 
         // Handles loan applications
-        public void ApplyForLoan(int customerId, decimal requestedAmount, int duration)
+        public Loan? ApplyForLoan(int customerId, decimal requestedAmount, int duration, int creditScore)
         {
             // Gets the customers combined total balance
-            decimal totalBalance = accountManager.GetTotalBalance();
+            decimal totalAccountBalance = accountManager.GetTotalBalance();
 
             // Validates and calculates interest etc.
-            Loan? loan = loanService.ApplyForLoan(customerId, requestedAmount, duration, totalBalance);
+            Loan? loan = loanService.ApplyForLoan(customerId, requestedAmount, duration, totalAccountBalance, creditScore);
 
             // If the loan application is rejected, LoanService returns null
-            if (loan is null)
+            if (loan == null)
             {
                 Console.WriteLine("Loan application rejected.");
-                return;
+                return null;
             }
 
             // Display the loan details
             Console.WriteLine($"Loan ID: {loan.LoanId}\nLoan amount: {loan.LoanAmount} SEK\n" +
                 $"Interest rate: {loan.InterestRate}%\nTotal interest: {loan.TotalInterest}\n" +
                 $"Total repayment: {loan.TotalRepayment}\nStatus: {loan.Status}");
+            return loan;
             }
+
+        public bool ChangeLoanStatus(int loanId, LoanStatus newStatus)
+        {
+            // Gets the customer's total balance from their bank accounts
+            decimal totalAccountBalance = accountManager.GetTotalBalance();
+
+            // Attempts to update the loan status
+            bool statusChanged = loanService.ChangeLoanStatus(loanId, newStatus, totalAccountBalance);
+            
+            // Checks if the status was succesfully changed
+            if (!statusChanged)
+            {
+                Console.WriteLine("Loan status could not be changed");
+                return false;
+            }
+
+            // Confirms that the loan status has been updated
+            Console.WriteLine($"Loan status changed to {newStatus}.");
+            return true;
+        }
     }
 }
