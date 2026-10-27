@@ -59,7 +59,7 @@ public class SlotMachineController(
                 if (view.ViewState == ViewState.Complete)
                 {
                     userInput.ReadKeyCode(ConsoleKey.Spacebar);
-                    _spinResults = machine.ResolveSpinResult();
+                    machine.ResolveSpinResult();
                 }
                 break;
 
@@ -72,7 +72,7 @@ public class SlotMachineController(
                 }
                 if (view.ViewState == ViewState.Complete)
                 {
-                    machine.Apply(_spinResults!);
+                    machine.Apply();
                 }
                 break;
 

@@ -1,3 +1,4 @@
+using System.Diagnostics.SymbolStore;
 using BankApp.Pull_The_Sack.Data_Model;
 using BankApp.Pull_The_Sack.Enum;
 using BankApp.Pull_The_Sack.Interface;
@@ -34,21 +35,17 @@ public class SlotMachine(IReadOnlyList<Reel> reels, IPayoutEvaluator evaluator, 
             reel.Spin();
     }
 
-    public SpinResult ResolveSpinResult()
+    public void ResolveSpinResult()
     {
         UpdateGamePhase(GamePhase.Resolving);
         IReadOnlyList<SlotSymbol> reelSymbols = [.. reels.Select(x => x.CurrentSymbol)];//did not know C# had spread
         var payoutMultipliler = evaluator.Evaluate(reelSymbols);
 
-        List<string> symbols = new(3);
+        List<SlotSymbol> symbols = [.. reels.Select(x => x.CurrentSymbol)];
 
-        foreach (var r in reels)
-        {
-            symbols.Add(SymbolCatalog.SymbolGraphic![r.CurrentSymbol]);
-        }
-        
-        SpinResult result = new(symbols,payoutMultipliler);
-        return result;
+        SpinResult result = new(symbols, payoutMultipliler);
+
+        State = State with {SpinResult = result };
     }
 
     private void UpdateGamePhase(GamePhase gamePhase)
@@ -57,9 +54,9 @@ public class SlotMachine(IReadOnlyList<Reel> reels, IPayoutEvaluator evaluator, 
     }
 
     /// <summary>Applies a spin result to the current balance.</summary>
-    public void Apply(SpinResult result)
+    public void Apply()
     {
         UpdateGamePhase(GamePhase.Result);
-        throw new NotImplementedException();
+        //fetch result from gamestate here
     }
 }

@@ -62,25 +62,21 @@ public class Orchestrator
         GameLoop gameLoop = new(updater, framesPerSecond: 2);
         SlotMachine machine = new(reels, evaluator, loanAmount, gameLoop);
 
-        // --- Glyphs ---
-        GlyphMap glyphs = new();
-        if (SymbolCatalog.SymbolGraphic is { } map)
-        {
-            foreach (var (symbol, glyph) in map)
-                glyphs.Register(symbol.ToString(), glyph);
-        }
-
         // --- Views ---
         SplashView splash = new(new SplashViewConfig());
 
-        IReadOnlyList<ReelView> reelViews = [.. reels.Select(r => new ReelView(r, glyphs))];
+        List<ReelView> reels_tmp = [];
+
+        foreach (var kvp in SymbolCatalog.SymbolGraphic)
+        {
+            reels_tmp.Add(new ReelView([.. SymbolCatalog.SymbolGraphic.Values], 3, 5));
+        }
+
+        IReadOnlyList<ReelView> reelViews = [.. reels_tmp];
+        
         BalanceView balance = new(loanAmount);
 
-        GameView game = new(
-            new GameViewConfig { ReelCount = reels.Count },
-            reelViews,
-            balance);
-
+        GameView game = new(new GameViewConfig { ReelCount = reels.Count }, reelViews);
         // ResultView intentionally not wired (testing splash only).
 
         // --- Registry ---

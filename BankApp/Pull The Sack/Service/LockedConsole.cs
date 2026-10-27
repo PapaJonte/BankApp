@@ -9,6 +9,18 @@ using BankApp.Pull_The_Sack.Interface;
 public class LockedConsole : IConsole
 {
     private readonly object _gate = new();
+    
+    public int GetTerminalWidth()
+    {
+        int width;
+        try { width = Console.WindowWidth; }
+        catch (IOException)
+        {
+            width = 120; //just hardcode a number that would seem like it could fit a terminal
+        }
+        
+        return width;
+    }
 
     /// <inheritdoc />
     public void Clear()
@@ -42,16 +54,41 @@ public class LockedConsole : IConsole
     {
         lock (_gate)
         {
-            int left = Math.Max(0, (width - text.Length) / 2);
-            Console.Write(new string(' ', left));
-            Console.WriteLine(text);
+            var lines = text.Split('\n');
+            int blockWidth = lines.Max(l => l.TrimEnd().Length);
+            int left = Math.Max(0, (width - blockWidth) / 2);
+            string pad = new(' ', left);
+
+            foreach (var line in lines)
+            {
+                Console.Write(pad);
+                Console.WriteLine(line.TrimEnd());
+            }
         }
     }
 
     /// <inheritdoc />
-    public void SetCursorPosition(int left, int top)
+    public void SetCursor(int left, int top)
     {
         lock (_gate) { Console.SetCursorPosition(left, top); }
+    }
+
+    /// <inheritdoc />
+    public void WriteAtCursor(string text)
+    {
+        lock (_gate) { Console.Write(text); }
+    }
+
+    /// <inheritdoc />
+    public int Left
+    {
+        get { lock (_gate) { return Console.CursorLeft; } }
+    }
+
+    /// <inheritdoc />
+    public int Top
+    {
+        get { lock (_gate) { return Console.CursorTop; } }
     }
 
     /// <inheritdoc />
@@ -60,3 +97,5 @@ public class LockedConsole : IConsole
         return Console.ReadKey(intercept: true);
     }
 }
+
+
