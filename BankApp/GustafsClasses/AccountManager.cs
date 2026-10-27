@@ -89,26 +89,34 @@ namespace BankApp
             decimal totalBalance = 0; //Where we put together all of the money into a total value.
             decimal additionValue = 0;
 
-            //Here we decide which currency to convert to.
-            Currency chosenValue = CheckCurrency();
-
-            ExchangeRate conversionTool = new ExchangeRate();
-
-            //Making sure the balance of all of the accounts are combined into a total balance.
-            foreach (var account in savingAccounts)
+            if (savingAccounts.Count > 0)
             {
-                if (account.GetCurrency() != chosenValue)
-                {
-                    conversionTool.TryCalculateExchangeValue(account.GetCurrency(),
-                        chosenValue, account.GetBalance(), out additionValue); //Don't be fooled, this is the same line of code.
+                //Here we decide which currency to convert to.
+                Currency chosenValue = CheckCurrency();
 
-                    totalBalance = totalBalance + additionValue;
-                }
-                else
+                ExchangeRate conversionTool = new ExchangeRate();
+
+                //Making sure the balance of all of the accounts are combined into a total balance.
+                foreach (var account in savingAccounts)
                 {
-                    totalBalance = totalBalance + account.GetBalance();
+                    if (account.GetCurrency() != chosenValue)
+                    {
+                        conversionTool.TryCalculateExchangeValue(account.GetCurrency(),
+                            chosenValue, account.GetBalance(), out additionValue); //Don't be fooled, this is the same line of code.
+
+                        totalBalance = totalBalance + additionValue;
+                    }
+                    else
+                    {
+                        totalBalance = totalBalance + account.GetBalance();
+                    }
                 }
             }
+            else
+            {
+                Console.WriteLine("Error! Du har inga sparkonton på banken.");
+            }
+            
             return totalBalance;
         }
     }
