@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BankApp
 {
-    internal class SavingsAccount : BankAccount
+    internal class SavingsAccount
     {
         private decimal Balance; //Ammount in the account.
         private Currency Currency; //Currency of Account.
