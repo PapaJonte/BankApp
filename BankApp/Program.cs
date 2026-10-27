@@ -19,8 +19,6 @@ namespace BankApp
             Menu menu = new Menu(userService, authService);
 
             menu.LoginMenu();
-
-            LoanTests.RunTests();
         }
     }
 }
