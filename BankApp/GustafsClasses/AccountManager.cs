@@ -89,8 +89,6 @@ namespace BankApp
             decimal totalBalance = 0; //Where we put together all of the money into a total value.
             decimal additionValue = 0;
 
-            Enum.GetValues<Currency>();
-
             //Here we decide which currency to convert to.
             Currency chosenValue = CheckCurrency();
 
