@@ -15,20 +15,37 @@ namespace BankApp.Jonathan
         //
 
         private readonly List<Loan> loans = new List<Loan>();
+        private readonly InterestRuleService interestRuleService;
+        private readonly InterestCalculator calculator;
+        
         private int nextLoandId = 1;
+
+        public LoanService(InterestRuleService interestRuleService)
+        {
+            this.interestRuleService = interestRuleService ?? throw new ArgumentNullException(nameof(interestRuleService));
+
+            calculator = new InterestCalculator(interestRuleService);
+        }
 
 
         //
         // LOAN APPLICATIONS
         //
 
-        public Loan? ApplyForLoan(int customerId, decimal requestedAmount, int duration, decimal totalAccountBalance)
+        public Loan? ApplyForLoan(int customerId, decimal requestedAmount, int duration, decimal totalAccountBalance, int creditScore)
         {
             // Rejects loan durations outside the allowed range
             if (duration < 12 || duration > 144)
             {
                 return null;
             }
+
+            // Checks that the customer's credit score is valid
+            if (creditScore < 0 || creditScore > 100)
+            {
+                return null;
+            }
+
             // Fetch the approved and pending loans
             decimal outstandingLoans = CalculateOutstandingLoans(customerId);
             decimal pendingLoans = CalculatePendingLoans(customerId);
@@ -49,9 +66,9 @@ namespace BankApp.Jonathan
             }
 
             // Fetch calculators from our InterestCalculator class
-            InterestCalculator calculator = new InterestCalculator();
+            InterestCalculator calculator = new InterestCalculator(interestRuleService);
 
-            decimal interestRate = calculator.GetInterestRate(duration);
+            decimal interestRate = calculator.GetInterestRate(duration, creditScore);
             decimal totalInterest = calculator.CalculateTotalInterest(requestedAmount, duration, interestRate);
 
             // Calculates the total amount the customer will repay, including interest.
@@ -316,6 +333,11 @@ namespace BankApp.Jonathan
             }
 
             return false;
+        }
+
+        public void UpdateInterestRule(int minimumCreditScore, int maximumCreditScore, decimal newAdjustment)
+        {
+            interestRuleService.UpdateInterestAdjustment(minimumCreditScore, maximumCreditScore, newAdjustment);
         }
     }
 }

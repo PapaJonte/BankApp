@@ -5,6 +5,17 @@ namespace BankApp.Jonathan
     internal class InterestCalculator
     {
         //
+        // CLASS FIELDS
+        //
+
+        private readonly InterestRuleService interestRuleService;
+
+        public InterestCalculator(InterestRuleService interestRuleService)
+        {
+            this.interestRuleService = interestRuleService ?? throw new ArgumentNullException(nameof(interestRuleService));
+        }
+
+        //
         // INTEREST RATES
         //
 
@@ -35,6 +46,16 @@ namespace BankApp.Jonathan
 
             return 9.25m; // 11-12 years
 
+        }
+
+        public decimal GetInterestRate(int duration, int creditScore)
+        {
+            // Gets the base interest rate based on the loan duration
+            decimal baseInterestRate = GetInterestRate(duration);
+            // Gets the additional interest based on customer's credit score
+            decimal interestAdjustment = interestRuleService.GetInterestAdjustment(creditScore);
+            // Adds the interest adjustment to the base interest rate
+            return baseInterestRate + interestAdjustment;
         }
 
 
