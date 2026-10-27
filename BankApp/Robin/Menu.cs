@@ -225,9 +225,14 @@ namespace BankApp.Robin
                         switch (selectedIndex)
                         {
                             case 0:
-                                // Skapa användare
                                 Console.CursorVisible = true;
-                                
+                                Console.Clear();
+                                Console.Write("\nPersonnummer : ");
+                                string userName = Console.ReadLine() ?? "";
+                                Console.Write("\nLösenord : ");
+                                string userPassword = Console.ReadLine() ?? "";
+                                LoginResult userLoggedIn = _authService.Login(userName, userPassword);
+                                Console.WriteLine(userLoggedIn);
                                 Console.ReadKey();
                                 break;
 
