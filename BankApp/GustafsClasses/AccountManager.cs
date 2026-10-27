@@ -92,14 +92,14 @@ namespace BankApp
         {
             foreach (var bAccount in bankAccountList)
             {
-                if (bAccount.userId == userId)
+                if (bAccount.GetUserId() == userId)
                 {
-                    if (savingAccounts.Count > 0 )
+                    if (bAccount.savingAccounts.Count > 0 )
                     {
-                        foreach (var sAccount in savingAccounts)
+                        foreach (var sAccount in bAccount.savingAccounts)
                         {
                             //Displays balance and currency of account.
-                            Console.WriteLine(bAccount.sAccount.GetBalance() + " " + bAccount.account.GetCurrency());
+                            Console.WriteLine(sAccount.GetBalance() + " " + sAccount.GetCurrency());
                         }
                     }
                     else
