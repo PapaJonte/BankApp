@@ -120,44 +120,43 @@ namespace BankApp
 
             foreach (var bAccount in bankAccountList)
             {
-                
-            }
-            if (savingAccounts.Count > 0)
-            {
-                //Here we decide which currency to convert to.
-                Currency chosenValue = CheckCurrency();
-
-                ExchangeRate conversionTool = new ExchangeRate();
-
-                //Making sure the balance of all of the accounts are combined into a total balance.
-                foreach (var account in savingAccounts)
+                if (bankAccountList.Count > 0)
                 {
-                    if (account.GetCurrency() != chosenValue)
-                    {
-                        //Don't be fooled, this is the same line of code.
-                        conversionTool.TryCalculateExchangeValue(
-                            account.GetCurrency(),
-                            chosenValue, account.GetBalance(),
-                            out additionValue);
+                    //Here we decide which currency to convert to.
+                    Currency chosenValue = CheckCurrency();
 
-                        totalBalance = totalBalance + additionValue;
-                    }
-                    else
+                    ExchangeRate conversionTool = new ExchangeRate();
+
+                    //Making sure the balance of all of the accounts are combined into a total balance.
+                    foreach (var account in bAccount.savingAccounts)
                     {
-                        totalBalance = totalBalance + account.GetBalance();
+                        if (account.GetCurrency() != chosenValue)
+                        {
+                            //Don't be fooled, this is the same line of code.
+                            conversionTool.TryCalculateExchangeValue(
+                                account.GetCurrency(),
+                                chosenValue, account.GetBalance(),
+                                out additionValue);
+
+                            totalBalance = totalBalance + additionValue;
+                        }
+                        
+                        else
+                        {
+                            totalBalance = totalBalance + account.GetBalance();
+                        }
                     }
+                    
+                }
+                else if (bAccount.savingAccounts.Count == 1)
+                {
+                    Console.WriteLine("You only have one savings account.");
+                }
+                else
+                {
+                    Console.WriteLine("Error! You have no savings accounts on the bank.");
                 }
             }
-            else if (savingAccounts.Count == 1)
-            {
-                Console.WriteLine("You only have one savings account.");
-            }
-
-            else
-            {
-                Console.WriteLine("Error! You have no savings accounts on the bank.");
-            }
-            
             return totalBalance;
         }
     }
