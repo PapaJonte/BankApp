@@ -18,13 +18,13 @@ namespace BankApp.Robin
         }
 
         // Handles loan applications
-        public Loan? ApplyForLoan(int customerId, decimal requestedAmount, int duration, int creditScore = 100)
+        public Loan? ApplyForLoan(int userId, decimal requestedAmount, int duration)
         {
             // Gets the customers combined total balance
             decimal totalAccountBalance = accountManager.GetTotalBalance();
 
             // Validates and calculates interest etc.
-            Loan? loan = loanService.ApplyForLoan(customerId, requestedAmount, duration, totalAccountBalance, creditScore);
+            Loan? loan = loanService.ApplyForLoan(userId, requestedAmount, duration, totalAccountBalance);
 
             // If the loan application is rejected, LoanService returns null
             if (loan == null)

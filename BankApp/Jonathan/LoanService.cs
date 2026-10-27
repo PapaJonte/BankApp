@@ -17,12 +17,15 @@ namespace BankApp.Jonathan
         private readonly List<Loan> loans = new List<Loan>();
         private readonly InterestRuleService interestRuleService;
         private readonly InterestCalculator calculator;
+        private readonly CreditScoreService creditScoreService;
         
         private int nextLoandId = 1;
 
-        public LoanService(InterestRuleService interestRuleService)
+        public LoanService(InterestRuleService interestRuleService, CreditScoreService creditScoreService)
         {
             this.interestRuleService = interestRuleService ?? throw new ArgumentNullException(nameof(interestRuleService));
+
+            this.creditScoreService = creditScoreService ?? throw new ArgumentNullException(nameof(creditScoreService));
 
             calculator = new InterestCalculator(interestRuleService);
         }
@@ -32,7 +35,7 @@ namespace BankApp.Jonathan
         // LOAN APPLICATIONS
         //
 
-        public Loan? ApplyForLoan(int customerId, decimal requestedAmount, int duration, decimal totalAccountBalance, int creditScore = 100)
+        public Loan? ApplyForLoan(int userId, decimal requestedAmount, int duration, decimal totalAccountBalance)
         {
             // Rejects loan durations outside the allowed range
             if (duration < 12 || duration > 144)
@@ -40,15 +43,9 @@ namespace BankApp.Jonathan
                 return null;
             }
 
-            // Checks that the customer's credit score is valid
-            if (creditScore < 0 || creditScore > 100)
-            {
-                return null;
-            }
-
             // Fetch the approved and pending loans
-            decimal outstandingLoans = CalculateOutstandingLoans(customerId);
-            decimal pendingLoans = CalculatePendingLoans(customerId);
+            decimal outstandingLoans = CalculateOutstandingLoans(userId);
+            decimal pendingLoans = CalculatePendingLoans(userId);
 
             // Adds the approved and pending loans together
             decimal totalCommittedLoans = outstandingLoans + pendingLoans;
@@ -68,6 +65,8 @@ namespace BankApp.Jonathan
             // Fetch calculators from our InterestCalculator class
             InterestCalculator calculator = new InterestCalculator(interestRuleService);
 
+            int creditScore = creditScoreService.GetCreditScore(userId);
+
             decimal interestRate = calculator.GetInterestRate(duration, creditScore);
             decimal totalInterest = calculator.CalculateTotalInterest(requestedAmount, duration, interestRate);
 
@@ -78,7 +77,7 @@ namespace BankApp.Jonathan
             Loan newLoan = new Loan(requestedAmount);
 
             // Customer and loan identification
-            newLoan.CustomerId = customerId;
+            newLoan.UserId = userId;
             newLoan.LoanId = nextLoandId;
             nextLoandId++;
 
@@ -172,10 +171,10 @@ namespace BankApp.Jonathan
             return availableCredit;
         }
 
-        public decimal CalculateOutstandingLoans(int customerId)
+        public decimal CalculateOutstandingLoans(int userId)
         {
             // Gets all loans belonging to the customer
-            List<Loan> customerLoans = GetCustomersLoan(customerId);
+            List<Loan> customerLoans = GetCustomersLoan(userId);
 
             // Stores the total remaining loan balance
             decimal outstandingLoans = 0m;
@@ -193,10 +192,10 @@ namespace BankApp.Jonathan
             return outstandingLoans;
         }
 
-        public decimal CalculatePendingLoans(int customerId)
+        public decimal CalculatePendingLoans(int userId)
         {
             // Gets all loans belonging to the customer
-            List<Loan> customerLoans = GetCustomersLoan(customerId);
+            List<Loan> customerLoans = GetCustomersLoan(userId);
 
             // Stores the total pending loan balance
             decimal pendingLoans = 0m;
@@ -219,7 +218,7 @@ namespace BankApp.Jonathan
         // LOAN MANAGEMENT
         //
 
-        public List<Loan> GetCustomersLoan(int customerId)
+        public List<Loan> GetCustomersLoan(int userId)
         {
             // Creates a list to store the customer's loans
             List<Loan> customerLoans = new List<Loan>();
@@ -228,7 +227,7 @@ namespace BankApp.Jonathan
             foreach (Loan loan in loans)
             {
                 // Checks if the loan belongs to the customer
-                if (loan.CustomerId == customerId)
+                if (loan.UserId == userId)
                 {
                     customerLoans.Add(loan);
                 }
@@ -271,8 +270,8 @@ namespace BankApp.Jonathan
                             if (newStatus == LoanStatus.Approved)
                             {
                                 // Gets the customer's approved and pending loans
-                                decimal outstandingLoans = CalculateOutstandingLoans(loan.CustomerId);
-                                decimal pendingLoans = CalculatePendingLoans(loan.CustomerId);
+                                decimal outstandingLoans = CalculateOutstandingLoans(loan.UserId);
+                                decimal pendingLoans = CalculatePendingLoans(loan.UserId);
 
                                 // Calculates the total loans and maximum allowed loan amount
                                 decimal totalCommittedLoans = outstandingLoans + pendingLoans;
