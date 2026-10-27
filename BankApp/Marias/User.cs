@@ -53,17 +53,17 @@ namespace BankApp
         }
 
         //Uppdatera personuppgifter.
-        public void UpdateUserInfo(string newEmail, string newPhone)
+        public void UpdateUserInfo(string newEmail, string NewPhone)
         {
             Email = newEmail;
-                PhoneNumber = newPhone;
+            PhoneNumber = NewPhone;
         }
 
 
     }
 
 
-     
 
-    
+
+
 }
