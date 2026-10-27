@@ -121,8 +121,8 @@ namespace BankApp.Robin
 
             while (userMenu)
             {
-                Console.WriteLine("\n Se Konton" +
-                    "Gå tillbaka till startsida");
+                Console.WriteLine("\nSe Konton" +
+                    "\nGå tillbaka till startsida");
 
                 ConsoleKey key = Console.ReadKey(true).Key;
 
@@ -232,12 +232,30 @@ namespace BankApp.Robin
                                 Console.Write("\nLösenord : ");
                                 string userPassword = Console.ReadLine() ?? "";
                                 LoginResult userLoggedIn = _authService.Login(userName, userPassword);
-                                Console.WriteLine(userLoggedIn);
+                                
+                                if(userLoggedIn == LoginResult.Success)
+                                {
+                                    Console.WriteLine("\nInloggning lyckades!");
+                                    if(_authService.IsLoggedInUserAdmin())
+                                    {
+                                        ShowAdminMenu();
+                                    }
+
+                                    else
+                                    {
+                                        ShowUserMenu();
+                                    }
+                                }
+
+                                else
+                                {
+                                    Console.WriteLine("\nError!");
+                                }
+
                                 Console.ReadKey();
                                 break;
 
                             case 1:
-                                // Acceptera eller avböja lånx§
                                 Console.CursorVisible = true;
                                 CreateUser();
                                 ShowCreatedUser();
