@@ -10,11 +10,12 @@ namespace BankApp
     /*This class is the upper class of BankAccount and SavingsAccount.*/
     internal class AccountManager
     {
-        List<BankAccount> BankAccountList = 
-        new List<BankAccount>();
+        List<BankAccount> bankAccountList = new List<BankAccount>();
 
-        Dictionary<int, BankAccountList> BankAccountDictionary = 
-        new Dictionary<int, BankAccountList>();
+        Dictionary<int, bankAccountList> BankAccountDictionary = 
+        new Dictionary<int, bankAccountList>();
+
+        BankAccountDictionary.Add(bankAccountList);
 
         //This method is intended to support the CreateAccount() method below. It will be called upon when CreateAccount needs it. Don't call upon this method!
         private Currency CheckCurrency()
@@ -42,34 +43,47 @@ namespace BankApp
                 }
             }
         }
-        //Used for creating accounts.
         public void CreateAccount(int userId)
         {
-            //Interest for savings accounts.
-            decimal interest = 0.5m;
+            /*Creation of object of the BankAccount class to represent an account held by a user,
+            rather than individual spaces to have money in*/
+            BankAccount userAccount = new BankAccount(userId);
 
-            //Communication is needed before I adapt this one further.
-            Console.WriteLine("You get "
-            + interest + " in interest.");
-            Console.WriteLine(
-                "Write how much money you want in the account.");
-
-            string stringInput = Console.ReadLine();
-            int convertedInput;
-
-            //Safety system against incorrect input.
-            if (Int32.TryParse(stringInput, out convertedInput))
+            bankAccountList.Add(userAccount);
+        }
+        //Used for creating accounts.
+        public void CreateSavingsAccount(int userId)
+        {
+            foreach (var account in bankAccountList)
             {
-                SavingsAccount savingsAccount = new SavingsAccount(
-                    convertedInput, CheckCurrency(), interest);
+                if( account.userId == userId)
+                {
+                    //Interest for savings accounts.
+                    decimal interest = 0.5m;
 
-                //Adding the newly created account to the list.
-                savingAccounts.Add(savingsAccount);
-            }
-            else
-            {
-                Console.WriteLine("Error! You must write a number.");
-            }
+                    //Communication is needed before I adapt this one further.
+                    Console.WriteLine(
+                        "You get " + interest + " in interest.");
+                    Console.WriteLine(
+                        "Write how much money you want in the account.");
+
+                    string stringInput = Console.ReadLine();
+                    int convertedInput;
+
+                    //Safety system against incorrect input.
+                    if (Int32.TryParse(stringInput, out convertedInput))
+                    {
+                        SavingsAccount savingsAccount = new SavingsAccount(
+                        convertedInput, CheckCurrency(), interest);
+
+                        account.savingAccounts.Add(savingsAccount);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error! You must write a number.");
+                    }
+                }
+            } 
         }
 
         //Method for accessing the savingsaccounts.
