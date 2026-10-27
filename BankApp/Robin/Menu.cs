@@ -17,12 +17,10 @@ namespace BankApp.Robin
         // Skickar in båda fälten i vår constructor för att kunna använda metoderna från marias klass.
         public Menu(UserService userService, AuthService authService)
         {
-            //_user = user ?? throw new ArgumentNullException(nameof(user));
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
-        //public List<User> users = new List<User> { new User(1, "0204", "123", "Robin@outlook.com", "076918", UserRole.Customer) };
-        public void ShowCreatedUser()
+        public void ShowCreatedUsers()
         {
             var users = _userService.GetAllUsers();
             foreach (var user in users)
@@ -59,6 +57,88 @@ namespace BankApp.Robin
 
             return true;
         }
+
+        public void ShowOwnerMenu()
+        {
+            Console.Clear();
+            bool userMenu = true;
+
+            int selectedIndex = 0;
+
+            while (userMenu)
+            {
+                Console.CursorVisible = false;
+                Console.Clear();
+
+                if (selectedIndex == 0)
+                {
+                    Console.WriteLine("\n[X] Se konton");
+                }
+
+                else
+                {
+                    Console.WriteLine("\n[ ] Se konton");
+                }
+
+                if (selectedIndex == 1)
+                {
+                    Console.WriteLine("\n[X] Transaktionshistorik");
+                }
+
+                else
+                {
+                    Console.WriteLine("\n[ ] Transaktionshistorik");
+                }
+                if (selectedIndex == 2)
+                {
+                    Console.WriteLine("\n[X] Logga ut");
+                }
+
+                else
+                {
+                    Console.WriteLine("\n[ ] Logga ut");
+                }
+
+                ConsoleKey key = Console.ReadKey(true).Key;
+
+                switch (key)
+                {
+                    case ConsoleKey.UpArrow:
+                        selectedIndex = (selectedIndex - 1 + 3) % 3;
+
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        selectedIndex = (selectedIndex + 1) % 3;
+                        break;
+
+                    case ConsoleKey.Enter:
+                        switch (selectedIndex)
+                        {
+                            case 0:
+                                Console.WriteLine("Konton");
+                                ShowCreatedUsers();
+                                Console.ReadKey();
+                                break;
+
+                            case 1:
+                                Console.WriteLine("Transaktionshistorik");
+                                break;
+
+                            case 2:
+                                _authService.Logout();
+                                userMenu = false;
+                                break;
+                        }
+                        break;
+
+                    case ConsoleKey.Escape:
+                        userMenu = false;
+
+                        break;
+                }
+            }
+        }
         public void ShowAdminMenu()
         {
             Console.Clear();
@@ -72,6 +152,7 @@ namespace BankApp.Robin
                     "\n[ ] Lån" +
                     "\n[ ] Växelkurser" +
                     "\n[ ] Gå tillbaka till startsidan");
+                // Ändra räntan på lån
                 ConsoleKey key = Console.ReadKey(true).Key;
 
                 switch (key)
@@ -146,12 +227,12 @@ namespace BankApp.Robin
                 }
                 if (selectedIndex == 2)
                 {
-                    Console.WriteLine("\n[X] Gå tillbaka till startsidan");
+                    Console.WriteLine("\n[X] Logga ut");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Gå tillbaka till startsidan");
+                    Console.WriteLine("\n[ ] Logga ut");
                 }
 
                 ConsoleKey key = Console.ReadKey(true).Key;
@@ -164,7 +245,7 @@ namespace BankApp.Robin
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex - 1) % 3;
+                        selectedIndex = (selectedIndex + 1) % 3;
                         break;
 
                     case ConsoleKey.Enter:
@@ -172,6 +253,8 @@ namespace BankApp.Robin
                         {
                             case 0:
                                 Console.WriteLine("Konton");
+                                ShowCreatedUsers();
+                                Console.ReadKey();
                                 break;
 
                             case 1:
@@ -179,6 +262,7 @@ namespace BankApp.Robin
                                 break;
 
                             case 2:
+                                _authService.Logout();
                                 userMenu = false;
                                 break;
                         }
@@ -305,7 +389,6 @@ namespace BankApp.Robin
                             case 1:
                                 Console.CursorVisible = true;
                                 CreateUser();
-                                ShowCreatedUser();
                                 Console.ReadKey();
                                 break;
 
