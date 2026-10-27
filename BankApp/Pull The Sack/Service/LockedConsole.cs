@@ -96,6 +96,15 @@ public class LockedConsole : IConsole
     {
         return Console.ReadKey(intercept: true);
     }
+
+    public void SetConsoleColor(ConsoleColor color)
+    {
+        lock(_gate)
+        {
+            Console.ForegroundColor = color;
+        }
+    }
+
 }
 
 

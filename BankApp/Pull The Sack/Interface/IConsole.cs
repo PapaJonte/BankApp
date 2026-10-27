@@ -31,6 +31,8 @@ public interface IConsole
     /// </summary>
     void WriteAtCursor(string text);
 
+    void SetConsoleColor(ConsoleColor color);
+
     /// <summary>Current cursor column (0-based, from the left).</summary>
     int Left { get; }
 
