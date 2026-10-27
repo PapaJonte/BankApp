@@ -89,23 +89,26 @@ namespace BankApp
         //Method for accessing the savingsaccounts.
         public void GetAccounts( int userId)
         {
-            //if statement as a safety measure to assure ourselves that the list is not null.
-            if (savingAccounts.Count > 0 )
+            foreach (var bAccount in bankAccountList)
             {
-                foreach (var account in savingAccounts)
+                if (bAccount.userId == userId)
                 {
-                    //Displays balance and currency of account.
-                    Console.WriteLine(
-                        account.GetBalance()
-                        + " " + account.GetCurrency());
+                    if (savingAccounts.Count > 0 )
+                    {
+                        foreach (var sAccount in savingAccounts)
+                        {
+                            //Displays balance and currency of account.
+                            Console.WriteLine(bAccount.sAccount.GetBalance() + " " + bAccount.account.GetCurrency());
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error! You have no accounts in the bank.");
+                    }
                 }
             }
-            else
-            {
-                Console.WriteLine(
-                    "Error!
-                    You have no accounts in the bank.");
-            }
+            //if statement as a safety measure to assure ourselves that the list is not null.
+            
         }
 
         //Puts balance of all savngs accounts together into a total value after converting them.
@@ -114,6 +117,10 @@ namespace BankApp
             decimal totalBalance = 0; //Where we put together all of the money into a total value.
             decimal additionValue = 0;
 
+            foreach (var bAccount in bankAccountList)
+            {
+                
+            }
             if (savingAccounts.Count > 0)
             {
                 //Here we decide which currency to convert to.
