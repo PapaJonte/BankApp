@@ -10,16 +10,23 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
     public bool HasBeenServed { get; set; } = false;
     public GameState GameState { get; set; }
     public ViewState ViewState { get; set; } = ViewState.Idle;
+    public float RenderSpeed { get; set; } = 1;
 
-    private string? targetSymbol;
+    private string targetSymbol = "";
+    private bool slowingDown = false;
+
     private int symbolIndex = 0; //symbol index for top reel view. then we add current render iteration to it
     private int reelSlot = 0;//which reel slot is currently being rendered, 1=>RowCount
     private readonly Random rnd = new();
+    private int framesSinceLastRender = 0;
 
 
     public void ResetView()
     {
         ViewState = ViewState.Idle;
+        targetSymbol = "";
+        slowingDown = false;
+        RenderSpeed = 1;
     }
 
     public void Render(IConsole console, double dt)
@@ -29,6 +36,12 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
             ViewState = ViewState.Animating;
             symbolIndex = PickStartSymbolIndex();
         }
+
+        ++framesSinceLastRender;
+
+        if (framesSinceLastRender * RenderSpeed < 1)//return if we've rendered the last frame too recentrly
+            return;
+
 
         int x = console.Left;
         int y = console.Top;
@@ -60,10 +73,15 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
         if (reelSlot == RowCount)
         {
             reelSlot = 0;
-            symbolIndex = WrapAround(--symbolIndex, SlotSymbols.Length-1);
+            symbolIndex = WrapAround(--symbolIndex, SlotSymbols.Length - 1);
         }
+
+        framesSinceLastRender = 0;
+
+        if (slowingDown)
+            SlowRenderSpeed();
     }
-    
+
     private int WrapAround(int val, int maxVal)
     {
         if (val < 0)
@@ -76,6 +94,12 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
 
     private int PickStartSymbolIndex() => rnd.Next(0, SlotSymbols.Length - 1);
 
-    public void AddTargetSymbol(string target) => targetSymbol = target;
+    private void SlowRenderSpeed() => RenderSpeed -= 0.25f;
+
+    public void AddTargetSymbol(string target)
+    {
+        targetSymbol = target;
+        slowingDown = true;
+    }
 
 }

@@ -24,14 +24,6 @@ public class GameView(GameViewConfig config, IReadOnlyList<ReelView> reels) : IV
     public void Render(IConsole console, double dt)
     {
         console.Clear();
-        console.SetConsoleColor(ConsoleColor.Yellow);
-
-        console.WriteCentered(config.Banner);
-        console.WriteCentered(config.SponsorText);
-
-        console.WriteCentered(config.TopArt);
-
-        console.SetConsoleColor(ConsoleColor.White);
 
         if (ViewState == ViewState.Idle)
         {
@@ -39,10 +31,31 @@ public class GameView(GameViewConfig config, IReadOnlyList<ReelView> reels) : IV
             BlockWidth = reels.Count * config.ReelWidth + (reels.Count - 1) * config.ReelGap; //thank you deepseek
         }
 
-        int reelY;
+        #region Draw top graphics
+        console.SetConsoleColor(ConsoleColor.Yellow);
+        console.WriteCentered(config.Banner);
+        console.SetConsoleColor(ConsoleColor.White);
+        console.WriteCentered(config.SponsorText);
+        console.SetConsoleColor(ConsoleColor.Yellow);
+        console.WriteCentered(config.TopArt);
+        console.SetConsoleColor(ConsoleColor.White);
+        #endregion
 
+        RenderSpinning(console, dt);
+
+        #region Draw bottom graphics
+        console.SetConsoleColor(ConsoleColor.Yellow);
+        console.WriteCentered("");//offset bottom graphic
+        console.WriteCentered(config.BottomArt);
+        #endregion
+    }
+
+    private void RenderSpinning(IConsole console, double dt)
+    {
+        int reelY;
         //calculate left reel top pos
         int leftReelX = Math.Max(0, (console.GetTerminalWidth() - BlockWidth / 2) / 2);
+        
         for (int i = 1; i <= config.ReelRows; i++)
         {
             reelY = CalculateReelHeight(i);
@@ -87,10 +100,6 @@ public class GameView(GameViewConfig config, IReadOnlyList<ReelView> reels) : IV
 
             reels[2].Render(console, dt);
         }
-
-        console.SetConsoleColor(ConsoleColor.Yellow);
-        console.WriteCentered("");//offset bottom graphic
-        console.WriteCentered(config.BottomArt);
     }
 
     private int CalculateReelHeight(int index) => config.ReelTop + (1 + config.ReelGap) * index;

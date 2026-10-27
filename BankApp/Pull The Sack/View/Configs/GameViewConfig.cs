@@ -41,7 +41,7 @@ public record GameViewConfig : ViewConfig
 
     public int ReelGap { get; init; } = 2;
 
-    public int ReelTop { get; init; } = 9;
+    public int ReelTop { get; init; } = 10;
 
     public int MinReelTargetSpinCount { get; init; } = 5;
 
