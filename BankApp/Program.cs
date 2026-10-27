@@ -1,4 +1,5 @@
 ﻿using BankApp.Jonathan;
+using BankApp.Pull_The_Sack;
 using BankApp.Robin;
 
 namespace BankApp
@@ -7,11 +8,14 @@ namespace BankApp
     {
         static void Main(string[] args)
         {
-            Menu menu = new Menu();
+            // Menu menu = new Menu();
 
-            menu.LoginMenu();
+            // menu.LoginMenu();
 
-            LoanTests.RunTests();
+            // LoanTests.RunTests();
+
+            Orchestrator orc = new();
+            orc.Start(100000);
         }
     }
 }
