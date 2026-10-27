@@ -228,36 +228,54 @@ namespace BankApp.Robin
                         {
                             case 0:
                                 Console.CursorVisible = true;
-                                Console.Clear();
-                                Console.Write("\nPersonnummer : ");
-                                string userName = Console.ReadLine() ?? "";
-                                Console.Write("\nLösenord : ");
-                                string userPassword = Console.ReadLine() ?? "";
-                                LoginResult userLoggedIn = _authService.Login(userName, userPassword);
+                                bool wrongUserInfo = true;
 
-                                if (userLoggedIn == LoginResult.Success)
+                                while (wrongUserInfo)
                                 {
-                                    Console.WriteLine("\nInloggning lyckades!");
-                                    if (_authService.IsLoggedInUserAdmin())
+                                    Console.Clear();
+                                    Console.Write("\nPersonnummer : ");
+                                    string userName = Console.ReadLine() ?? "";
+                                    Console.Write("\nLösenord : ");
+                                    string userPassword = Console.ReadLine() ?? "";
+                                    LoginResult userLoggedIn = _authService.Login(userName, userPassword);
+
+                                    if (userLoggedIn == LoginResult.WrongCredentials)
                                     {
-                                        ShowAdminMenu();
+                                        Console.CursorVisible = false;
+                                        Console.WriteLine("\nFelaktiga uppgifter!" +
+                                            "\nTryck valfri knapp för att fortsätta." +
+                                            "\nTryck Esc för att avsluta");
+                                        key = Console.ReadKey(true).Key;
+
+                                        if (key == ConsoleKey.Escape)
+                                        {
+                                            wrongUserInfo = false;
+                                        }
                                     }
 
-                                    else
+                                    if (userLoggedIn == LoginResult.Success)
                                     {
-                                        ShowUserMenu();
+
+                                        Console.WriteLine("\nInloggning lyckades!");
+                                        if (_authService.IsLoggedInUserAdmin())
+                                        {
+                                            ShowAdminMenu();
+                                        }
+
+                                        else
+                                        {
+                                            ShowUserMenu();
+                                        }
+                                        wrongUserInfo = false;
+                                    }
+
+                                    else if (userLoggedIn == LoginResult.LockedOut)
+                                    {
+                                        Console.WriteLine("Ditt konto är låst!");
+                                        wrongUserInfo = false;
                                     }
                                 }
-                                else if (userLoggedIn == LoginResult.LockedOut)
-                                {
 
-                                    Console.WriteLine("Ditt konto är låst!");
-                                }
-
-                                else
-                                {
-                                    Console.WriteLine("Fel försök igen!");
-                                }
 
                                 Console.ReadKey();
                                 break;
