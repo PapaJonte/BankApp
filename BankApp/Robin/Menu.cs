@@ -177,6 +177,7 @@ namespace BankApp.Robin
                 Console.CursorVisible = false;
                 Console.Clear();
 
+
                 if (selectedIndex == 0)
                 {
                     Console.WriteLine("[X] Logga in");
@@ -212,7 +213,7 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 0 + 3) % 3;
+                        selectedIndex = (selectedIndex - 1 + 3) % 3;
 
                         break;
 
