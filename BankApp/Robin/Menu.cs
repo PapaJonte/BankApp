@@ -1,19 +1,15 @@
 ﻿
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace BankApp.Robin
 {
     internal class Menu
     {
 
-        // Skapar privata fält av userservice och authservice
+        // Creates private fields for UserService and AuthService
         private readonly UserService _userService;
         private readonly AuthService _authService;
-        // CONSTRUCTOR INJECTION: Vi kräver att UserService skickas in när Menu skapas
+        // CONSTRUCTOR INJECTION: We require UserService to be passed in when Menu is created
 
-        // Skickar in båda fälten i vår constructor för att kunna använda metoderna från marias klass.
+        // Passes both fields into our constructor so we can use the methods from Maria's class.
         public Menu(UserService userService, AuthService authService)
         {
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
@@ -24,7 +20,7 @@ namespace BankApp.Robin
             var users = _userService.GetAllUsers();
             foreach (var user in users)
             {
-                Console.WriteLine($"\nDina uppgifter" +
+                Console.WriteLine($"\nYour details" +
                   $"\n{user.Username}" +
                   $"\n{user.Password}" +
                   $"\n{user.Email}" +
@@ -35,20 +31,20 @@ namespace BankApp.Robin
         public bool CreateUser()
         {
             Console.Clear();
-            Console.Write("\nVänligen ange uppgifter.");
-            Console.Write("\nPersonnummer : ");
+            Console.Write("\nPlease enter your details.");
+            Console.Write("\nPersonal identity number: ");
             string userName = Console.ReadLine() ?? "";
             if (_userService.UsernameExists(userName))
             {
-                Console.WriteLine("\nFel: Personnumret är redan registrerat!");
+                Console.WriteLine("\nError: This personal identity number is already registered!");
                 Console.ReadKey();
                 return false;
             }
-            Console.Write("\nLösenord : ");
+            Console.Write("\nPassword: ");
             string userPass = Console.ReadLine() ?? "";
-            Console.Write("\nEmail : ");
+            Console.Write("\nEmail: ");
             string userEmail = Console.ReadLine() ?? "";
-            Console.Write("\nTelefonnummer : ");
+            Console.Write("\nPhone number: ");
             string userPhoneNumber = Console.ReadLine() ?? "";
 
             bool succesCreatedUser = _userService.CreateUser(true, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
@@ -70,31 +66,31 @@ namespace BankApp.Robin
 
                 if (selectedIndex == 0)
                 {
-                    Console.WriteLine("\n[X] Se konton");
+                    Console.WriteLine("\n[X] View accounts");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Se konton");
+                    Console.WriteLine("\n[ ] View accounts");
                 }
 
                 if (selectedIndex == 1)
                 {
-                    Console.WriteLine("\n[X] Transaktionshistorik");
+                    Console.WriteLine("\n[X] Transaction history");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Transaktionshistorik");
+                    Console.WriteLine("\n[ ] Transaction history");
                 }
                 if (selectedIndex == 2)
                 {
-                    Console.WriteLine("\n[X] Logga ut");
+                    Console.WriteLine("\n[X] Log out");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Logga ut");
+                    Console.WriteLine("\n[ ] Log out");
                 }
 
                 ConsoleKey key = Console.ReadKey(true).Key;
@@ -114,13 +110,13 @@ namespace BankApp.Robin
                         switch (selectedIndex)
                         {
                             case 0:
-                                Console.WriteLine("Konton");
+                                Console.WriteLine("Accounts");
                                 ShowCreatedUsers();
                                 Console.ReadKey();
                                 break;
 
                             case 1:
-                                Console.WriteLine("Transaktionshistorik");
+                                Console.WriteLine("Transaction history");
                                 break;
 
                             case 2:
@@ -151,61 +147,61 @@ namespace BankApp.Robin
 
                 if (selectedIndex == 0)
                 {
-                    Console.WriteLine("\n[X] Skapa nya användare");
+                    Console.WriteLine("\n[X] Create new users");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Skapa nya användare");
+                    Console.WriteLine("\n[ ] Create new users");
                 }
 
                 if (selectedIndex == 1)
                 {
-                    Console.WriteLine("\n[X] Lås upp användares konto");
+                    Console.WriteLine("\n[X] Unlock user account");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Lås upp användares konto");
+                    Console.WriteLine("\n[ ] Unlock user account");
                 }
 
 
                 if (selectedIndex == 2)
                 {
-                    Console.WriteLine("\n[X] Lån");
+                    Console.WriteLine("\n[X] Loans");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Lån");
+                    Console.WriteLine("\n[ ] Loans");
                 }
                 if (selectedIndex == 3)
                 {
-                    Console.WriteLine("\n[X] Växelkurser");
+                    Console.WriteLine("\n[X] Exchange rates");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Växelkurser");
+                    Console.WriteLine("\n[ ] Exchange rates");
                 }
 
                 if (selectedIndex == 4)
                 {
-                    Console.WriteLine("\n[X] Ränta");
+                    Console.WriteLine("\n[X] Interest rate");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Ränta");
+                    Console.WriteLine("\n[ ] Interest rate");
                 }
                 if (selectedIndex == 5)
                 {
-                    Console.WriteLine("\n[X] Logga ut");
+                    Console.WriteLine("\n[X] Log out");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Logga ut");
+                    Console.WriteLine("\n[ ] Log out");
                 }
                 ConsoleKey key = Console.ReadKey(true).Key;
 
@@ -228,20 +224,21 @@ namespace BankApp.Robin
                                 break;
 
                             case 1:
-                                //Lås upp användare
-
+                                // Unlock user
+                                Console.WriteLine("Type in identity number : ");
+                                _authService.UnlockUser();
                                 break;
 
                             case 2:
-                                //Lån
+                                // Loans
                                 break;
 
                             case 3:
-                                // Växelkurser
+                                // Exchange rates
                                 break;
 
                             case 4:
-                                //Ränta
+                                // Interest rate
 
                                 break;
 
@@ -274,31 +271,31 @@ namespace BankApp.Robin
 
                 if (selectedIndex == 0)
                 {
-                    Console.WriteLine("\n[X] Se konton");
+                    Console.WriteLine("\n[X] View accounts");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Se konton");
+                    Console.WriteLine("\n[ ] View accounts");
                 }
 
                 if (selectedIndex == 1)
                 {
-                    Console.WriteLine("\n[X] Transaktionshistorik");
+                    Console.WriteLine("\n[X] Transaction history");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Transaktionshistorik");
+                    Console.WriteLine("\n[ ] Transaction history");
                 }
                 if (selectedIndex == 2)
                 {
-                    Console.WriteLine("\n[X] Logga ut");
+                    Console.WriteLine("\n[X] Log out");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Logga ut");
+                    Console.WriteLine("\n[ ] Log out");
                 }
 
                 ConsoleKey key = Console.ReadKey(true).Key;
@@ -318,13 +315,13 @@ namespace BankApp.Robin
                         switch (selectedIndex)
                         {
                             case 0:
-                                Console.WriteLine("Konton");
+                                Console.WriteLine("Accounts");
                                 ShowCreatedUsers();
                                 Console.ReadKey();
                                 break;
 
                             case 1:
-                                Console.WriteLine("Transaktionshistorik");
+                                Console.WriteLine("Transaction history");
                                 break;
 
                             case 2:
@@ -355,32 +352,32 @@ namespace BankApp.Robin
 
                 if (selectedIndex == 0)
                 {
-                    Console.WriteLine("\n[X] Logga in");
+                    Console.WriteLine("\n[X] Log in");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Logga in");
+                    Console.WriteLine("\n[ ] Log in");
                 }
 
                 if (selectedIndex == 1)
                 {
-                    Console.WriteLine("\n[X] Skapa konto");
+                    Console.WriteLine("\n[X] Create account");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Skapa konto");
+                    Console.WriteLine("\n[ ] Create account");
                 }
 
                 if (selectedIndex == 2)
                 {
-                    Console.WriteLine("\n[X] Avsluta");
+                    Console.WriteLine("\n[X] Exit");
                 }
 
                 else
                 {
-                    Console.WriteLine("\n[ ] Avsluta");
+                    Console.WriteLine("\n[ ] Exit");
                 }
 
                 ConsoleKey key = Console.ReadKey(true).Key;
@@ -406,18 +403,18 @@ namespace BankApp.Robin
                                 while (wrongUserInfo)
                                 {
                                     Console.Clear();
-                                    Console.Write("\nPersonnummer : ");
+                                    Console.Write("\nPersonal identity number: ");
                                     string userName = Console.ReadLine() ?? "";
-                                    Console.Write("\nLösenord : ");
+                                    Console.Write("\nPassword: ");
                                     string userPassword = Console.ReadLine() ?? "";
                                     LoginResult userLoggedIn = _authService.Login(userName, userPassword);
 
                                     if (userLoggedIn == LoginResult.WrongCredentials)
                                     {
                                         Console.CursorVisible = false;
-                                        Console.WriteLine("\nFelaktiga uppgifter!" +
-                                            "\nTryck valfri knapp för att försöka igen." +
-                                            "\nTryck Esc för att avsluta");
+                                        Console.WriteLine("\nIncorrect credentials!" +
+                                            "\nPress any key to try again." +
+                                            "\nPress Esc to exit");
 
                                         key = Console.ReadKey(true).Key;
                                         if (key == ConsoleKey.Escape)
@@ -428,7 +425,7 @@ namespace BankApp.Robin
 
                                     if (userLoggedIn == LoginResult.Success)
                                     {
-                                        Console.WriteLine("\nInloggning lyckades!");
+                                        Console.WriteLine("\nLogin successful!");
                                         if (_authService.IsLoggedInUserAdmin())
                                         {
                                             ShowAdminMenu();
@@ -443,7 +440,7 @@ namespace BankApp.Robin
 
                                     if (userLoggedIn == LoginResult.LockedOut)
                                     {
-                                        Console.WriteLine("Ditt konto är låst!");
+                                        Console.WriteLine("Your account is locked!");
                                         wrongUserInfo = false;
                                     }
                                 }
@@ -459,7 +456,7 @@ namespace BankApp.Robin
 
                             case 2:
                                 Console.CursorVisible = true;
-                                Console.WriteLine("Avsluta");
+                                Console.WriteLine("Exit");
                                 userMenu = false;
                                 break;
                         }
@@ -473,5 +470,3 @@ namespace BankApp.Robin
         }
     }
 }
-
-
