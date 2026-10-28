@@ -15,6 +15,7 @@ namespace BankApp
 
             AnsiConsole.MarkupLine("[red bold]Hello World[/]");
             AnsiConsole.MarkupLine("[slowblink]Hello World[/]");
+            
 
             Console.ReadKey();
 
