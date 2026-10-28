@@ -15,23 +15,37 @@ namespace BankApp.Jonathan
         //
 
         private readonly List<Loan> loans = new List<Loan>();
+        private readonly InterestRuleService interestRuleService;
+        private readonly InterestCalculator calculator;
+        private readonly CreditScoreService creditScoreService;
+        
         private int nextLoandId = 1;
+
+        public LoanService(InterestRuleService interestRuleService, CreditScoreService creditScoreService)
+        {
+            this.interestRuleService = interestRuleService ?? throw new ArgumentNullException(nameof(interestRuleService));
+
+            this.creditScoreService = creditScoreService ?? throw new ArgumentNullException(nameof(creditScoreService));
+
+            calculator = new InterestCalculator(interestRuleService);
+        }
 
 
         //
         // LOAN APPLICATIONS
         //
 
-        public Loan? ApplyForLoan(int customerId, decimal requestedAmount, int duration, decimal totalAccountBalance)
+        public Loan? ApplyForLoan(int userId, decimal requestedAmount, int duration, decimal totalAccountBalance)
         {
             // Rejects loan durations outside the allowed range
             if (duration < 12 || duration > 144)
             {
                 return null;
             }
+
             // Fetch the approved and pending loans
-            decimal outstandingLoans = CalculateOutstandingLoans(customerId);
-            decimal pendingLoans = CalculatePendingLoans(customerId);
+            decimal outstandingLoans = CalculateOutstandingLoans(userId);
+            decimal pendingLoans = CalculatePendingLoans(userId);
 
             // Adds the approved and pending loans together
             decimal totalCommittedLoans = outstandingLoans + pendingLoans;
@@ -49,9 +63,11 @@ namespace BankApp.Jonathan
             }
 
             // Fetch calculators from our InterestCalculator class
-            InterestCalculator calculator = new InterestCalculator();
+            InterestCalculator calculator = new InterestCalculator(interestRuleService);
 
-            decimal interestRate = calculator.GetInterestRate(duration);
+            int creditScore = creditScoreService.GetCreditScore(userId);
+
+            decimal interestRate = calculator.GetInterestRate(duration, creditScore);
             decimal totalInterest = calculator.CalculateTotalInterest(requestedAmount, duration, interestRate);
 
             // Calculates the total amount the customer will repay, including interest.
@@ -61,7 +77,7 @@ namespace BankApp.Jonathan
             Loan newLoan = new Loan(requestedAmount);
 
             // Customer and loan identification
-            newLoan.CustomerId = customerId;
+            newLoan.UserId = userId;
             newLoan.LoanId = nextLoandId;
             nextLoandId++;
 
@@ -155,10 +171,10 @@ namespace BankApp.Jonathan
             return availableCredit;
         }
 
-        public decimal CalculateOutstandingLoans(int customerId)
+        public decimal CalculateOutstandingLoans(int userId)
         {
             // Gets all loans belonging to the customer
-            List<Loan> customerLoans = GetCustomersLoan(customerId);
+            List<Loan> customerLoans = GetCustomersLoan(userId);
 
             // Stores the total remaining loan balance
             decimal outstandingLoans = 0m;
@@ -176,10 +192,10 @@ namespace BankApp.Jonathan
             return outstandingLoans;
         }
 
-        public decimal CalculatePendingLoans(int customerId)
+        public decimal CalculatePendingLoans(int userId)
         {
             // Gets all loans belonging to the customer
-            List<Loan> customerLoans = GetCustomersLoan(customerId);
+            List<Loan> customerLoans = GetCustomersLoan(userId);
 
             // Stores the total pending loan balance
             decimal pendingLoans = 0m;
@@ -202,7 +218,7 @@ namespace BankApp.Jonathan
         // LOAN MANAGEMENT
         //
 
-        public List<Loan> GetCustomersLoan(int customerId)
+        public List<Loan> GetCustomersLoan(int userId)
         {
             // Creates a list to store the customer's loans
             List<Loan> customerLoans = new List<Loan>();
@@ -211,7 +227,7 @@ namespace BankApp.Jonathan
             foreach (Loan loan in loans)
             {
                 // Checks if the loan belongs to the customer
-                if (loan.CustomerId == customerId)
+                if (loan.UserId == userId)
                 {
                     customerLoans.Add(loan);
                 }
@@ -254,8 +270,8 @@ namespace BankApp.Jonathan
                             if (newStatus == LoanStatus.Approved)
                             {
                                 // Gets the customer's approved and pending loans
-                                decimal outstandingLoans = CalculateOutstandingLoans(loan.CustomerId);
-                                decimal pendingLoans = CalculatePendingLoans(loan.CustomerId);
+                                decimal outstandingLoans = CalculateOutstandingLoans(loan.UserId);
+                                decimal pendingLoans = CalculatePendingLoans(loan.UserId);
 
                                 // Calculates the total loans and maximum allowed loan amount
                                 decimal totalCommittedLoans = outstandingLoans + pendingLoans;
@@ -273,6 +289,12 @@ namespace BankApp.Jonathan
 
                             // Updates the loan status
                             loan.UpdateStatus(newStatus);
+
+                            // Starts the monthly repayment schedule if the loan was approved
+                            if (newStatus == LoanStatus.Approved)
+                            {
+                                loan.StartRepaymentSchedule(DateTime.Today);
+                            }
                             return true;
                         }
                     }
@@ -296,6 +318,12 @@ namespace BankApp.Jonathan
                         return false;
                     }
 
+                    // Checks that the repayment schedule has started
+                    if (!loan.NextPaymentDate.HasValue)
+                    {
+                        return false;
+                    }
+
                     // Checks if the payment amount is greater than zero
                     if (paymentAmount <= 0)
                     {
@@ -308,14 +336,71 @@ namespace BankApp.Jonathan
                         return false;
                     }
 
-                    // Subtracts the payment from the remaining loan balance
-                    loan.ReduceBalance(paymentAmount);
+                    // Gets the current month of the loan
+                    int currentMonth = loan.PaymentsCompleted + 1;
+
+                    // Calculates the monthly amortization
+                    decimal amortization = calculator.CalculateMonthlyAmortization(loan.LoanAmount, loan.Duration);
+
+                    // Make sure the final payment clears the remaining loan balance
+                    if (currentMonth == loan.Duration)
+                    {
+                        amortization = loan.RemainingLoanBalance;
+                    }
+                    else
+                    {
+                        amortization = Math.Min(amortization, loan.RemainingLoanBalance);
+                    }
+
+                    // Calculates the interest based on the remaining loan balance
+                    decimal interest = calculator.CalculateMonthlyInterest(loan.RemainingLoanBalance, loan.InterestRate);
+
+                    // Calculates the total monthly payment
+                    decimal monthlyPayment = amortization + interest;
+
+                    // Checks that the payment matches the required total payment
+                    if (paymentAmount != monthlyPayment)
+                    {
+                        return false;
+                    }
+
+                    // Records the payment and updates the repayment schedule
+                    loan.RecordMonthlyPayment(interest, amortization);
 
                     return true;
                 }
             }
 
             return false;
+        }
+
+        public decimal GetMonthlyPayment(int loanId)
+        {
+            // Goes through the loans to find the correct loan
+            foreach (Loan loan in loans)
+            {
+                if (loan.LoanId == loanId)
+                {
+                    // Checks that the loan is approved and has remaining payments
+                    if (loan.Status != LoanStatus.Approved || !loan.NextPaymentDate.HasValue)
+                    {
+                        return 0m;
+                    }
+
+                    // Gets the current month of the loan
+                    int currentMonth = loan.PaymentsCompleted + 1;
+
+                    // Calculates the monthly payment
+                    return calculator.CalculateMonthlyPayment(loan.LoanAmount, loan.Duration, loan.RemainingLoanBalance, loan.InterestRate, currentMonth);
+                }
+            }
+
+            return 0m;
+        }
+
+        public void UpdateInterestRule(int minimumCreditScore, int maximumCreditScore, decimal newAdjustment)
+        {
+            interestRuleService.UpdateInterestAdjustment(minimumCreditScore, maximumCreditScore, newAdjustment);
         }
     }
 }

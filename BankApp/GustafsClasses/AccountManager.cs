@@ -1,4 +1,5 @@
-﻿using BankApp.Transaction_Layer.Enum;
+﻿using BankApp.Transaction_Layer.API;
+using BankApp.Transaction_Layer.Enum;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
@@ -9,16 +10,18 @@ namespace BankApp
     /*This class is the upper class of BankAccount and SavingsAccount.*/
     internal class AccountManager
     {
-        //We'll keep our savingsAccounts here.
-        List<SavingsAccount> savingAccounts = new List<SavingsAccount>();
+        List<BankAccount> bankAccountList = new List<BankAccount>();
 
+        Dictionary<int, List<BankAccount>> BankAccountDictionary = new Dictionary<int, List<BankAccount>>();
+        
         //This method is intended to support the CreateAccount() method below. It will be called upon when CreateAccount needs it. Don't call upon this method!
         private Currency CheckCurrency()
         {
             //while loop around to make sure the user gives a correct value as currency.
             while ( true)
             {
-                Console.WriteLine("Skriv vilken valuta du vill sätta i ditt sparkonto.");
+                Console.WriteLine(
+                    "Write which currency you want in your account.");
                 string currencyString = Console.ReadLine();
 
                 Enum.GetValues<Currency>();
@@ -29,7 +32,7 @@ namespace BankApp
                     {
                         if (c == parsedCurrency)
                         {
-                            Console.WriteLine("Valutan är registrerad.");
+                            Console.WriteLine("Currency is registered.");
 
                             return parsedCurrency;
                         }
@@ -37,79 +40,124 @@ namespace BankApp
                 }
             }
         }
-        //Used for creating accounts.
-        public void CreateAccount()
+        public void CreateAccount(int userId)
         {
-            //Interest for savings accounts.
-            decimal interest = 0.5m;
+            /*Creation of object of the BankAccount class to represent an account held by a user,
+            rather than individual spaces to have money in*/
+            BankAccount userAccount = new BankAccount(userId);
 
-            //Communication is needed before I adapt this one further.
-            Console.WriteLine("Du får " + interest + " i ränta på kontot.");
-            Console.WriteLine("Skriv hur mycket pengar som ska finnas i kontot.");
-
-            string stringInput = Console.ReadLine();
-            int convertedInput;
-
-            //Safety system against incorrect input.
-            if (Int32.TryParse(stringInput, out convertedInput))
+            bankAccountList.Add(userAccount);
+        }
+        //Used for creating accounts.
+        public void CreateSavingsAccount(int userId)
+        {
+            if (bankAccountList.Count > 0)
             {
-                SavingsAccount savingsAccount = new SavingsAccount(convertedInput, CheckCurrency(), interest);
+                foreach (var account in bankAccountList)
+                {
+                    if (account.GetUserId() == userId)
+                    {
+                        //Interest for savings accounts.
+                        decimal interest = 0.5m;
 
-                //Adding the newly created account to the list.
-                savingAccounts.Add(savingsAccount);
+                        //Communication is needed before I adapt this one further.
+                        Console.WriteLine(
+                            "You get " + interest + " in interest.");
+                        Console.WriteLine(
+                            "Write how much money you want in the account.");
+
+                        string stringInput = Console.ReadLine();
+                        int convertedInput;
+
+                        //Safety system against incorrect input.
+                        if (Int32.TryParse(stringInput, out convertedInput))
+                        {
+                            SavingsAccount savingsAccount = new SavingsAccount(
+                            convertedInput, CheckCurrency(), interest);
+
+                            account.savingAccounts.Add(savingsAccount);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Error! You must write a number.");
+                        }
+                    }
+                }
             }
-            else
-            {
-                Console.WriteLine("Error! Du måste skriva en siffra.");
-            }
+             
         }
 
         //Method for accessing the savingsaccounts.
-        public void GetAccounts()
+        public void GetAccounts( int userId)
         {
-            //if statement as a safety measure to assure ourselves that the list is not null.
-            if (savingAccounts.Count > 0 )
+            foreach (var bAccount in bankAccountList)
             {
-                foreach (var account in savingAccounts)
+                if (bAccount.GetUserId() == userId)
                 {
-                    //Displays balance and currency of account.
-                    Console.WriteLine(account.GetBalance() + " " + account.GetCurrency());
+                    if (bAccount.savingAccounts.Count > 0 )
+                    {
+                        foreach (var sAccount in bAccount.savingAccounts)
+                        {
+                            //Displays balance and currency of account.
+                            Console.WriteLine(sAccount.GetBalance() + " " + sAccount.GetCurrency());
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error! You have no accounts in the bank.");
+                    }
                 }
             }
-            else
-            {
-                Console.WriteLine("Error! Du har inga konton på banken.");
-            }
+            //if statement as a safety measure to assure ourselves that the list is not null.
+            
         }
 
-        /*Method for getting the total balance of all accounts put together. However the method does not yet convert between currencies.
-         * For that I need the ExchangeRate class to be filled first, so that I may convert currencies by the exchange rate.
-         * Pherhaps the method may still be used for testing purposes though?*/
-        public decimal GetTotalBalance( )
+        //Puts balance of all savngs accounts together into a total value after converting them.
+        public decimal GetTotalBalance(int userId)
         {
+            decimal totalBalance = 0; //Where we put together all of the money into a total value.
+            decimal additionValue = 0;
 
-            //Where we put together all of the money into a total value.
-            decimal totalBalance = 0;
-            
-            //Will use this when ExchangeRate either gets filled in, or explained to me.
-            Enum.GetValues<Currency>();
-
-            //Security measure preventing the code from running if there is no content in the list.
-            if (savingAccounts.Count > 0)
+            foreach (var bAccount in bankAccountList)
             {
-                //Making sure all of the accounts are combined into a total balance.
-                foreach (SavingsAccount account in savingAccounts)
+                if (bankAccountList.Count > 0)
                 {
-                    //Combining balance of accounts here.
-                    totalBalance = totalBalance + account.GetBalance();
+                    //Here we decide which currency to convert to.
+                    Currency chosenValue = CheckCurrency();
+
+                    ExchangeRate conversionTool = new ExchangeRate();
+
+                    //Making sure the balance of all of the accounts are combined into a total balance.
+                    foreach (var account in bAccount.savingAccounts)
+                    {
+                        if (account.GetCurrency() != chosenValue)
+                        {
+                            //Don't be fooled, this is the same line of code.
+                            conversionTool.TryCalculateExchangeValue(
+                                account.GetCurrency(),
+                                chosenValue, account.GetBalance(),
+                                out additionValue);
+
+                            totalBalance = totalBalance + additionValue;
+                        }
+                        
+                        else
+                        {
+                            totalBalance = totalBalance + account.GetBalance();
+                        }
+                    }
+                    
                 }
-                return totalBalance; //Returns balance.
+                else if (bAccount.savingAccounts.Count == 1)
+                {
+                    Console.WriteLine("You only have one savings account.");
+                }
+                else
+                {
+                    Console.WriteLine("Error! You have no savings accounts on the bank.");
+                }
             }
-            else
-            {
-                Console.WriteLine("Error! Du har inga sparkonton på denna bank. Ditt totala saldo är alltså " + totalBalance);
-                return totalBalance; //Defaulting to 0  in total balance in the event that the user has no accounts.
-            }
+            return totalBalance;
         }
     }
 }

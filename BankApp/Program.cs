@@ -11,6 +11,10 @@ namespace BankApp
             Theme theme = new Theme();
             UserService userService = new UserService();
             AuthService authService = new AuthService(userService);
+            InterestRuleService interestRuleService = new InterestRuleService();
+            CreditScoreService creditScoreService = new CreditScoreService();
+            LoanService loanService = new LoanService(interestRuleService, creditScoreService);
+
             Menu menu = new Menu(userService, authService);
 
             theme.Markup();
