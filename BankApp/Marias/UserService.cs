@@ -16,6 +16,7 @@ namespace BankApp
         //Det måste finnas minst en admin från start, skapar med testvärden för den enda admin-användaren som skapas automatiskt när programmet startar.
         public UserService()
         {
+            AddUser("000000-0000", "ownerpassword123", "owner@gmail.com", "0729216167", UserRole.Owner);
             AddUser("000000-0000", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
         }
 
