@@ -230,12 +230,11 @@ namespace BankApp.Robin
                                 Console.WriteLine("Type in identity number : ");
                                 string userName = Console.ReadLine() ?? "";
 
-                                bool userExists = _userService.UsernameExists(userName);
                                 bool userUnlocked = _authService.UnlockUser(userName);
 
-                                if (userUnlocked && userExists == true)
+                                if (userUnlocked)
                                 {
-                                    Console.WriteLine($"You unlocked user ,{userName}");
+                                    Console.Write($"You unlocked user : {userName}");
                                 }
                                 else
                                 {
@@ -266,6 +265,7 @@ namespace BankApp.Robin
                         break;
 
                     case ConsoleKey.Escape:
+                        _authService.Logout();
                         userMenu = false;
 
                         break;
@@ -319,7 +319,6 @@ namespace BankApp.Robin
                 {
                     case ConsoleKey.UpArrow:
                         selectedIndex = (selectedIndex - 1 + 3) % 3;
-
                         break;
 
                     case ConsoleKey.DownArrow:
@@ -347,6 +346,7 @@ namespace BankApp.Robin
                         break;
 
                     case ConsoleKey.Escape:
+                        _authService.Logout();
                         userMenu = false;
 
                         break;
@@ -460,7 +460,6 @@ namespace BankApp.Robin
                                     }
                                 }
 
-                                Console.ReadKey();
                                 break;
 
                             case 1:
