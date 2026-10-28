@@ -11,7 +11,6 @@ namespace BankApp.Robin
         // Skapar privata fält av userservice och authservice
         private readonly UserService _userService;
         private readonly AuthService _authService;
-        //private readonly User _user;
         // CONSTRUCTOR INJECTION: Vi kräver att UserService skickas in när Menu skapas
 
         // Skickar in båda fälten i vår constructor för att kunna använda metoderna från marias klass.
@@ -57,7 +56,6 @@ namespace BankApp.Robin
 
             return true;
         }
-
         public void ShowOwnerMenu()
         {
             Console.Clear();
@@ -148,22 +146,78 @@ namespace BankApp.Robin
 
             while (userMenu)
             {
-                Console.WriteLine("\n[ ] Skapa nya användare" +
-                    "\n[ ] Lån" +
-                    "\n[ ] Växelkurser" +
-                    "\n[ ] Gå tillbaka till startsidan");
-                // Ändra räntan på lån
+                Console.CursorVisible = false;
+                Console.Clear();
+
+                if (selectedIndex == 0)
+                {
+                    Console.WriteLine("\n[X] Skapa nya användare");
+                }
+
+                else
+                {
+                    Console.WriteLine("\n[ ] Skapa nya användare");
+                }
+
+                if (selectedIndex == 1)
+                {
+                    Console.WriteLine("\n[X] Lås upp användares konto");
+                }
+
+                else
+                {
+                    Console.WriteLine("\n[ ] Lås upp användares konto");
+                }
+
+
+                if (selectedIndex == 2)
+                {
+                    Console.WriteLine("\n[X] Lån");
+                }
+
+                else
+                {
+                    Console.WriteLine("\n[ ] Lån");
+                }
+                if (selectedIndex == 3)
+                {
+                    Console.WriteLine("\n[X] Växelkurser");
+                }
+
+                else
+                {
+                    Console.WriteLine("\n[ ] Växelkurser");
+                }
+
+                if (selectedIndex == 4)
+                {
+                    Console.WriteLine("\n[X] Ränta");
+                }
+
+                else
+                {
+                    Console.WriteLine("\n[ ] Ränta");
+                }
+                if (selectedIndex == 5)
+                {
+                    Console.WriteLine("\n[X] Logga ut");
+                }
+
+                else
+                {
+                    Console.WriteLine("\n[ ] Logga ut");
+                }
                 ConsoleKey key = Console.ReadKey(true).Key;
 
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 4) % 4;
+                        selectedIndex = (selectedIndex - 1 + 6) % 6;
 
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 4;
+                        selectedIndex = (selectedIndex + 1) % 6;
                         break;
 
                     case ConsoleKey.Enter:
@@ -174,16 +228,28 @@ namespace BankApp.Robin
                                 break;
 
                             case 1:
-                                // Acceptera eller avböja lån
+                                //Lås upp användare
+
                                 break;
 
                             case 2:
-                                // Växelkurser
+                                //Lån
                                 break;
 
                             case 3:
+                                // Växelkurser
+                                break;
+
+                            case 4:
+                                //Ränta
+
+                                break;
+
+                            case 5:
+                                _authService.Logout();
                                 userMenu = false;
                                 break;
+
                         }
                         break;
 
@@ -286,7 +352,6 @@ namespace BankApp.Robin
             {
                 Console.CursorVisible = false;
                 Console.Clear();
-
 
                 if (selectedIndex == 0)
                 {
@@ -397,7 +462,6 @@ namespace BankApp.Robin
                                 Console.WriteLine("Avsluta");
                                 userMenu = false;
                                 break;
-
                         }
                         break;
 
