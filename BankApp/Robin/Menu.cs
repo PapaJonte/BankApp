@@ -1,4 +1,5 @@
-﻿
+﻿using Spectre.Console;
+
 namespace BankApp.Robin
 {
     internal class Menu

@@ -1,5 +1,6 @@
 ﻿using BankApp.Jonathan;
 using BankApp.Robin;
+using Spectre.Console;
 
 namespace BankApp
 {
@@ -12,7 +13,12 @@ namespace BankApp
             AuthService authService = new AuthService(userService);
             Menu menu = new Menu(userService, authService);
 
-            menu.LoginMenu();
+            AnsiConsole.MarkupLine("[red bold]Hello World[/]");
+            AnsiConsole.MarkupLine("[slowblink]Hello World[/]");
+
+            Console.ReadKey();
+
+            //menu.LoginMenu();
 
             LoanTests.RunTests();
         }
