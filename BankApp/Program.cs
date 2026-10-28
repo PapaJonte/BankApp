@@ -8,9 +8,7 @@ namespace BankApp
     {
         static void Main(string[] args)
         {
-            //User user = new User();
-            
-            // SERVICES
+            Theme theme = new Theme();
             UserService userService = new UserService();
             AuthService authService = new AuthService(userService);
             InterestRuleService interestRuleService = new InterestRuleService();
@@ -18,6 +16,8 @@ namespace BankApp
             LoanService loanService = new LoanService(interestRuleService, creditScoreService);
 
             Menu menu = new Menu(userService, authService);
+
+            theme.Markup();
 
             AnsiConsole.MarkupLine("[red bold]Hello World[/]");
             AnsiConsole.MarkupLine("[slowblink]Hello World[/]");
