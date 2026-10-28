@@ -12,11 +12,7 @@ namespace BankApp
             UserService userService = new UserService();
             AuthService authService = new AuthService(userService);
             Menu menu = new Menu(userService, authService);
-
-            theme.Markup();
-
-            AnsiConsole.MarkupLine("[red bold]Hello World[/]");
-            AnsiConsole.MarkupLine("[slowblink]Hello World[/]");
+            
 
             Console.ReadKey();
 
