@@ -32,12 +32,14 @@ public record GameViewConfig : ViewConfig
         @"╚═════════════════════════════════════════════════╝";
 
     /// <summary>Number of reels displayed on the payline.</summary>
-    public int ReelCount { get; init; } = 3;
+    public int ReelCols { get; init; } = 3;
     public int ReelRows { get; init; } = 3;
 
     /// <summary>Number of glyphs drawn per reel.</summary>
     public int ReelHeight { get; init; } = 3;
     public int ReelWidth { get; init; } = 5;
+    public int ResolveSlowDownSteps { get; init; } = 4;
+    public int SpinsBeforeComplete { get; init; } = 4;
 
     public int ReelGap { get; init; } = 2;
 

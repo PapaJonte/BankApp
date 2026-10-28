@@ -18,4 +18,14 @@ public class SymbolCatalog
         Symbols = symbols;
     }
 
+    public static string GetSymbolGraphicNullCheck(SlotSymbol symbol)
+    {
+        if (string.IsNullOrEmpty(SymbolGraphic[symbol]))
+        {
+            throw new FormatException($"Graphic for symbol {symbol} is null!");
+        }
+
+        return SymbolGraphic[symbol];
+    }
+
 }

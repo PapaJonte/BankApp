@@ -24,6 +24,7 @@ public class SlotMachineController(
     {
         ClearAllViews();
         machine.StartGame();
+
         ServeViewToUpdater(ViewType.SplashView);
 
         while (machine.State.GamePhase != GamePhase.Exiting)
@@ -56,23 +57,24 @@ public class SlotMachineController(
                     view.GameState = gameState;
                     view.HasBeenServed = true;
                 }
-                if (view.ViewState == ViewState.Complete)
+                if (userInput.TryReadKeyCode(ConsoleKey.Spacebar))
                 {
-                    userInput.ReadKeyCode(ConsoleKey.Spacebar);
                     machine.ResolveSpinResult();
                 }
                 break;
-
             case GamePhase.Resolving:
                 view = viewRegistry.GetView(ViewType.GameView);
-                if (!view.HasBeenServed)
+                if (view.GameState.GamePhase != gameState.GamePhase)
                 {
                     view.GameState = gameState;
-                    view.HasBeenServed = true;
                 }
-                if (view.ViewState == ViewState.Complete)
+                
+                if (userInput.TryReadKeyCode(ConsoleKey.Spacebar))
                 {
-                    machine.Apply();
+                    if (view.ViewState == ViewState.Complete)
+                    {
+                        machine.Apply();
+                    }
                 }
                 break;
 

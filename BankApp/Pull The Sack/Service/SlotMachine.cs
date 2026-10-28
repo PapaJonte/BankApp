@@ -44,8 +44,8 @@ public class SlotMachine(IReadOnlyList<Reel> reels, IPayoutEvaluator evaluator, 
         List<SlotSymbol> symbols = [.. reels.Select(x => x.CurrentSymbol)];
 
         SpinResult result = new(symbols, payoutMultipliler);
-
-        State = State with {SpinResult = result };
+        State = State with { SpinResult = result };
+        UpdateGamePhase(GamePhase.Resolving);
     }
 
     private void UpdateGamePhase(GamePhase gamePhase)

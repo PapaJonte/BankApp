@@ -6,100 +6,142 @@ using BankApp.Pull_The_Sack.Interface;
 using BankApp.Pull_The_Sack.View.Configs;
 
 /// <summary>Parent layout for the main game screen; owns the child views.</summary>
-public class GameView(GameViewConfig config, IReadOnlyList<ReelView> reels) : IView
+public class GameView : IView
 {
 
     public bool HasBeenServed { get; set; } = false;
     public GameState GameState { get; set; }
     public ViewState ViewState { get; set; } = ViewState.Idle;
 
+    private readonly GameViewConfig config;
+    private readonly IReadOnlyList<ReelView> reels;
     private int BlockWidth;
+    private bool resolved;
+    private bool complete;
 
+
+    public GameView(GameViewConfig config, IReadOnlyList<ReelView> reels)
+    {
+        this.config = config;
+        this.reels = reels;
+    }
 
     public void ResetView()
     {
         ViewState = ViewState.Idle;
+        resolved = false;
     }
 
     public void Render(IConsole console, double dt)
     {
-        console.Clear();
-
-        if (ViewState == ViewState.Idle)
+        //lock the whole render logic instead of individual draw calls
+        //this prevents flickering and is compatible to use with the
+        using (console.Lock())
         {
-            ViewState = ViewState.Animating;
-            BlockWidth = reels.Count * config.ReelWidth + (reels.Count - 1) * config.ReelGap; //thank you deepseek
+            console.Clear();
+
+            if (ViewState == ViewState.Idle)
+            {
+                ViewState = ViewState.Animating;
+                BlockWidth = reels.Count * config.ReelWidth + (reels.Count - 1) * config.ReelGap; //thank you deepseek
+            }
+
+            if (GameState.GamePhase == GamePhase.Resolving && !resolved)
+            {
+                Resolve();
+            }
+
+            #region Draw top graphics
+            console.SetConsoleColor(ConsoleColor.Yellow);
+            console.WriteCentered(config.Banner);
+            console.SetConsoleColor(ConsoleColor.White);
+            console.WriteCentered(config.SponsorText);
+            console.SetConsoleColor(ConsoleColor.Yellow);
+            console.WriteCentered(config.TopArt);
+            console.SetConsoleColor(ConsoleColor.White);
+            #endregion
+
+            RenderSpinning(console, dt);
+
+            #region Draw bottom graphics
+            console.SetConsoleColor(ConsoleColor.Yellow);
+            console.WriteCentered("");//offset bottom graphic
+            console.WriteCentered(config.BottomArt);
+            #endregion
+
+            if (resolved)
+            {
+                console.WriteCentered($"symbol 1 {GameState.SpinResult.Symbols[0]} symbol 2 {GameState.SpinResult.Symbols[1]} symbol 3 {GameState.SpinResult.Symbols[2]}");
+            }
+
+            //gameview register callbacks with reels for when they are done
+            //calls reels to start blink functionality
+            //once blink is complete another callback
+            //let user continue
         }
-
-        #region Draw top graphics
-        console.SetConsoleColor(ConsoleColor.Yellow);
-        console.WriteCentered(config.Banner);
-        console.SetConsoleColor(ConsoleColor.White);
-        console.WriteCentered(config.SponsorText);
-        console.SetConsoleColor(ConsoleColor.Yellow);
-        console.WriteCentered(config.TopArt);
-        console.SetConsoleColor(ConsoleColor.White);
-        #endregion
-
-        RenderSpinning(console, dt);
-
-        #region Draw bottom graphics
-        console.SetConsoleColor(ConsoleColor.Yellow);
-        console.WriteCentered("");//offset bottom graphic
-        console.WriteCentered(config.BottomArt);
-        #endregion
     }
 
     private void RenderSpinning(IConsole console, double dt)
     {
         int reelY;
         //calculate left reel top pos
-        int leftReelX = Math.Max(0, (console.GetTerminalWidth() - BlockWidth / 2) / 2);
-        
-        for (int i = 1; i <= config.ReelRows; i++)
+        int reelX = (console.GetTerminalWidth() - BlockWidth) / 2, mReelX;
+
+        for (int r = 0; r < config.ReelCols; r++)
         {
-            reelY = CalculateReelHeight(i);
-            console.SetCursor(leftReelX, reelY);
+            mReelX = reelX + ((config.ReelWidth + config.ReelGap) * r);
+            for (int i = 1; i <= config.ReelRows; i++)
+            {
+                reelY = CalculateReelHeight(i);
+                console.SetCursor(mReelX, reelY);
 
-            if (i == 2)
-                console.SetConsoleColor(ConsoleColor.Yellow);
-            else
-                console.SetConsoleColor(ConsoleColor.White);
+                if (i == 2)
+                    console.SetConsoleColor(ConsoleColor.Yellow);
+                else
+                    console.SetConsoleColor(ConsoleColor.White);
 
-            reels[0].Render(console, dt); //pass in console after we update the cursor position. ReelView is only responsible for drawing the symbol. Not for placement, that is controller from gameview.
+                reels[r].Render(console, dt); /*pass in console after we update the cursor position. ReelView is only responsible for drawing the symbol. Not for placement, that is controller from gameview. 
+                **Update** it is now a lil responsible for placement since its drawing its own box. But it's akin to GameView placing in worldspace/terminal space and reelview placeing in localspace, kind of.
+                */
+            }
+        }
+    }
+
+
+    /*
+    Ok so this is a last minute fix because I didnt actually look up the rules for the slot machine -.-
+    apparently the slot result is evaluated before you begin spinning and you should setup the reel spin offset from the start.
+    But because I didn't do that, we now have to offset the reel target spins when we're already spinning. And I guess this is one way of doing so.. We just add extra buffer to spin symbols on the reels that run longer
+    and let them run at each frame, determined by frame delta and current scroll speed for that reel.
+    and then we slow down the scroll speed (skipping frames basically) when we approach the spin target.
+    */
+    private void Resolve()
+    {
+        if (GameState.SpinResult == null)
+        {
+            throw new NullReferenceException("Spin Result cannot be null!");
         }
 
-        //calculate middle reel top pos
-        int middleReelX = leftReelX + config.ReelWidth + config.ReelGap;
-        for (int i = 1; i <= config.ReelRows; i++)
+        if (GameState.SpinResult.Symbols.Count != reels.Count)
         {
-            reelY = CalculateReelHeight(i);
-            console.SetCursor(middleReelX, reelY);
-
-            if (i == 2)
-                console.SetConsoleColor(ConsoleColor.Yellow);
-            else
-                console.SetConsoleColor(ConsoleColor.White);
-
-            reels[1].Render(console, dt);
+            throw new FormatException("Spin Result does not match reels count!");
+            
         }
 
-        console.SetConsoleColor(ConsoleColor.White);
+        string[] targetSymbols = new string[GameState.SpinResult.Symbols.Count];
 
-        //calculate right reel top pos
-        int righteReelX = leftReelX + ((config.ReelWidth + config.ReelGap) * 2);
-        for (int i = 1; i <= config.ReelRows; i++)
+        for (int i = 0; i < GameState.SpinResult.Symbols.Count; i++)
         {
-            reelY = CalculateReelHeight(i);
-            console.SetCursor(righteReelX, reelY);
-
-            if (i == 2)
-                console.SetConsoleColor(ConsoleColor.Yellow);
-            else
-                console.SetConsoleColor(ConsoleColor.White);
-
-            reels[2].Render(console, dt);
+            SlotSymbol symbl = GameState.SpinResult.Symbols[i];
+            targetSymbols[i] = SymbolCatalog.GetSymbolGraphicNullCheck(symbl);
         }
+
+        for (int i = 0; i < reels.Count; i++)
+        {
+            reels[i].Target(targetSymbols[i], config.ResolveSlowDownSteps + (i * 1), 1 + (i * .25f), .25f);
+        }
+
+        resolved = true;
     }
 
     private int CalculateReelHeight(int index) => config.ReelTop + (1 + config.ReelGap) * index;

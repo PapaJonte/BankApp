@@ -67,16 +67,16 @@ public class Orchestrator
 
         List<ReelView> reels_tmp = [];
 
-        foreach (var kvp in SymbolCatalog.SymbolGraphic)
+        for (int i = 0; i < 3; i++)
         {
             reels_tmp.Add(new ReelView([.. SymbolCatalog.SymbolGraphic.Values], 3, 5));
         }
-
-        IReadOnlyList<ReelView> reelViews = [.. reels_tmp];
         
+        IReadOnlyList<ReelView> reelViews = [.. reels_tmp];
+
         BalanceView balance = new(loanAmount);
 
-        GameView game = new(new GameViewConfig { ReelCount = reels.Count }, reelViews);
+        GameView game = new(new GameViewConfig { ReelCols = reels.Count }, reelViews);
         // ResultView intentionally not wired (testing splash only).
 
         // --- Registry ---

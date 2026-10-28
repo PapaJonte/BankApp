@@ -11,13 +11,23 @@ public class UserInput(IConsole console)
     /// <summary>Blocks until the user presses a key and returns just the key.</summary>
     public void ReadKeyCode(ConsoleKey key)
     {
-        while(true)
+        while (true)
         {
             ConsoleKey inputKey = console.ReadKey().Key;
 
-            if (key == inputKey)
+            if (inputKey == key)
                 break;
-            
+
         }
+    }
+
+    public bool TryReadKeyCode(ConsoleKey key)
+    {
+        while (console.TryReadKey(out var info))
+        {
+            if (info.Key == key)
+                return true;
+        }
+        return false;
     }
 }

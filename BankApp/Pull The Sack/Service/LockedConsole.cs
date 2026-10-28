@@ -2,14 +2,63 @@ namespace BankApp.Pull_The_Sack.Service;
 
 using BankApp.Pull_The_Sack.Interface;
 
+
 /// <summary>
 /// Single shared console chokepoint. Serializes all console access so
 /// rendering and input from different views don't interleave/corrupt.
 /// </summary>
 public class LockedConsole : IConsole
 {
+
+    private sealed class Releaser(object gate) : IDisposable
+    {
+        private object? _gate = gate;
+        public void Dispose()
+        {
+            var g = Interlocked.Exchange(ref _gate, null);
+            if (g is not null) Monitor.Exit(g);
+        }
+    }
+
     private readonly object _gate = new();
+
+    /*
+    Using try read key here because listening for input even from another thread seems to cause
+    the host to write from buffer and flush it more frequently, causing flickering during
+    the GameView slot machine graphic loop. I have no idea why this happens 
+    and haven't found any comments on it on google. Asked GLM and it's solution was to 
+    only check for available key and not hog the thread with read key. It works, and it's 
+    explanation was this : 
     
+    "why exactly the outstanding read degraded paint batching. 
+    My "eager servicing of the active connection" explanation is the model that fits the observations — 
+    the outstanding read keeps your process's console connection "hot" in the host's scheduling 
+    so paints get serviced in smaller batches during your write burst. I flagged it as inference 
+    last time and I'll keep it flagged: conhost's exact thread/paint scheduling under an 
+    outstanding ReadConsoleInput isn't something I can cite documentation for."
+    */
+    public bool TryReadKey(out ConsoleKeyInfo key)
+    {
+        key = default;
+
+        bool available;
+        lock (_gate) { available = Console.KeyAvailable; }
+
+        if (!available)
+            return false;
+
+        key = Console.ReadKey(intercept: true); // key is guaranteed present → returns instantly
+        return true;
+    }
+
+
+
+    public IDisposable Lock()
+    {
+        Monitor.Enter(_gate);
+        return new Releaser(_gate);
+    }
+
     public int GetTerminalWidth()
     {
         int width;
@@ -18,7 +67,7 @@ public class LockedConsole : IConsole
         {
             width = 120; //just hardcode a number that would seem like it could fit a terminal
         }
-        
+
         return width;
     }
 
@@ -99,7 +148,7 @@ public class LockedConsole : IConsole
 
     public void SetConsoleColor(ConsoleColor color)
     {
-        lock(_gate)
+        lock (_gate)
         {
             Console.ForegroundColor = color;
         }

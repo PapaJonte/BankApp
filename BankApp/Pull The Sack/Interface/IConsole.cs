@@ -6,6 +6,8 @@ namespace BankApp.Pull_The_Sack.Interface;
 /// </summary>
 public interface IConsole
 {
+    IDisposable Lock();
+    bool TryReadKey(out ConsoleKeyInfo key);
     int GetTerminalWidth();
     /// <summary>Clears the console.</summary>
     void Clear();
