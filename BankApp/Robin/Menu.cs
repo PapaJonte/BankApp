@@ -220,13 +220,28 @@ namespace BankApp.Robin
                         switch (selectedIndex)
                         {
                             case 0:
+                                Console.Clear();
                                 CreateUser();
                                 break;
 
                             case 1:
                                 // Unlock user
+                                Console.Clear();
                                 Console.WriteLine("Type in identity number : ");
-                                _authService.UnlockUser();
+                                string userName = Console.ReadLine() ?? "";
+
+                                bool userExists = _userService.UsernameExists(userName);
+                                bool userUnlocked = _authService.UnlockUser(userName);
+
+                                if (userUnlocked && userExists == true)
+                                {
+                                    Console.WriteLine($"You unlocked user ,{userName}");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("User not found!");
+                                }
+                                Console.ReadKey();
                                 break;
 
                             case 2:
