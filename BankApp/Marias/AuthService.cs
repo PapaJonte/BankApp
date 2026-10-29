@@ -54,7 +54,7 @@ namespace BankApp
             LoggedInUser = null;
         }
 
-        //Behörighet
+        //Autherisation
         public bool IsAdmin(User? user)
         {
             return user != null &&
@@ -66,25 +66,23 @@ namespace BankApp
             return IsAdmin(LoggedInUser);
         }
 
-        //Bara Owner (bankägaren) får skapa nya Admin Konton. Förhindrar andra från att skapa fler admin-konto.
+        //Only owner can create new Admin accounts.
         public bool CanCreateAdminAccount()
         {
             return LoggedInUser != null && LoggedInUser.Role == UserRole.Owner;
         }
-
-
-        //Låser upp ett låst konto.
+        //Unlocks a locked account.
         public bool UnlockUser(string username)
         {
-            if (!IsLoggedInUserAdmin()) //Kollar att den som försöker låsa upp är admin.
+            if (!IsLoggedInUserAdmin()) //Confirms that the person that gets to unlock is an admin.
                 return false;
 
-            User? user = _userService.GetUserByUsername(username); //Hittar personen som ska låsas upp.
+            User? user = _userService.GetUserByUsername(username); //Finds the user that needs to be unlocked.
             if (user == null)
                 return false;
 
-            user.IsLockedOut = false; //Upplåsningen.
-            user.FailedLoginAttempts = 0; //nollställer räknaren.
+            user.IsLockedOut = false; //Unlocking.
+            user.FailedLoginAttempts = 0; //resets the timer.
             return true;
         }
     }
