@@ -20,9 +20,7 @@ namespace BankApp
 
             Console.ReadKey();
 
-            //menu.LoginMenu();
-
-            LoanTests.RunTests();
+            menu.LoginMenu();
         }
     }
 }
