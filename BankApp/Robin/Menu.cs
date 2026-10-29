@@ -7,7 +7,7 @@ namespace BankApp.Robin
 
         // Creates private fields for UserService and AuthService
 
-        private readonly Theme theme;
+        //private readonly Theme theme;
         private readonly UserService _userService;
         private readonly AuthService _authService;
         // CONSTRUCTOR INJECTION: We require UserService to be passed in when Menu is created
@@ -50,8 +50,8 @@ namespace BankApp.Robin
             Console.Write("\nPhone number: ");
             string userPhoneNumber = Console.ReadLine() ?? "";
 
-            bool succesCreatedUser = _userService.CreateUser(true, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
-            User? user = _userService.GetUserByUsername(userName);
+            bool succesCreatedUser = _userService.CreateUser(true, false, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
+            //User? user = _userService.GetUserByUsername(userName);
 
             return true;
         }
@@ -227,8 +227,14 @@ namespace BankApp.Robin
                             case 0:
                                 Console.Clear();
                                 CreateUser();
+                                string userName = "";
+                                string userPass = "";
+                                string userEmail = "";
+                                string userPhoneNumber = "";
 
-                                if (CreateUser())
+                                bool succesCreatedUser = _userService.CreateUser(true, false, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
+
+                                if (succesCreatedUser)
                                 {
                                     Console.WriteLine("Success!");
 
@@ -237,6 +243,7 @@ namespace BankApp.Robin
                                 else
                                 {
                                     Console.WriteLine("Error!");
+                                    
                                 }
                                 break;
 
@@ -261,7 +268,7 @@ namespace BankApp.Robin
 
                             case 2:
                                 // Loans
-
+                                LoanMenu.
                                 break;
 
                             case 3:
