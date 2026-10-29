@@ -1,6 +1,6 @@
 ﻿using MailKit.Net.Smtp;
 using MimeKit;
-
+using MailKit.Net.Imap;
 public class EmailService
 {
     public void SendEmail(string recipientAddress, string subject, string body)
@@ -15,6 +15,15 @@ public class EmailService
         {
             Text = body
         };
+
+        // Connecting and authenticating to Gmail's IMAP server
+        using (var imapClient = new ImapClient())
+        {
+            imapClient.Connect("imap.gmail.com", 993, true);
+            imapClient.Authenticate("yourgmail@gmail.com", "yourpassword");
+            // Access and manage your inbox here
+            imapClient.Disconnect(true);
+        }
 
         using (var client = new SmtpClient())
         {
