@@ -1,5 +1,6 @@
 ﻿using BankApp.Jonathan;
 using BankApp.Robin;
+using Spectre.Console;
 
 namespace BankApp
 {
@@ -7,9 +8,7 @@ namespace BankApp
     {
         static void Main(string[] args)
         {
-            //User user = new User();
-            
-            // SERVICES
+            Theme theme = new Theme();
             UserService userService = new UserService();
             AuthService authService = new AuthService(userService);
             InterestRuleService interestRuleService = new InterestRuleService();
@@ -17,6 +16,9 @@ namespace BankApp
             LoanService loanService = new LoanService(interestRuleService, creditScoreService);
 
             Menu menu = new Menu(userService, authService);
+            
+
+            Console.ReadKey();
 
             menu.LoginMenu();
         }

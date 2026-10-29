@@ -402,5 +402,20 @@ namespace BankApp.Jonathan
         {
             interestRuleService.UpdateInterestAdjustment(minimumCreditScore, maximumCreditScore, newAdjustment);
         }
+
+        // Gets a loan using its unique loan ID
+        public Loan? GetLoanById(int loanId)
+        {
+            // Goes through all loans to find the matching ID
+            foreach (Loan loan in loans)
+            {
+                if (loan.LoanId == loanId)
+                {
+                    return loan;
+                }
+            }
+
+            return null;
+        }
     }
 }

@@ -21,7 +21,7 @@ namespace BankApp.Robin
         public Loan? ApplyForLoan(int userId, decimal requestedAmount, int duration)
         {
             // Gets the customers combined total balance
-            decimal totalAccountBalance = accountManager.GetTotalBalance();
+            decimal totalAccountBalance = accountManager.GetTotalBalance(userId);
 
             // Validates and calculates interest etc.
             Loan? loan = loanService.ApplyForLoan(userId, requestedAmount, duration, totalAccountBalance);
@@ -42,8 +42,18 @@ namespace BankApp.Robin
 
         public bool ChangeLoanStatus(int loanId, LoanStatus newStatus)
         {
+            // Gets the loan using its loand ID
+            Loan? loan = loanService.GetLoanById(loanId);
+
+            // Checks if the loan exists
+            if (loan == null)
+            {
+                Console.WriteLine("Loan could not be found.");
+                return false;
+            }
+
             // Gets the customer's total balance from their bank accounts
-            decimal totalAccountBalance = accountManager.GetTotalBalance();
+            decimal totalAccountBalance = accountManager.GetTotalBalance(loan.UserId);
 
             // Attempts to update the loan status
             bool statusChanged = loanService.ChangeLoanStatus(loanId, newStatus, totalAccountBalance);

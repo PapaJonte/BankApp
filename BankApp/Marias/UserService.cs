@@ -7,16 +7,17 @@ namespace BankApp
 
     internal class UserService
     {
-        //alla användare sparas i en lista i minnet.
+        //All users are stored in a list.
         private readonly Dictionary<int, User> _users =
              new Dictionary<int, User>();
-        //Ger varje ny användare ett unikt internt ID (1, 2, 3 ...).
+        //Gives every user a unique internal ID (1, 2, 3 ...).
         private int _nextUserId = 1;
 
-        //Det måste finnas minst en admin från start, skapar med testvärden för den enda admin-användaren som skapas automatiskt när programmet startar.
+        //There should be at least one admin and owner from the beginning, skapar med testvärden för den enda admin-användaren som skapas automatiskt när programmet startar.
         public UserService()
         {
-            AddUser("000000-0000", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
+            AddUser("000000-0000", "ownerpassword123", "owner@gmail.com", "0729216167", UserRole.Owner);
+            AddUser("111111-1111", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
         }
 
         //Privat hjälpmetod som skapar och lagrar en ny User. Används av konstruktorn (default-admin) och av CreateUser.
@@ -99,11 +100,20 @@ namespace BankApp
          är inloggad.
         */
 
-        //returnerar true om användaren skapades, annars false.
-        public bool CreateUser(bool callerIsAdmin, string username, string password, string email, string phoneNumber, UserRole role = UserRole.Customer)
+        public bool CreateUser(bool callerIsAdmin, bool callerIsOwner, string username,
+            string password, string email, string phoneNumber,
+            UserRole role = UserRole.Customer)
         {
-            //bara admin får skapa nya användare.
+            // Måste vara minst admin för att skapa någon användare
             if (!callerIsAdmin)
+                return false;
+
+            // Ingen kan skapa en ny Owner
+            if (role == UserRole.Owner)
+                return false;
+
+            // Bara Owner får skapa Admin
+            if (role == UserRole.Admin && !callerIsOwner)
                 return false;
 
             if (string.IsNullOrWhiteSpace(password))
@@ -111,13 +121,12 @@ namespace BankApp
 
             if (!IsValidPersonalNumberFormat(username))
                 return false;
-            //Personumret måste vara unikt (normaliserat, se NormalizeUsername)
+
             if (UsernameExists(username))
                 return false;
 
             AddUser(username, password, email, phoneNumber, role);
             return true;
-
         }
 
         /*
