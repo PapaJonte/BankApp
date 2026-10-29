@@ -9,10 +9,9 @@ namespace BankApp.Robin
     background: Color.White,
     decoration: Decoration.Bold);
 
-        public void Markup()
+        public void Markup(string input)
         {
-            AnsiConsole.Write(new Markup("Welcome", style));
-
+            AnsiConsole.Write(new Markup(input, style));
         }
 
     }

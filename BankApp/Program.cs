@@ -16,11 +16,7 @@ namespace BankApp
             LoanService loanService = new LoanService(interestRuleService, creditScoreService);
 
             Menu menu = new Menu(userService, authService);
-
-            theme.Markup();
-
-            AnsiConsole.MarkupLine("[red bold]Hello World[/]");
-            AnsiConsole.MarkupLine("[slowblink]Hello World[/]");
+            
 
             Console.ReadKey();
 

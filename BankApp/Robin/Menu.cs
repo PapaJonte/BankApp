@@ -6,6 +6,8 @@ namespace BankApp.Robin
     {
 
         // Creates private fields for UserService and AuthService
+
+        private readonly Theme theme;
         private readonly UserService _userService;
         private readonly AuthService _authService;
         // CONSTRUCTOR INJECTION: We require UserService to be passed in when Menu is created
