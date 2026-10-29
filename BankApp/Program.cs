@@ -1,4 +1,5 @@
 ﻿using BankApp.Jonathan;
+using BankApp.Pull_The_Sack;
 using BankApp.Robin;
 using Spectre.Console;
 
@@ -21,7 +22,7 @@ namespace BankApp
             Menu menu = new Menu(userService, authService, loanMenu);
             
 
-            Console.ReadKey();
+            // Console.ReadKey();
 
             menu.LoginMenu();
         }
