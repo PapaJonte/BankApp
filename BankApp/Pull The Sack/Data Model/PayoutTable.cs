@@ -4,10 +4,18 @@ namespace BankApp.Pull_The_Sack.Data_Model;
 
 public class PayoutTable
 {
+
     public IReadOnlyList<PayoutEntry>? Entries { get; set; }
     public PayoutTable() => GenerateTable();
 
-    public decimal GetPayoutValue(SlotSymbol symbol) => Entries!.FirstOrDefault(s=>s.Symbol == symbol).Multiplier;
+    /// <summary>
+    ///  returns the payout value per symbol
+    /// </summary>
+    /// <param name="">
+    /// SlotSymbol symbol that we need payout value for.
+    /// </param>
+    /// <returns></returns>
+    public decimal GetPayoutValue(SlotSymbol symbol) => Entries!.FirstOrDefault(s => s.Symbol == symbol).Multiplier;
 
     private void GenerateTable()
     {

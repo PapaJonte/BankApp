@@ -3,8 +3,7 @@ using BankApp.Pull_The_Sack.Enum;
 namespace BankApp.Pull_The_Sack.Data_Model;
 
 /// <summary>
-/// A single spinning reel. Holds the current symbol and can be spun
-/// to select a new one via the injected RNG.
+/// A single spinning reel. Holds the target symbol, can be spun to recalculate new target symbol.
 /// </summary>
 public class Reel(SymbolCatalog catalog)
 {
@@ -15,7 +14,11 @@ public class Reel(SymbolCatalog catalog)
     public SlotSymbol CurrentSymbol { get; private set; } = catalog.Symbols[0];
 
 
-    /// <summary>Spins this reel and updates <see cref="CurrentSymbol"/>.</summary>
+    /// <summary>
+    /// Roll a target symbol for this Reel
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public void Spin()
     {
         int rolledSymbol = rnd.Next(0, _catalog.Symbols.Count);

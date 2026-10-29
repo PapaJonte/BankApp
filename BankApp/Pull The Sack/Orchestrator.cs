@@ -16,7 +16,7 @@ using BankApp.Pull_The_Sack.View.Configs;
 public class Orchestrator
 {
     /// <summary>Builds the object graph and runs a single game session.</summary>
-    public void Start(decimal loanAmount)
+    public SlotMachineController Start(decimal loanAmount)
     {
         // --- Infrastructure ---
         IConsole console = new LockedConsole();
@@ -89,5 +89,6 @@ public class Orchestrator
             new(machine, updater, bank, userInput, registry);
         controller.PullTheSack();
 
+        return controller;
     }
 }

@@ -5,11 +5,13 @@ using BankApp.Pull_The_Sack.Enum;
 using BankApp.Pull_The_Sack.Interface;
 using BankApp.Pull_The_Sack.View.Configs;
 
-/// <summary>Outcome screen (halve / double / unchanged) with the resulting balance.</summary>
+
+/// <summary>
+/// Displays the user balance after the slot machine game.
+/// </summary>
+/// <param name="config"></param>
 public class ResultView(ResultViewConfig config) : IView
 {
-    private int currentFrame = 0;
-
     public bool HasBeenServed { get; set; } = false;
     public GameState GameState { get; set; }
     public ViewState ViewState { get; set; } = ViewState.Idle;
@@ -39,7 +41,7 @@ public class ResultView(ResultViewConfig config) : IView
 
         ++viewIndex;
 
-        if(viewIndex > 4)//prevent previous space from also registering on this frame
+        if (viewIndex > 4)//prevent previous space from also registering on this frame
         {
             ViewState = ViewState.Complete;
         }

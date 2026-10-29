@@ -4,7 +4,7 @@ using BankApp.Pull_The_Sack.Enum;
 namespace BankApp.Pull_The_Sack.Interface;
 
 /// <summary>
-/// Base contract for a screen/panel rendered to the console.
+/// IView interface, used by the different Views for slot game.
 /// </summary>
 public interface IView
 {
@@ -13,7 +13,6 @@ public interface IView
     public ViewState ViewState { get; set; }
 
 
-    /// <summary>Renders the view to the console.</summary>
     void Render(IConsole console, double dt);
     void ResetView();
 }

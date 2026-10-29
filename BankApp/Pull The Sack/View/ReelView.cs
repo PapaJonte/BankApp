@@ -4,7 +4,13 @@ using BankApp.Pull_The_Sack.Data_Model;
 using BankApp.Pull_The_Sack.Enum;
 using BankApp.Pull_The_Sack.Interface;
 
-/// <summary>Renders a single <see cref="Reel"/> and its spin animation.</summary>
+
+/// <summary>
+/// View for the reel, draws the symbol and the box around it based on placement from the GameView
+/// </summary>
+/// <param name="SlotSymbols">all the slot symbols looping through the reel</param>
+/// <param name="RowCount">how many rows each reel has (set to 3 in config)</param>
+/// <param name="Width">width of the reel box</param>
 public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
 {
     public bool HasBeenServed { get; set; } = false;
@@ -21,12 +27,19 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
     private readonly Random rnd = new();
     private bool runningResolveSequence;
 
-
+    /// <summary>
+    /// Reset the view state to idle
+    /// </summary>
     public void ResetView()
     {
         ViewState = ViewState.Idle;
     }
 
+    /// <summary>
+    /// Render the box around the symbol as well as the symbol based on cursor placement and its own width
+    /// </summary>
+    /// <param name="console"></param>
+    /// <param name="dt"></param>
     public void Render(IConsole console, double dt)
     {
         if (ViewState == ViewState.Idle)
@@ -68,7 +81,7 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
 
             if (runningResolveSequence)
             {
-                if(sequenceSpeed <= 0)
+                if (sequenceSpeed <= 0)
                 {
                     if (!resolveComplete)
                     {
@@ -96,6 +109,12 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
         }
     }
 
+    /// <summary>
+    /// Wraps value around maxvalue 0=>maxVal
+    /// </summary>
+    /// <param name="val">value to wrap</param>
+    /// <param name="maxVal">value to wrap around</param>
+    /// <returns></returns>
     private int WrapAround(int val, int maxVal)
     {
         if (val < 0)
@@ -106,8 +125,19 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
         return val;
     }
 
+    /// <summary>
+    /// Randomly pick the start symbol for this reel
+    /// </summary>
+    /// <returns></returns>
     private int PickStartSymbolIndex() => rnd.Next(0, SlotSymbols.Length - 1);
 
+    /// <summary>
+    /// Sets the reel target symbol once they are rolled by slot machine. 
+    /// </summary>
+    /// <param name="target">symbol to land on</param>
+    /// <param name="sequenceLenght">length of the sequence that the reel will loop</param> <= this one is unneccesarry, should just add the full symbol list offset by target.
+    /// <param name="sequenceSpeed">The speed used move the loop, lower speed skips frames between updates.</param>
+    /// <param name="sequenceSpeedDecay">How much speed should decay on each successful symbol update.</param>
     public void Target(string target, int sequenceLenght, float sequenceSpeed, float sequenceSpeedDecay)
     {
         this.sequenceSpeed = sequenceSpeed;
@@ -128,7 +158,7 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
                 currentIndex = WrapAround(--currentIndex, SlotSymbols.Length - 1);
             }
         }
-        symbolIndex = sequenceLenght -1;
+        symbolIndex = sequenceLenght - 1;
         SlotSymbols = temp;
         runningResolveSequence = true;
     }

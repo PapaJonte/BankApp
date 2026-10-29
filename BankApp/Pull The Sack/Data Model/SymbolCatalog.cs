@@ -4,22 +4,29 @@ using BankApp.Pull_The_Sack.Enum;
 namespace BankApp.Pull_The_Sack.Data_Model;
 
 /// <summary>
-/// Injected configuration holding the set of symbols the reels can land on
-/// and any weighted-distribution information.
+/// Holds different mappings for the symbols and their graphic
 /// </summary>
-public class SymbolCatalog
+/// <param name=""></param>
+/// <returns></returns>
+public class SymbolCatalog(IReadOnlyDictionary<int, SlotSymbol> symbols)
 {
-    /// <summary>The ordered set of symbols available to the reels.</summary>
-    public IReadOnlyDictionary<int, SlotSymbol> Symbols { get; private set; }
+    public IReadOnlyDictionary<int, SlotSymbol> Symbols { get; private set; } = symbols;
     public static IReadOnlyDictionary<SlotSymbol, string>? SymbolGraphic { get; set; }
 
-    public SymbolCatalog(IReadOnlyDictionary<int, SlotSymbol> symbols)
-    {
-        Symbols = symbols;
-    }
-
+    /// <summary>
+    /// Returns graphic for symbol passed in.
+    /// </summary>
+    /// <param name="">
+    /// SlotSymbol symbol the enum representing the symbol we want graphic for.
+    /// </param>
+    /// <returns></returns>
     public static string GetSymbolGraphicNullCheck(SlotSymbol symbol)
     {
+        if(SymbolGraphic == null)
+        {
+            throw new NullReferenceException("Symbol Graphics are null!");
+        }
+        
         if (string.IsNullOrEmpty(SymbolGraphic[symbol]))
         {
             throw new FormatException($"Graphic for symbol {symbol} is null!");

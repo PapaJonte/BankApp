@@ -3,8 +3,7 @@ namespace BankApp.Pull_The_Sack.Service;
 using BankApp.Pull_The_Sack.Interface;
 
 /// <summary>
-/// Default <see cref="IViewUpdater"/>. Holds the active views and
-/// runs their update+render pass on each tick.
+/// Updates registered IViews with each gameplay loop
 /// </summary>
 public class ViewUpdater : IViewUpdater
 {
@@ -16,12 +15,21 @@ public class ViewUpdater : IViewUpdater
         _console = console;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Registers IView to update
+    /// </summary>
+    /// <param name="view">IView to update each tick</param>
     public void Register(IView view) => _views.Add(view);
-
+    /// <summary>
+    /// Removes IView to update
+    /// </summary>
+    /// <param name="view">Remove IView from tick update</param>
     public void DeRegister(IView view) => _views.Remove(view);
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Called from gameplay loop to IViews each tick.
+    /// </summary>
+    /// <param name="dt">Delta Time between ticks. Currently not in use.</param>
     public void Tick(double dt)
     {
         foreach (var view in _views)

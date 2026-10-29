@@ -4,7 +4,10 @@ using BankApp.Pull_The_Sack.Data_Model;
 using BankApp.Pull_The_Sack.Enum;
 using BankApp.Pull_The_Sack.Interface;
 
-/// <summary>Displays the player's current loan balance and its animation.</summary>
+
+/// <summary>
+/// Display balance after game. Not in use.
+/// </summary>
 public class BalanceView : IView
 {
     private decimal _displayed;
@@ -14,7 +17,6 @@ public class BalanceView : IView
         _displayed = startingBalance;
     }
 
-    /// <summary>Target balance the view animates toward.</summary>
     public decimal Target { get; set; }
     public bool HasBeenServed { get; set; } = false;
     public GameState GameState { get; set; }

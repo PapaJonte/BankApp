@@ -11,6 +11,13 @@ using BankApp.Pull_The_Sack.Interface;
 public class PayoutEvaluator(PayoutTable table) : IPayoutEvaluator
 {
 
+    /// <summary>
+    /// Evaluate payout based on symbols the reels rolled
+    /// </summary>
+    /// <param name="">
+    /// IReadOnlyList<SlotSymbol> symbols rolled by reel, used to evaluate payout.
+    /// </param>
+    /// <returns></returns>
     public decimal Evaluate(IReadOnlyList<SlotSymbol> symbols)
     {
         decimal payoutMultiplier = .5m;

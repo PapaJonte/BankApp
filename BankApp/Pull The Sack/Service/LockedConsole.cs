@@ -47,7 +47,7 @@ public class LockedConsole : IConsole
         if (!available)
             return false;
 
-        key = Console.ReadKey(intercept: true); // key is guaranteed present → returns instantly
+        key = Console.ReadKey(intercept: true);
         return true;
     }
 

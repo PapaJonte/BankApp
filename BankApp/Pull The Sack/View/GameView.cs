@@ -1,12 +1,14 @@
 namespace BankApp.Pull_The_Sack.View;
 
-using System.Collections.Concurrent;
 using BankApp.Pull_The_Sack.Data_Model;
 using BankApp.Pull_The_Sack.Enum;
 using BankApp.Pull_The_Sack.Interface;
 using BankApp.Pull_The_Sack.View.Configs;
 
-/// <summary>Parent layout for the main game screen; owns the child views.</summary>
+
+/// <summary>
+/// GameView displays the slot machine game
+/// </summary>
 public class GameView : IView
 {
 
@@ -24,7 +26,11 @@ public class GameView : IView
     private int targetBlinkCounts = 4;
     private ConsoleColor[] blinkColor;
 
-
+    /// <summary>
+    /// Constructor, sets the blink colors iterated between once the reels have landed on their symbols.
+    /// </summary>
+    /// <param name="config"></param>
+    /// <param name="reels"></param>
     public GameView(GameViewConfig config, IReadOnlyList<ReelView> reels)
     {
         this.config = config;
@@ -34,12 +40,20 @@ public class GameView : IView
         blinkColor[1] = ConsoleColor.Yellow;
     }
 
+    /// <summary>
+    /// called on IView delist from updater. Resets ViewState and resolved status
+    /// </summary>
     public void ResetView()
     {
         ViewState = ViewState.Idle;
         resolved = false;
     }
 
+    /// <summary>
+    /// Render current frame. Renders the slot machine game.
+    /// </summary>
+    /// <param name="console">used to write to with thread safety</param>
+    /// <param name="dt">delta time between this and previous tick, not in use.</param>
     public void Render(IConsole console, double dt)
     {
         //lock the whole render logic instead of individual draw calls
@@ -93,6 +107,12 @@ public class GameView : IView
         }
     }
 
+    /// <summary>
+    /// Renders the spinning graphics, calculate which symbol to display as well as blinking on selected symbols.
+    /// Responsible for placing graphic(reels) inside the terminal as well as coloring them. Does not actually render to terminal.
+    /// </summary>
+    /// <param name="console"></param>
+    /// <param name="dt"></param>
     private void RenderSpinning(IConsole console, double dt)
     {
         int reelY;
@@ -147,6 +167,11 @@ public class GameView : IView
     and let them run at each frame, determined by frame delta and current scroll speed for that reel.
     and then we slow down the scroll speed (skipping frames basically) when we approach the spin target.
     */
+    /// <summary>
+    /// Responsible for fetching the reel target symbols from gamestate and setting up the reel views with correct offset data to make them slow down correctly and with correct offset.
+    /// </summary>
+    /// <exception cref="NullReferenceException"></exception>
+    /// <exception cref="FormatException"></exception>
     private void Resolve()
     {
         if (GameState.SpinResult == null)
@@ -177,12 +202,20 @@ public class GameView : IView
         resolved = true;
     }
 
+    /// <summary>
+    /// Callback from last reelview once it has landed on its target synbol
+    /// </summary>
     private void OnReelResolveComplete()
     {
         reels[reels.Count - 1].OnResolveComplete -= OnReelResolveComplete;
         blinkGraphic = true;
     }
 
+    /// <summary>
+    /// Evaluates and returns the correct complete text to be displayed once the slot machine game is complete.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="NullReferenceException"></exception>
     private string EvaluateCompleteText()
     {
         string outcome;
@@ -208,6 +241,11 @@ public class GameView : IView
         return outcome;
     }
 
+    /// <summary>
+    /// Calculates the placement of the next reelview based on its vertical order.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
     private int CalculateReelHeight(int index) => config.ReelTop + (1 + config.ReelGap) * index;
 
 }

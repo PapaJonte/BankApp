@@ -5,14 +5,18 @@ using BankApp.Pull_The_Sack.Interface;
 using BankApp.Pull_The_Sack.IO;
 using BankApp.Pull_The_Sack.Service;
 
+
 /// <summary>
-/// State machine that iterates through the game based on user input that furthers the gamestate inside the SlotMachine.
+/// state machine based router, loops and routes gamelogic while gamestate is not set to exit.
+/// calls slotmachine to process the gameplay and update gamephase. 
+/// Handles display call for views based on gamephase.
 /// </summary>
 /// <param name="">
-/// SlotMachine machine GameLogic, handling game
-/// 
-/// 
-/// 
+/// SlotMachine machine, handles gameplay logic and owns the link to gameloop.
+/// IViewUpdater updater is hooked into gameloop, gets update calls each frame and calls Render function inside IViews on frame update. Register and Deregister views that need to be updated.
+/// IBankInterface bank small bank bridge class between bank app and gambling app, holds user loan amount.
+/// UserInput userInput small input class that returns user input.
+/// ViewRegistry viewRegistry data model that holds the different IViews.
 /// </param>
 /// <returns></returns>
 public class SlotMachineController(
@@ -24,9 +28,19 @@ public class SlotMachineController(
 {
     private SpinResult? _spinResults;
 
-    public void PullTheSack() => RunSession();
+    /// <summary>
+    /// Entry function to run the gambling game.
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    public IBankInterface PullTheSack() => RunSession();
 
-    private void RunSession()
+    /// <summary>
+    /// runs the router loop for gameplay and view updates. Exit on GamePhase exiting.
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    private IBankInterface RunSession()
     {
         ClearAllViews();
         machine.StartGame();
@@ -37,8 +51,17 @@ public class SlotMachineController(
         {
             StateControl(machine.State);
         }
+
+        return bank;
     }
 
+    /// <summary>
+    /// state machine that routes the views and gameplay logic based on current gamephase.
+    /// </summary>
+    /// <param name="">
+    /// GameState gameState represents current gamestate from the slotmachine, used to direct gameplay data.
+    /// </param>
+    /// <returns></returns>
     private void StateControl(GameState gameState)
     {
         IView view;
@@ -110,15 +133,33 @@ public class SlotMachineController(
         }
     }
 
+    /// <summary>
+    /// Register IViewUpdater with a IView that will be updated each game loop.
+    /// </summary>
+    /// <param name="">
+    /// ViewType view used to fetch IView from registry and update the IViewUpdater with that IView.
+    /// </param>
+    /// <returns></returns>
     private void ServeViewToUpdater(ViewType view) => updater.Register(viewRegistry.GetView(view));
 
+    /// <summary>
+    /// Removes IView from IViewUpdater and call reset function on that IView.
+    /// </summary>
+    /// <param name="">
+    /// ViewType viewType used to fetch IView from registry to deregister from IVewUpdater
+    /// </param>
+    /// <returns></returns>
     private void RemoveViewFromUpdater(ViewType view)
     {
         IView v = viewRegistry.GetView(view);
         updater.DeRegister(v);
-        v.ResetView();
+        v.ResetView();//Debatable if reset should be called here or if we should add a DeRegister function and let the IView decide if they want to reset on DeRegister. Currently we do want that for all of them, so it works here.
     }
-
+    /// <summary>
+    /// Deregisters all Iviews currently in IViewUpdater
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     private void ClearAllViews()
     {
         foreach (IView view in viewRegistry.AllViews)

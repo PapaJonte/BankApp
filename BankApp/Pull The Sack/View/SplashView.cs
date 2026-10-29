@@ -5,7 +5,11 @@ using BankApp.Pull_The_Sack.Enum;
 using BankApp.Pull_The_Sack.Interface;
 using BankApp.Pull_The_Sack.View.Configs;
 
-/// <summary>Branding / intro screen shown before a game starts.</summary>
+
+/// <summary>
+/// Looping splash screen showing logo and spinning coin. 
+/// </summary>
+/// <param name="config"></param>
 public class SplashView(SplashViewConfig config) : IView
 {
 
@@ -20,7 +24,7 @@ public class SplashView(SplashViewConfig config) : IView
     public void Render(IConsole console, double dt)
     {
         console.Clear();
-        
+
         string frame = config.Frames[currentFrame % config.Frames.Count];
 
         console.WriteCentered(config.SponsorText);
@@ -36,7 +40,7 @@ public class SplashView(SplashViewConfig config) : IView
         {
             ViewState = ViewState.Complete;
         }
-            
+
     }
 
     public void ResetView()
