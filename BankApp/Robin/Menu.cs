@@ -113,12 +113,14 @@ namespace BankApp.Robin
                         switch (selectedIndex)
                         {
                             case 0:
+                                // Create admin
                                 Console.WriteLine("Accounts");
                                 ShowCreatedUsers();
                                 Console.ReadKey();
                                 break;
 
                             case 1:
+                                // 
                                 Console.WriteLine("Transaction history");
                                 break;
 
@@ -225,6 +227,17 @@ namespace BankApp.Robin
                             case 0:
                                 Console.Clear();
                                 CreateUser();
+
+                                if (CreateUser())
+                                {
+                                    Console.WriteLine("Success!");
+
+                                }
+
+                                else
+                                {
+                                    Console.WriteLine("Error!");
+                                }
                                 break;
 
                             case 1:
@@ -248,10 +261,12 @@ namespace BankApp.Robin
 
                             case 2:
                                 // Loans
+
                                 break;
 
                             case 3:
                                 // Exchange rates
+
                                 break;
 
                             case 4:
