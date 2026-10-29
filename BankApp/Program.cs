@@ -1,6 +1,7 @@
 ﻿using BankApp.Jonathan;
 using BankApp.Pull_The_Sack;
 using BankApp.Robin;
+using Spectre.Console;
 
 namespace BankApp
 {
@@ -8,11 +9,19 @@ namespace BankApp
     {
         static void Main(string[] args)
         {
-            // Menu menu = new Menu();
+            Theme theme = new Theme();
+            UserService userService = new UserService();
+            AuthService authService = new AuthService(userService);
+            InterestRuleService interestRuleService = new InterestRuleService();
+            CreditScoreService creditScoreService = new CreditScoreService();
+            LoanService loanService = new LoanService(interestRuleService, creditScoreService);
 
-            // menu.LoginMenu();
+            Menu menu = new Menu(userService, authService);
+            
 
-            // LoanTests.RunTests();
+            Console.ReadKey();
+
+            //menu.LoginMenu();
 
             Orchestrator orc = new();
             orc.Start(100000);
