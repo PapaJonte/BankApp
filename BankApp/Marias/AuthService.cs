@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BankApp
 {
-    //Resultatet av ett inloggningsförsök, kan användas i menyn.
+    //Result of a logged in attempt. Can be used in menu.
     public enum LoginResult
     {
         Success,
@@ -15,7 +15,7 @@ namespace BankApp
     {
         private readonly UserService _userService;
 
-        //Den som är inloggad just nu.
+        //Current logged in user.
         public User? LoggedInUser { get; private set; }
 
         public AuthService(UserService userService)
@@ -54,7 +54,7 @@ namespace BankApp
             LoggedInUser = null;
         }
 
-        //Autherisation
+        //Authentication.
         public bool IsAdmin(User? user)
         {
             return user != null &&

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace BankApp
@@ -16,8 +15,8 @@ namespace BankApp
         //There should be at least one admin and owner from the beginning, skapar med testvärden för den enda admin-användaren som skapas automatiskt när programmet startar.
         public UserService()
         {
-            AddUser("000000-0000", "ownerpassword123", "owner@gmail.com", "0729216167", UserRole.Owner);
-            AddUser("111111-1111", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
+            AddUser("00000000-0000", "ownerpassword123", "owner@gmail.com", "0729216167", UserRole.Owner);
+            AddUser("11111111-1111", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
         }
 
         //Privat hjälpmetod som skapar och lagrar en ny User. Används av konstruktorn (default-admin) och av CreateUser.
@@ -43,7 +42,18 @@ namespace BankApp
             if (username == null)
                 return string.Empty;
 
-            return username.Replace("-", "").Trim();
+            return username.Replace("-", "").Replace(" ", "");
+        }
+
+        //New method letting users use both "-" and "" when they type their ID.
+        public string FormatPersonalNumber(string username)
+        {
+            string digits = NormalizeUsername(username);
+
+            if (digits.Length != 12)
+                return digits;
+
+            return digits.Insert(8, "-");
         }
 
         /* Hämta användare.
@@ -108,11 +118,11 @@ namespace BankApp
             if (!callerIsAdmin)
                 return false;
 
-            // Ingen kan skapa en ny Owner
+            // No one can create a new Owner.
             if (role == UserRole.Owner)
                 return false;
 
-            // Bara Owner får skapa Admin
+            // Only onwer can create Admin.
             if (role == UserRole.Admin && !callerIsOwner)
                 return false;
 
