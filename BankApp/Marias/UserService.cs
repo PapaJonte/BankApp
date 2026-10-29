@@ -6,7 +6,7 @@ namespace BankApp
 
     internal class UserService
     {
-        //All users are stored in a list.
+        //All users are stored in a dictionary, with UserID as the key.
         private readonly Dictionary<int, User> _users =
              new Dictionary<int, User>();
         //Gives every user a unique internal ID (1, 2, 3 ...).
@@ -45,7 +45,7 @@ namespace BankApp
             return username.Replace("-", "").Replace(" ", "");
         }
 
-        //New method letting users use both "-" and "" when they type their ID.
+        //Formats "199001011234" as "19900101-1234" for display in menus.
         public string FormatPersonalNumber(string username)
         {
             string digits = NormalizeUsername(username);
@@ -62,10 +62,10 @@ namespace BankApp
         public User? GetUserByUsername(string username)
         {
             string normalizedUsername = NormalizeUsername(username);
-            return _users.Values.FirstOrDefault(u => NormalizeUsername(u.Username) == normalizedUsername);
+            return _users.Values.FirstOrDefault(u => u.Username == normalizedUsername);
         }
 
-        //Använder TryGetValue
+        //Using TryGetValue
         public User? GetUserById(int userId)
         {
             if (_users.TryGetValue(userId, out User? user))
