@@ -9,24 +9,22 @@ namespace BankApp
     {
         static void Main(string[] args)
         {
-            // Theme theme = new Theme();
-            // UserService userService = new UserService();
-            // AuthService authService = new AuthService(userService);
-            // InterestRuleService interestRuleService = new InterestRuleService();
-            // CreditScoreService creditScoreService = new CreditScoreService();
-            // LoanService loanService = new LoanService(interestRuleService, creditScoreService);
 
-            // Menu menu = new Menu(userService, authService);
+            Theme theme = new Theme();
+            UserService userService = new UserService();
+            AuthService authService = new AuthService(userService);
+            CreditScoreService creditScoreService = new CreditScoreService();
+            InterestRuleService interestRuleService = new InterestRuleService();
+            LoanService loanService = new LoanService(interestRuleService, creditScoreService);
+            AccountManager accountManager = new AccountManager();
+            LoanMenu loanMenu = new LoanMenu(loanService, accountManager);
 
+            Menu menu = new Menu(userService, authService, loanMenu);
+            
 
             // Console.ReadKey();
 
-            // //menu.LoginMenu();
-
-            // Orchestrator orc = new();
-            // orc.Start(100000);
-            Orchestrator orc = new();
-            orc.Start(1000000);
+            menu.LoginMenu();
         }
     }
 }

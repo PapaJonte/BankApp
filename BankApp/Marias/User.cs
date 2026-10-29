@@ -19,14 +19,14 @@ namespace BankApp
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
 
-        //Roll
+        //Role
         public UserRole Role { get; set; }
 
         //Login Security
         public int FailedLoginAttempts { get; set; }
         public bool IsLockedOut { get; set; }
 
-        //Konstruktor
+        //Constructor
         public User(int userId, string username, string password,
                     string email, string phoneNumber, UserRole role = UserRole.Customer)
 
@@ -38,13 +38,13 @@ namespace BankApp
             PhoneNumber = phoneNumber;
             Role = role;
 
-            // Nya användare är inte låsta från början
+            //New users are not locked from the beginning.
             IsLockedOut = false;
             FailedLoginAttempts = 0;
 
         }
 
-        // Registrera misslycakt försök.
+        //Registering failed logins.
         public void RegisterFailedLogin()
         {
             FailedLoginAttempts++;
@@ -52,18 +52,18 @@ namespace BankApp
                 IsLockedOut = true;
         }
 
-        //Uppdatera personuppgifter.
+        //Method for updating the user´s information.
         public void UpdateUserInfo(string newEmail, string NewPhone)
         {
             Email = newEmail;
-                PhoneNumber = NewPhone;
+            PhoneNumber = NewPhone;
         }
 
 
     }
 
 
-     
 
-    
+
+
 }
