@@ -6,9 +6,15 @@ using BankApp.Pull_The_Sack.IO;
 using BankApp.Pull_The_Sack.Service;
 
 /// <summary>
-/// Orchestrates a single game session: drives phases, mediates between
-/// the <see cref="SlotMachine"/> model, the views, and the bank.
+/// State machine that iterates through the game based on user input that furthers the gamestate inside the SlotMachine.
 /// </summary>
+/// <param name="">
+/// SlotMachine machine GameLogic, handling game
+/// 
+/// 
+/// 
+/// </param>
+/// <returns></returns>
 public class SlotMachineController(
     SlotMachine machine,
     IViewUpdater updater,
@@ -87,7 +93,7 @@ public class SlotMachineController(
                     view.GameState = gameState;
                     view.HasBeenServed = true;
                 }
-                
+
                 if (userInput.TryReadKeyCode(ConsoleKey.Spacebar))
                 {
                     if (view.ViewState == ViewState.Complete)

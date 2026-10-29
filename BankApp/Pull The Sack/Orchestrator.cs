@@ -21,11 +21,10 @@ public class Orchestrator
         // --- Infrastructure ---
         IConsole console = new LockedConsole();
         IViewUpdater updater = new ViewUpdater(console);
-        UserInput userInput = new UserInput(console);
-        IBankInterface bank = new BankStub(loanAmount);
+        UserInput userInput = new(console);
+        IBankInterface bank = new BankBridge(loanAmount);
 
         // --- RNG + symbol catalog ---
-        IRng rng = new Rng();
         SymbolCatalog catalog = new(new Dictionary<int, SlotSymbol>
         {
             [0] = SlotSymbol.Sackpot,
@@ -51,9 +50,9 @@ public class Orchestrator
         // --- Reels + payout ---
         IReadOnlyList<Reel> reels =
         [
-            new Reel(catalog, rng),
-            new Reel(catalog, rng),
-            new Reel(catalog, rng),
+            new Reel(catalog),
+            new Reel(catalog),
+            new Reel(catalog),
         ];
 
         IPayoutEvaluator evaluator = new PayoutEvaluator(new PayoutTable());
@@ -89,5 +88,6 @@ public class Orchestrator
         SlotMachineController controller =
             new(machine, updater, bank, userInput, registry);
         controller.PullTheSack();
+
     }
 }

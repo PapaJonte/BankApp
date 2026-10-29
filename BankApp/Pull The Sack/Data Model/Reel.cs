@@ -6,25 +6,19 @@ namespace BankApp.Pull_The_Sack.Data_Model;
 /// A single spinning reel. Holds the current symbol and can be spun
 /// to select a new one via the injected RNG.
 /// </summary>
-public class Reel
+public class Reel(SymbolCatalog catalog)
 {
-    private readonly SymbolCatalog _catalog;
-    private readonly IRng _rng;
+    private readonly SymbolCatalog _catalog = catalog;
+    private readonly Random rnd = new();
 
     /// <summary>The symbol currently on the payline for this reel.</summary>
-    public SlotSymbol CurrentSymbol { get; private set; }
+    public SlotSymbol CurrentSymbol { get; private set; } = catalog.Symbols[0];
 
-    public Reel(SymbolCatalog catalog, IRng rng)
-    {
-        _catalog = catalog;
-        _rng = rng;
-        CurrentSymbol = catalog.Symbols[0];
-    }
 
     /// <summary>Spins this reel and updates <see cref="CurrentSymbol"/>.</summary>
     public void Spin()
     {
-        int rolledSymbol = _rng.Next(0, _catalog.Symbols.Count);
+        int rolledSymbol = rnd.Next(0, _catalog.Symbols.Count);
         CurrentSymbol = _catalog.Symbols[rolledSymbol];
     }
 }

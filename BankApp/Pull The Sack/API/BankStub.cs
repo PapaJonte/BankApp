@@ -4,11 +4,11 @@ namespace BankApp.Pull_The_Sack.API;
 /// Integration stub used until the game is wired into the real bank layer.
 /// Holds the loan amount in memory.
 /// </summary>
-public class BankStub : IBankInterface
+public class BankBridge : IBankInterface
 {
     private decimal _loanAmount;
 
-    public BankStub(decimal startingLoanAmount)
+    public BankBridge(decimal startingLoanAmount)
     {
         _loanAmount = startingLoanAmount;
     }
