@@ -1,5 +1,6 @@
 namespace BankApp.Pull_The_Sack.View;
 
+using System.Collections.Concurrent;
 using BankApp.Pull_The_Sack.Data_Model;
 using BankApp.Pull_The_Sack.Enum;
 using BankApp.Pull_The_Sack.Interface;
@@ -18,12 +19,19 @@ public class GameView : IView
     private int BlockWidth;
     private bool resolved;
     private bool complete;
+    private bool blinkGraphic;
+    private int blinkCount = 0;
+    private int targetBlinkCounts = 4;
+    private ConsoleColor[] blinkColor;
 
 
     public GameView(GameViewConfig config, IReadOnlyList<ReelView> reels)
     {
         this.config = config;
         this.reels = reels;
+        blinkColor = new ConsoleColor[2];
+        blinkColor[0] = ConsoleColor.White;
+        blinkColor[1] = ConsoleColor.Yellow;
     }
 
     public void ResetView()
@@ -69,9 +77,13 @@ public class GameView : IView
             console.WriteCentered(config.BottomArt);
             #endregion
 
-            if (resolved)
+            if (complete)
             {
-                console.WriteCentered($"symbol 1 {GameState.SpinResult.Symbols[0]} symbol 2 {GameState.SpinResult.Symbols[1]} symbol 3 {GameState.SpinResult.Symbols[2]}");
+                string outcome = EvaluateCompleteText();
+                console.WriteCentered(outcome);
+                console.WriteCentered("");
+                console.WriteCentered("Press space to continue");
+                ViewState = ViewState.Complete;
             }
 
             //gameview register callbacks with reels for when they are done
@@ -96,7 +108,17 @@ public class GameView : IView
                 console.SetCursor(mReelX, reelY);
 
                 if (i == 2)
-                    console.SetConsoleColor(ConsoleColor.Yellow);
+                {
+                    if (blinkGraphic)
+                    {
+                        ConsoleColor c = blinkColor[blinkCount % blinkColor.Length];
+                        console.SetConsoleColor(c);
+                    }
+                    else
+                    {
+                        console.SetConsoleColor(ConsoleColor.Yellow);
+                    }
+                }
                 else
                     console.SetConsoleColor(ConsoleColor.White);
 
@@ -104,6 +126,16 @@ public class GameView : IView
                 **Update** it is now a lil responsible for placement since its drawing its own box. But it's akin to GameView placing in worldspace/terminal space and reelview placeing in localspace, kind of.
                 */
             }
+        }
+
+        if (blinkGraphic && blinkCount >= targetBlinkCounts)
+        {
+            blinkGraphic = false;
+            complete = true;
+        }
+        else if (blinkGraphic)
+        {
+            ++blinkCount;
         }
     }
 
@@ -125,7 +157,7 @@ public class GameView : IView
         if (GameState.SpinResult.Symbols.Count != reels.Count)
         {
             throw new FormatException("Spin Result does not match reels count!");
-            
+
         }
 
         string[] targetSymbols = new string[GameState.SpinResult.Symbols.Count];
@@ -141,7 +173,39 @@ public class GameView : IView
             reels[i].Target(targetSymbols[i], config.ResolveSlowDownSteps + (i * 1), 1 + (i * .25f), .25f);
         }
 
+        reels[reels.Count - 1].OnResolveComplete += OnReelResolveComplete; //listen for when last reel has displayed its target symbol
         resolved = true;
+    }
+
+    private void OnReelResolveComplete()
+    {
+        reels[reels.Count - 1].OnResolveComplete -= OnReelResolveComplete;
+        blinkGraphic = true;
+    }
+
+    private string EvaluateCompleteText()
+    {
+        string outcome;
+
+        if (GameState.SpinResult == null)
+        {
+            throw new NullReferenceException("SpinResult is null!");
+        }
+
+        if (GameState.SpinResult.PayoutMultiplier >= 5)
+        {
+            outcome = config.CompleteText_SackPot;
+        }
+        else if (GameState.SpinResult.PayoutMultiplier > 1)
+        {
+            outcome = config.CompleteText_Won;
+        }
+        else
+        {
+            outcome = config.CompleteText_Lost;
+        }
+
+        return outcome;
     }
 
     private int CalculateReelHeight(int index) => config.ReelTop + (1 + config.ReelGap) * index;

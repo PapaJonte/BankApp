@@ -77,12 +77,13 @@ public class Orchestrator
         BalanceView balance = new(loanAmount);
 
         GameView game = new(new GameViewConfig { ReelCols = reels.Count }, reelViews);
-        // ResultView intentionally not wired (testing splash only).
+        ResultView result = new(new ResultViewConfig());
 
         // --- Registry ---
         ViewRegistry registry = new();
         registry.AddView(ViewType.SplashView, splash);
         registry.AddView(ViewType.GameView, game);
+        registry.AddView(ViewType.ResultView, result);
 
         // --- Controller + run ---
         SlotMachineController controller =

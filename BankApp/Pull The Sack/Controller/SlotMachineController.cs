@@ -68,7 +68,7 @@ public class SlotMachineController(
                 {
                     view.GameState = gameState;
                 }
-                
+
                 if (userInput.TryReadKeyCode(ConsoleKey.Spacebar))
                 {
                     if (view.ViewState == ViewState.Complete)
@@ -87,17 +87,19 @@ public class SlotMachineController(
                     view.GameState = gameState;
                     view.HasBeenServed = true;
                 }
-                if (view.ViewState == ViewState.Complete)
+                
+                if (userInput.TryReadKeyCode(ConsoleKey.Spacebar))
                 {
-                    userInput.ReadKeyCode(ConsoleKey.Spacebar);
-                    bank.SetLoanAmount(423424);
+                    if (view.ViewState == ViewState.Complete)
+                    {
+                        bank.SetLoanAmount(423424);
+                        machine.EndGame();
+                    }
                 }
                 break;
 
             case GamePhase.Exiting:
-                ServeViewToUpdater(ViewType.ResultView);
-                userInput.ReadKeyCode(ConsoleKey.Spacebar);
-                machine.EndGame();
+                RemoveViewFromUpdater(ViewType.ResultView);
                 break;
         }
     }

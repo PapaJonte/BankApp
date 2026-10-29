@@ -31,6 +31,11 @@ public record GameViewConfig : ViewConfig
         @"║    ~ G O O D  L U C K ,  H I G H  R O L L E R ~ ║" + "\n" +
         @"╚═════════════════════════════════════════════════╝";
 
+
+    public string CompleteText_Lost = "Congratulations! You lost money you didn't have!";
+    public string CompleteText_Won = "Congratulations! You won money, use them on your next gamble at LiveForGambling.com!";
+    public string CompleteText_SackPot = "Congratulations! You hit the Sackpot! Use your Sackpot at LiveForGamble.Com!";
+    
     /// <summary>Number of reels displayed on the payline.</summary>
     public int ReelCols { get; init; } = 3;
     public int ReelRows { get; init; } = 3;

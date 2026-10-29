@@ -14,11 +14,11 @@ public class PayoutTable
         Entries = [
             new PayoutEntry(SlotSymbol.Sackpot, 5),
             new PayoutEntry(SlotSymbol.Awesome,4),
-            new PayoutEntry(SlotSymbol.Coin,3.5m),
-            new PayoutEntry(SlotSymbol.Star,3m),
-            new PayoutEntry(SlotSymbol.Bar,2.5m),
-            new PayoutEntry(SlotSymbol.Stash,2.3m),
-            new PayoutEntry(SlotSymbol.Ampersand,2m),    
+            new PayoutEntry(SlotSymbol.Coin,2.5m),
+            new PayoutEntry(SlotSymbol.Star,2.1m),
+            new PayoutEntry(SlotSymbol.Bar,1.9m),
+            new PayoutEntry(SlotSymbol.Stash,1.7m),
+            new PayoutEntry(SlotSymbol.Ampersand,1.6m),    
         ];
     }
 }

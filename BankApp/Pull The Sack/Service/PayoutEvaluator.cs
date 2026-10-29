@@ -13,7 +13,7 @@ public class PayoutEvaluator(PayoutTable table) : IPayoutEvaluator
 
     public decimal Evaluate(IReadOnlyList<SlotSymbol> symbols)
     {
-        decimal payoutMultiplier = -.5m;
+        decimal payoutMultiplier = .5m;
 
         var bestCount = symbols
                         .GroupBy(x => x) //skapar IGrouping<key = SlotSymbol, element = IEnumerable<SlotSymbol>>

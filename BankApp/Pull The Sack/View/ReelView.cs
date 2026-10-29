@@ -10,8 +10,9 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
     public bool HasBeenServed { get; set; } = false;
     public GameState GameState { get; set; }
     public ViewState ViewState { get; set; } = ViewState.Idle;
+    public Action? OnResolveComplete { get; set; }
 
-    private string targetSymbol = "";
+    private bool resolveComplete;
     private float sequenceSpeed;
     private float sequenceSpeedDecay;
     private int framesSinceLastUpdate;
@@ -24,7 +25,6 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
     public void ResetView()
     {
         ViewState = ViewState.Idle;
-        targetSymbol = "";
     }
 
     public void Render(IConsole console, double dt)
@@ -65,8 +65,19 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
         if (reelSlot == RowCount)
         {
             reelSlot = 0;
+
             if (runningResolveSequence)
             {
+                if(sequenceSpeed <= 0)
+                {
+                    if (!resolveComplete)
+                    {
+                        resolveComplete = true;
+                        OnResolveComplete?.Invoke();
+                    }
+
+                    return;
+                }
                 if (framesSinceLastUpdate * sequenceSpeed < 1)
                 {
                     ++framesSinceLastUpdate;
@@ -82,7 +93,6 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
             {
                 symbolIndex = WrapAround(--symbolIndex, SlotSymbols.Length - 1);
             }
-
         }
     }
 
@@ -102,7 +112,6 @@ public class ReelView(string[] SlotSymbols, int RowCount, int Width) : IView
     {
         this.sequenceSpeed = sequenceSpeed;
         this.sequenceSpeedDecay = sequenceSpeedDecay;
-        targetSymbol = target;
         framesSinceLastUpdate = 1;
         string[] temp = new string[sequenceLenght * RowCount];
         int currentIndex = symbolIndex;

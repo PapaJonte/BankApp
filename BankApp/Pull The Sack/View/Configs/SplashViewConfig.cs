@@ -50,9 +50,9 @@ public record SplashViewConfig : ViewConfig
 
     private const string Frame2 =
         Head + "\n" +
-        @"              ( | )                                    " + "\n" +
-        @"              (   )                                    " + "\n" +
-        @"              ( | )                                    ";
+        @"              |  |                                    " + "\n" +
+        @"              |  |                                    " + "\n" +
+        @"              |  |                                    ";
 
     private const string Frame3 =
         Head + "\n" +
@@ -62,7 +62,8 @@ public record SplashViewConfig : ViewConfig
 
     private const string Frame4 =
         Head + "\n" +
-        @"              ( | )                                    " + "\n" +
-        @"              (   )                                    " + "\n" +
-        @"              ( | )                                    ";
+        @"              |  |                                    " + "\n" +
+        @"              |  |                                    " + "\n" +
+        @"              |  |                                    ";
+
 }
