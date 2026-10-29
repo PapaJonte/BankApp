@@ -3,7 +3,16 @@ using System.Linq;
 
 namespace BankApp
 {
-
+    /*public enum CreateUserResult
+    {
+        Success,
+        NotAllowed,
+        InvalidPersonalNumber,
+        UsernameTaken,
+        InvalidPassword,
+        InvalidEmail,
+        InvalidPhone
+    }*/
     internal class UserService
     {
         //All users are stored in a dictionary, with UserID as the key.
@@ -138,6 +147,47 @@ namespace BankApp
             AddUser(username, password, email, phoneNumber, role);
             return true;
         }
+
+        /*
+         public CreateUserResult CreateUser(bool callerIsAdmin, bool callerIsOwner, string username,
+    string password, string email, string phoneNumber,
+    UserRole role = UserRole.Customer)
+{
+    if (!callerIsAdmin)
+        return CreateUserResult.NotAllowed;
+
+    if (role == UserRole.Owner)
+        return CreateUserResult.NotAllowed;
+
+    if (role == UserRole.Admin && !callerIsOwner)
+        return CreateUserResult.NotAllowed;
+
+    if (!IsValidPersonalNumberFormat(username))
+        return CreateUserResult.InvalidPersonalNumber;
+
+    if (UsernameExists(username))
+        return CreateUserResult.UsernameTaken;
+
+    if (string.IsNullOrWhiteSpace(password))
+        return CreateUserResult.InvalidPassword;
+
+    if (string.IsNullOrWhiteSpace(email) || !email.Contains("@"))
+        return CreateUserResult.InvalidEmail;
+
+    if (string.IsNullOrWhiteSpace(phoneNumber))
+        return CreateUserResult.InvalidPhone;
+
+    AddUser(username, password, email, phoneNumber, role);
+    return CreateUserResult.Success;
+} 
+         * */
+
+
+
+
+
+
+
 
         /*
           UPPDATERA PERSONUPPGIFTER

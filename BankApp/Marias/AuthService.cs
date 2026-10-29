@@ -85,6 +85,20 @@ namespace BankApp
             user.FailedLoginAttempts = 0; //resets the timer.
             return true;
         }
+
+        //Checks that a bank account belongs to the given user.
+        public bool OwnsAccount(User? user, BankAccount? account)
+        {
+            if (user == null || account == null)
+                return false;
+
+            return account.GetUserId() == user.UserID;
+        }
+
+        public bool LoggedInUserOwns(BankAccount? account)
+        {
+            return OwnsAccount(LoggedInUser, account);
+        }
     }
 }
 
