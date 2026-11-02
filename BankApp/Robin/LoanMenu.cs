@@ -132,7 +132,7 @@ namespace BankApp.Robin
         }
 
 
-        // The actual menu displayed to the customer.
+        // The actual menu displayed to the customer
         public void ShowLoanMenu(int userId)
         {
             string[] options =
