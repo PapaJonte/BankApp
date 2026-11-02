@@ -10,6 +10,8 @@ The majority of methods are dedicated to returning the various different propert
 
 BankAccount
 Not to be confused with SavingsAccount!
-The BankAccount serves to contain SavingsAccounts, and sort them by user ID. Hence why it has both a list and a dictionary dedicated to storing objects of the SavingsAccount class.
+The BankAccount serves to contain SavingsAccounts, and sort them by user ID. Hence why it has both a list dedicated to storing objects of the SavingsAccount class, and a dictionary for storing the list.
+The userId variable that represents the ID of the user may be returned with a method.
 
 AccountManager
+This class may create objects
