@@ -47,5 +47,10 @@ namespace BankApp
         {
             return Interest;
         }
+
+        public int GetSavingsAccountNumber()
+        {
+            return SavingsAccountNumber;
+        }
     }
 }
