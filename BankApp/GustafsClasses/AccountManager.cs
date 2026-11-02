@@ -42,11 +42,11 @@ namespace BankApp.GustafsClasses
                 }
             }
         }
-        public void CreateAccount(int userId)
+        public void CreateAccount(int userId, int bankAccountNumber)
         {
             /*Creation of object of the BankAccount class to represent an account held by a user,
-            rather than individual spaces to have money in*/
-            BankAccount userAccount = new BankAccount(userId);
+            rather than individual spaces to have money in.*/
+            BankAccount userAccount = new BankAccount(userId, bankAccountNumber);
 
             BankAccountList.Add(userAccount);
             BankAccountDictionary.Add(userId, BankAccountList);
@@ -111,8 +111,6 @@ namespace BankApp.GustafsClasses
                     }
                 }
             }
-            //if statement as a safety measure to assure ourselves that the list is not null.
-            
         }
 
         //Puts balance of all savngs accounts together into a total value after converting them.
