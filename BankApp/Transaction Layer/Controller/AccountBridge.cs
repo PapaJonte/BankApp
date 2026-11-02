@@ -1,4 +1,5 @@
 using System;
+using BankApp.GustafsClasses;
 using BankApp.Transaction_Layer.Interface;
 
 namespace BankApp.Transaction_Layer.Controller;
@@ -28,7 +29,7 @@ internal class AccountBridge(AccountManager accountManager) : IAccountBridge
     {
         var bankAccounts = accountManager.BankAccountDictionary[userID] ?? throw new NullReferenceException($"No accounts connected to user ID {userID}");
 
-        var savingsAccounts = bankAccounts.FirstOrDefault(x => x.GetUserId() == userID).savingAccounts ?? throw new NullReferenceException($"No savings accounts connected to user ID {userID}");
+        var savingsAccounts = bankAccounts.FirstOrDefault(x => x.GetUserId() == userID).SavingAccounts ?? throw new NullReferenceException($"No savings accounts connected to user ID {userID}");
 
         var savingsAccount = savingsAccounts.FirstOrDefault(x => x.GetSavingsAccountNumber() == accountNumber) ?? throw new NullReferenceException($"No savings account connected to account number {accountNumber}");
 
