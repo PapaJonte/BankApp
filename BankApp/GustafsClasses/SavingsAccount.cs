@@ -13,7 +13,7 @@ namespace BankApp.GustafsClasses
         private decimal Interest;
         private int SavingsAccountNumber; //For access to specific savings accounts.
 
-        public SavingsAccount (decimal Balance, Currency Currency, decimal Interest, int SavingsAccountNumber) : base ( )
+        public SavingsAccount (decimal Balance, Currency Currency, decimal Interest, int SavingsAccountNumber)
         {
             this.Balance = Balance;
             this.Currency = Currency;
