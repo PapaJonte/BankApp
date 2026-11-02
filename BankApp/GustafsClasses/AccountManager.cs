@@ -78,7 +78,7 @@ namespace BankApp.GustafsClasses
                             SavingsAccount savingsAccount = new SavingsAccount(
                             convertedInput, CheckCurrency(), interest, SavingsAccountNumber);
 
-                            account.savingAccounts.Add(savingsAccount);
+                            account.SavingAccounts.Add(savingsAccount);
                         }
                         else
                         {
@@ -97,9 +97,9 @@ namespace BankApp.GustafsClasses
             {
                 if (bAccount.GetUserId() == userId)
                 {
-                    if (bAccount.savingAccounts.Count > 0 )
+                    if (bAccount.SavingAccounts.Count > 0 )
                     {
-                        foreach (var sAccount in bAccount.savingAccounts)
+                        foreach (var sAccount in bAccount.SavingAccounts)
                         {
                             //Displays balance and currency of account.
                             Console.WriteLine(sAccount.GetBalance() + " " + sAccount.GetCurrency());
@@ -131,7 +131,7 @@ namespace BankApp.GustafsClasses
                     ExchangeRate conversionTool = new ExchangeRate();
 
                     //Making sure the balance of all of the accounts are combined into a total balance.
-                    foreach (var account in bAccount.savingAccounts)
+                    foreach (var account in bAccount.SavingAccounts)
                     {
                         if (account.GetCurrency() != chosenValue)
                         {
@@ -151,7 +151,7 @@ namespace BankApp.GustafsClasses
                     }
                     
                 }
-                else if (bAccount.savingAccounts.Count == 1)
+                else if (bAccount.SavingAccounts.Count == 1)
                 {
                     Console.WriteLine("You only have one savings account.");
                 }
