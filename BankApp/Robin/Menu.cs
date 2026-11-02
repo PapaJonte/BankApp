@@ -1,6 +1,7 @@
 ﻿using Spectre.Console;
-
+using BankApp.Pull_The_Sack.Interface;
 namespace BankApp.Robin
+    
 {
     internal class Menu
     {
@@ -9,6 +10,8 @@ namespace BankApp.Robin
 
         //private readonly Theme theme;
 
+        
+        
         private readonly LoanMenu _loanMenu;
         private readonly UserService _userService;
         private readonly AuthService _authService;
@@ -17,6 +20,7 @@ namespace BankApp.Robin
         // Passes both fields into our constructor so we can use the methods from Maria's class.
         public Menu(UserService userService, AuthService authService, LoanMenu loanMenu)
         {
+
             _loanMenu = loanMenu ?? throw new ArgumentNullException(nameof(loanMenu));
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -410,6 +414,7 @@ namespace BankApp.Robin
             {
                 Console.CursorVisible = false;
                 Console.Clear();
+            global::BankApp.GoldenSack.WriteLogo();
 
                 if (selectedIndex == 0)
                 {
