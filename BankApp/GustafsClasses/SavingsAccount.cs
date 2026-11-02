@@ -21,7 +21,7 @@ namespace BankApp
             this.SavingsAccountNumber = SavingsAccountNumber;
         }
         //For transfer of balance. Bool determines if you add or remove balance.
-        public void TransferBalance(int transferSum, bool addMore)
+        public void TransferBalance(decimal transferSum, bool addMore)
         {
             if (addMore == true)
             {
