@@ -9,13 +9,28 @@ namespace BankApp
     {
         private decimal Balance; //Ammount in the account.
         private Currency Currency; //Currency of Account.
-        private decimal Interest;
 
-        public SavingsAccount (decimal Balance, Currency Currency, decimal Interest) : base ( )
+        private decimal Interest;
+        private int SavingsAccountNumber; //For access to specific savings accounts.
+
+        public SavingsAccount (decimal Balance, Currency Currency, decimal Interest, int SavingsAccountNumber) : base ( )
         {
             this.Balance = Balance;
             this.Currency = Currency;
             this.Interest = Interest;
+            this.SavingsAccountNumber = SavingsAccountNumber;
+        }
+        //For transfer of balance. Bool determines if you add or remove balance.
+        public void TransferBalance(int transferSum, bool addMore)
+        {
+            if (addMore == true)
+            {
+                Balance = Balance + transferSum;
+            }
+            else
+            {
+                Balance = Balance - transferSum;
+            }
         }
 
         //Method that returns account balance.
