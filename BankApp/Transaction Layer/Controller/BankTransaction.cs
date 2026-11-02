@@ -5,7 +5,7 @@ using BankApp.Transaction_Layer.Enum;
 
 namespace BankApp.Transaction_Layer.Controller;
 
-public class BankTransaction(StageTransaction stageTransaction, BankTransaction bankTransaction, ExchangeRate exchangeRateModule)
+public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exchangeRateModule)
 {
 
     /// <summary>
@@ -70,8 +70,8 @@ public class BankTransaction(StageTransaction stageTransaction, BankTransaction 
         if (statusCode == StatusCode.Successful)
         {
             //verify account balance
-            bankTransaction.RequestDeposit(targetAccount.AccountNumber, depositAmount);
-            bankTransaction.RequestWithdrawal(originAccount.AccountNumber, withdrawalAmount);
+            RequestDeposit(targetAccount.AccountNumber, depositAmount);
+            RequestWithdrawal(originAccount.AccountNumber, withdrawalAmount);
         }
 
         return statusCode;
