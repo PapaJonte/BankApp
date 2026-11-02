@@ -12,6 +12,16 @@ namespace BankApp
         LockedOut
     }
 
+    /*
+ AuthService handles authentication and permissions:
+ - logging in and out
+ - keeping track of who is currently logged in
+ - locking accounts after three failed login attempts (user story 3)
+ - checking roles (Customer / Admin / Owner)
+ - checking that a bank account belongs to the logged-in user
+
+ It uses UserService to find users, but does not store any users itself.
+*/
     internal class AuthService
     {
         private readonly UserService _userService;
@@ -49,16 +59,22 @@ namespace BankApp
             return LoginResult.Success;
         }
 
+        //Logs out the current user by clearing LoggedInUser.
         public void Logout()
         {
             LoggedInUser = null;
         }
 
-        /* BEHÖRIGHET
-        Admin och Owner får göra "admin-saker" (t.ex. skapa användare,
-        låsa upp konton) - IsAdmin/IsLoggedInUserAdmin.
-        Owner har DÄRUTÖVER saker bara Owner får göra - IsOwner/IsLoggedInUserOwner. */
-
+        /* PERMISSIONS
+     
+        Admin and Owner can both do "admin things" (for example create users
+        and unlock accounts), checked with IsAdmin / IsLoggedInUserAdmin.
+        On top of that, the Owner can do some things that only the Owner
+        can do, checked with IsOwner / IsLoggedInUserOwner.
+         Returns true if the given user has admin rights.
+         Both Admin and Owner count as admin here, since the Owner can do
+         everything an Admin can do. Returns false if the user is null.
+        */ 
         public bool IsAdmin(User? user)
         {
             return user != null &&
@@ -70,7 +86,7 @@ namespace BankApp
             return IsAdmin(LoggedInUser);
         }
 
-        // Owner är en EGEN roll, inte "extra admin" - en Admin är INTE Owner.
+        //Returns true if the currently logged-in user is an Owner. Returns false if no user is logged in.
         public bool IsOwner(User? user)
         {
             return user != null && user.Role == UserRole.Owner;
@@ -81,14 +97,20 @@ namespace BankApp
             return IsOwner(LoggedInUser);
         }
 
-        // Konkret skillnad enligt era user stories: bara Owner får skapa Admin-konton.
-        // En vanlig Admin kan bara skapa Customer-konton (kontrolleras i UserService.CreateUser).
+        /*
+ Returns true if the logged-in user is allowed to create Admin accounts.
+ According to our user stories, only the Owner can create Admins.
+ A regular Admin can only create Customer accounts.
+ The menu can use this to decide whether to show the "create admin" option.
+ The real check is also done in UserService.CreateUser, so the rule holds
+ even if the menu forgets to call this method.
+           */
         public bool CanCreateAdminAccount()
         {
             return LoggedInUser != null && LoggedInUser.Role == UserRole.Owner;
         }
 
-        // Unlocks a locked account.
+        // Unlocks a locked account. Only an Admin or Owner can unlock accounts.
         public bool UnlockUser(string username)
         {
             if (!IsLoggedInUserAdmin())
@@ -102,7 +124,7 @@ namespace BankApp
             return true;
         }
 
-        // Checks that a bank account belongs to the given user.
+        //Checks that a bank account belongs to the given user by comparing the user ID of the account with the user ID of the user.
         public bool OwnsAccount(User? user, BankAccount? account)
         {
             if (user == null || account == null)
