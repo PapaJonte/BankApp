@@ -1,0 +1,35 @@
+sequenceDiagram
+actor Player
+participant SlotMachineController
+participant SlotMachine
+participant GameLoop
+participant ViewUpdater
+participant GameView
+participant Reels as "Reels (x3)"
+participant PayoutEvaluator
+participant BankBridge as "BankBridge «IBankInterface»"
+Player->>SlotMachineController: GambleOnLoan(loan) via facade
+SlotMachineController->>SlotMachine: StartGame() - phase = Splash
+SlotMachine->>GameLoop: StartGameLoopAsync()
+loop every 500 ms (render Task)
+  GameLoop->>ViewUpdater: Tick(deltaTime)
+  ViewUpdater->>GameView: Render(console, dt)
+end
+Note over SlotMachineController: UserInput.ReadKeyCode(Spacebar) - blocks<br/>while SplashView animates
+SlotMachineController->>SlotMachine: Spin() - phase = Spinning
+SlotMachine->>Reels: Spin() on each reel
+Note over SlotMachineController: space polled with TryReadKeyCode<br/>while reels scroll
+SlotMachineController->>SlotMachine: ResolveSpinResult()
+Reels-->>SlotMachine: CurrentSymbol x 3
+SlotMachine->>PayoutEvaluator: Evaluate(symbols)
+PayoutEvaluator-->>SlotMachine: PayoutMultiplier
+SlotMachine->>SlotMachine: State = with { SpinResult, phase = Resolving }
+Note over GameView: Resolve(): reel slowdown with stagger,<br/>payline blink, ViewState = Complete
+Note over SlotMachineController: space pressed (ViewState = Complete)
+SlotMachineController->>SlotMachine: Apply() - phase = Result
+Note over SlotMachineController: ResultView shows loan vs payout,<br/>Complete on 5th render
+Note over SlotMachineController: space pressed again
+SlotMachineController->>BankBridge: SetLoanAmount(423424) - hardcoded placeholder
+SlotMachineController->>SlotMachine: EndGame() - phase = Exiting
+SlotMachine->>GameLoop: StopGameLoopAsync()
+SlotMachineController-->>Player: returns IBankInterface

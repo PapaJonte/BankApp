@@ -1,0 +1,72 @@
+classDiagram
+direction LR
+class BankTransfer {
+  <<API>>
+  +TransferMoney(origin, target, amount, currency) StatusCode
+  +DepositMoney(accountNumber, amount) StatusCode
+}
+class BankTransaction {
+  <<Controller>>
+  -stageTransaction : StageTransaction
+  -bankTransaction : BankTransaction
+  -exchangeRateModule : ExchangeRate
+  +RequestDeposit(accountNumber, amount)
+  +RequestWithdrawal(accountNumber, amount)
+  +TransferMoney(origin, target, amount, currency) StatusCode
+}
+class StageTransaction {
+  -transactionScheduler : TransactionScheduler
+  -transactionRegistry : TransactionRegistry
+  +Stage(accountNumber, amount, type)
+  -InitScheduler()
+  -OnSchedule()
+}
+class TransactionScheduler {
+  -ct : CancellationTokenSource
+  -OnSchedule : Action
+  +StartSchedule(listener)
+  +CancelSchedule()
+  -TransactionSchedule(duration, ct) Task
+}
+class TransactionRegistry {
+  -stagedTransactions : Queue~TransactionDataObject~
+  -registryLock : Lock
+  +RegisterStagedTransaction(t)
+  +GetAllStagedTransactions() List
+  +GetNextStagedTransaction() TDO
+  +ClearStagedTransactions()
+}
+class TransactionDataObject {
+  <<record struct>>
+  +AccountNumber : string
+  +Amount : decimal
+  +TransactionType : TransactionType
+}
+class AccountData {
+  <<record struct>>
+  +AccountNumber : string
+  +Currency : Currency
+}
+class StatusCode {
+  <<enumeration>>
+  Successful
+  Aborted
+  Failed
+  Invalid
+}
+class TransactionType {
+  <<enumeration>>
+  Deposit
+  Withdrawal
+}
+BankTransfer ..> BankTransaction : delegates
+BankTransfer ..> AccountData : parameters
+BankTransfer ..> StatusCode : returns
+BankTransaction --> StageTransaction : stages via
+BankTransaction ..> AccountData : reads
+BankTransaction ..> TransactionType : Deposit/Withdrawal
+StageTransaction --> TransactionScheduler : callback
+StageTransaction --> TransactionRegistry : enqueues
+StageTransaction ..> TransactionDataObject : create
+TransactionRegistry "1" *-- "1..*" TransactionDataObject : queues
+BankTransaction ..> StatusCode : returns

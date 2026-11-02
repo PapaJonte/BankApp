@@ -1,0 +1,82 @@
+classDiagram
+direction LR
+class LoanMenu {
+  <<external BankApp.Robin>>
+}
+class LoanService {
+  -loans : List~Loan~
+  -interestRuleService : InterestRuleService
+  -calculator : InterestCalculator
+  -creditScoreService : CreditScoreService
+  -nextLoandId : int
+  +ApplyForLoan(userId, amount, duration, balance) Loan?
+  +ValidateLoanApplication(requested, eligible, committed) bool
+  +CalculateEligibleBalance(balance, outstanding) decimal
+  +CalculateMaxLoanAmount(balance) decimal
+  +CalculateOutstandingLoans(userId) decimal
+  +ChangeLoanStatus(loanId, status, balance) bool
+  +RepayLoan(loanId, amount) bool
+  +GetMonthlyPayment(loanId) decimal
+  +UpdateInterestRule(min, max, adj)
+  +GetCustomersLoan(userId) List~Loan~
+}
+class CreditScoreService {
+  -creditScores : Dictionary~int, int~
+  +GetCreditScore(userId) int
+  +UpdateCreditScore(userId, score)
+  +IncreaseCreditScore(userId, amount)
+  +DecreaseCreditScore(userId, amount)
+}
+class Loan {
+  +UserId : int
+  +LoanId : int
+  +LoanAmount : decimal
+  +RemainingLoanBalance : decimal
+  +InterestRate : decimal
+  +Duration : int
+  +TotalInterest : decimal
+  +TotalRepayment : decimal
+  +Status : LoanStatus
+  +ApprovalDate : DateTime
+  +NextPaymentDate : DateTime
+  +PaymentsCompleted : int
+  +InterestPaid : decimal
+  -ReduceBalance(amount)
+  -UpdateStatus(newStatus)
+  -StartRepaymentSchedule(date)
+  -RecordMonthlyPayment(interest, amortization)
+}
+class LoanStatus {
+  <<enumeration>>
+  Pending
+  Approved
+  Rejected
+}
+class InterestCalculator {
+  -interestRuleService : InterestRuleService
+  +GetInterestRate(duration) decimal
+  +GetInterestRate(duration, creditScore) decimal
+  +CalculateMonthlyAmortization(amount, duration) decimal
+  +CalculateMonthlyInterest(balance, rate) decimal
+  +CalculateMonthlyPayment(...) decimal
+  +CalculateTotalInterest(amount, duration, rate) decimal
+  +CalculateTotalRepayment(amount, duration, rate) decimal
+}
+class InterestRuleService {
+  -interestRules : List~InterestRule~
+  +GetInterestAdjustment(creditScore) decimal
+  +UpdateInterestAdjustment(min, max, newAdjustment)
+}
+class InterestRule {
+  +MinimumCreditScore : int
+  +MaximumCreditScore : int
+  +InterestAdjustment : decimal
+}
+LoanMenu ..> LoanService : uses
+LoanService --> CreditScoreService : prices via
+LoanService --> InterestCalculator : uses
+LoanService --> InterestRuleService : rules + updates
+LoanService "1" *-- "*" Loan : manages
+Loan --> LoanStatus : Status
+InterestCalculator --> InterestRuleService : adjustments
+InterestRuleService "1" *-- "5" InterestRule : bands

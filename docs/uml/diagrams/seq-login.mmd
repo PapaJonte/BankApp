@@ -1,0 +1,31 @@
+sequenceDiagram
+actor Customer
+participant Menu
+participant AuthService
+participant UserService
+participant User as "User «entity»"
+Customer->>Menu: starts app (LoginMenu)
+Menu->>AuthService: Login(personnummer, password)
+AuthService->>UserService: GetUserByUsername(username)
+UserService-->>AuthService: User?
+alt unknown user or wrong password
+  AuthService->>User: RegisterFailedLogin()
+  User-->>AuthService: FailedLoginAttempts++
+  opt attempts >= 3
+    User->>User: IsLockedOut = true
+    AuthService-->>Menu: LockedOut
+    Menu-->>Customer: "account locked" - exit
+  end
+  AuthService-->>Menu: WrongCredentials
+else user locked out
+  AuthService-->>Menu: LockedOut
+else correct password
+  AuthService->>User: FailedLoginAttempts = 0
+  AuthService->>AuthService: LoggedInUser = user
+  AuthService-->>Menu: Success
+  alt admin or owner
+    Menu->>Menu: ShowAdminMenu(userId)
+  else customer
+    Menu->>Menu: ShowUserMenu()
+  end
+end

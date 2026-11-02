@@ -1,0 +1,35 @@
+sequenceDiagram
+actor Customer
+participant LoanMenu
+participant LoanService
+participant AccountManager
+participant CreditScoreService
+participant InterestCalculator
+participant InterestRuleService
+Customer->>LoanMenu: "Apply for a loan"
+LoanMenu->>AccountManager: GetTotalBalance(userId)
+AccountManager-->>LoanMenu: totalBalance
+LoanMenu->>LoanService: ApplyForLoan(userId, amount, duration, balance)
+LoanService->>LoanService: eligibility: balance*5 - committed loans
+LoanService->>CreditScoreService: GetCreditScore(userId)
+CreditScoreService-->>LoanService: creditScore (default 100)
+LoanService->>InterestCalculator: GetInterestRate(duration, score)
+InterestCalculator->>InterestRuleService: GetInterestAdjustment(score)
+InterestRuleService-->>InterestCalculator: adjustment
+InterestCalculator-->>LoanService: interestRate
+LoanService->>InterestCalculator: CalculateTotalInterest(...)
+InterestCalculator-->>LoanService: totalInterest
+LoanService->>LoanService: new Loan(amount) - Status = Pending
+LoanService-->>LoanMenu: Loan?
+LoanMenu-->>Customer: loan terms (rate, interest, repayment)
+opt later: decision on the loan
+  LoanMenu->>LoanService: ChangeLoanStatus(loanId, status, balance)
+  LoanService->>AccountManager: GetTotalBalance(loan.UserId)
+  AccountManager-->>LoanService: totalBalance
+  LoanService->>LoanService: re-check borrowing limit (5x rule)
+  LoanService->>LoanService: loan.UpdateStatus(status)
+  opt approved
+    LoanService->>LoanService: loan.StartRepaymentSchedule(today)
+  end
+  LoanService-->>LoanMenu: bool
+end

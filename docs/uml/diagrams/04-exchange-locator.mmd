@@ -1,0 +1,37 @@
+classDiagram
+direction LR
+class ExchangeRate {
+  <<API>>
+  -exchangeRateRegistry : ExchangeRateRegistry
+  +SetExchangeRate(c1, c2, rate) StatusCode
+  +TryGetExchangeRate(c1, c2, out rate) StatusCode
+  +TryCalculateExchangeValue(c1, c2, value, out amount) StatusCode
+}
+class ExchangeRateRegistry {
+  -exchangeRates : Dictionary~(Currency, Currency), decimal~
+  +SetExchangeRate(c1, c2, rate)
+  +TryGetExchangeRate(c1, c2, out rate) bool
+}
+class Currency {
+  <<enumeration>>
+  EUR GBP NOK SEK USD
+  ...154 ISO-4217 codes
+}
+class ExchangeRateCalculator {
+  +CalculateWithExchangeRate(val, rate) decimal
+}
+class BankTransactionServiceLocator {
+  -_instance : BankTransactionServiceLocator
+  -_services : Dictionary~Type, object~
+  +Instance : BankTransactionServiceLocator
+  +RegisterService(o)
+  +TryGetService(t, out o) bool
+}
+class LocatorBootstrap {
+  <<utility>>
+  +RegisterAll(locator)$
+}
+ExchangeRate "1" *-- "1" ExchangeRateRegistry : owns
+ExchangeRate ..> ExchangeRateCalculator : multiplies
+ExchangeRateRegistry ..> Currency : tuple key
+LocatorBootstrap ..> BankTransactionServiceLocator : populates
