@@ -83,7 +83,7 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
         //Check if withdraw possible
         if (statusCode == StatusCode.Successful)
         {
-            statusCode = WithdrawalStatus(originAccount.UserID, originAccount.AccountNumber, transferAmount);
+            statusCode = WithdrawalStatus(originAccount.UserID, originAccount.AccountNumber, withdrawalAmount);
         }
 
         if (statusCode == StatusCode.Successful)

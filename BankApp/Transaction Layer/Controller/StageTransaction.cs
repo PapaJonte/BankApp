@@ -86,6 +86,9 @@ public class StageTransaction
                         {
                             accountBridge.Withdraw(withdrawalObj.userID, withdrawalObj.AccountNumber, withdrawalObj.Amount);
                             accountBridge.Deposit(depositObject.userID, depositObject.AccountNumber, depositObject.Amount);
+
+                            transactionRegistry.RegisterSuccessfulTransaction(withdrawalObj);
+                            transactionRegistry.RegisterSuccessfulTransaction(depositObject);
                         }
 
                     }
@@ -96,12 +99,14 @@ public class StageTransaction
                 if (s.TryGetDepositObject(out TransactionDataObject depositObject))
                 {
                     accountBridge.Deposit(depositObject.userID, depositObject.AccountNumber, depositObject.Amount);
+                    transactionRegistry.RegisterSuccessfulTransaction(depositObject);
                 }
                 else if(s.TryGetWithdrawalObject(out TransactionDataObject withdrawalObject))
                 {
                     if (accountBridge.CanWithdraw(withdrawalObject.userID, withdrawalObject.AccountNumber, withdrawalObject.Amount))
                     {
                         accountBridge.Withdraw(withdrawalObject.userID, withdrawalObject.AccountNumber, withdrawalObject.Amount);
+                        transactionRegistry.RegisterSuccessfulTransaction(withdrawalObject);
                     }
                 }
             }
