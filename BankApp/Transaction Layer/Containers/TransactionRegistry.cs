@@ -6,7 +6,7 @@ namespace BankApp.Transaction_Layer.Data;
 public class TransactionRegistry
 {
 
-    private readonly Queue<TransactionDataObject> stagedTransactions = new(); //we'll use queue in case maybe we'd like to limit amount of transactions at a later stage.
+    private readonly Queue<TransactionDataWrapper> stagedTransactions = new(); //we'll use queue in case maybe we'd like to limit amount of transactions at a later stage.
     private readonly Lock registryLock = new();
     /// <summary>
     /// Responsible for staging a requested transaction so it is ready to be processed later.
@@ -16,11 +16,11 @@ public class TransactionRegistry
     /// <param name="">
     /// TransactionDataObject transactionData holds the relevant data for the transaction being staged.
     /// </param>
-    public void RegisterStagedTransaction(TransactionDataObject transactionData)
+    public void RegisterStagedTransaction(TransactionDataWrapper transactionDataWrapper)
     {
         lock (registryLock)
         {
-            stagedTransactions.Enqueue(transactionData);
+            stagedTransactions.Enqueue(transactionDataWrapper);
         }
     }
 
@@ -32,11 +32,11 @@ public class TransactionRegistry
     /// <returns>
     /// List of TransactionDataObject representing all currently staged transactions
     /// </returns>
-    public List<TransactionDataObject> GetAllStagedTransactions()
+    public List<TransactionDataWrapper> GetAllStagedTransactions()
     {
         lock (registryLock)
         {
-            List<TransactionDataObject> transactions = [.. stagedTransactions];
+            List<TransactionDataWrapper> transactions = [.. stagedTransactions];
             return transactions;
         }
     }
@@ -62,7 +62,7 @@ public class TransactionRegistry
     /// <returns>
     /// TransactionDataObject representing the next staged transaction
     /// </returns>
-    public TransactionDataObject GetNextStagedTransaction()
+    public TransactionDataWrapper GetNextStagedTransaction()
     {
         lock (registryLock)
         {

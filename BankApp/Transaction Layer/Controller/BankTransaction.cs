@@ -20,7 +20,7 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
     /// </param>
     public void RequestDeposit(int userID, int accountNumber, decimal amount)
     {
-        stageTransaction.Stage(userID, accountNumber, amount, TransactionType.Deposit);
+        stageTransaction.Stage_Single(userID, accountNumber, amount, TransactionType.Deposit);
     }
 
     /// <summary>
@@ -33,7 +33,12 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
     /// </param>
     public void RequestWithdrawal(int userID, int accountNumber, decimal amount)
     {
-        stageTransaction.Stage(userID, accountNumber, amount, TransactionType.Withdrawal);
+        stageTransaction.Stage_Single(userID, accountNumber, amount, TransactionType.Withdrawal);
+    }
+
+    private void RequestTransfer(AccountData origin, AccountData target, decimal withdrawalAmount, decimal depositAmount)
+    {
+        stageTransaction.Stage_Transaction(origin, target,withdrawalAmount,depositAmount);
     }
 
     public StatusCode WithdrawalStatus(int userID, int accountNumber, decimal amount)
@@ -83,8 +88,7 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
 
         if (statusCode == StatusCode.Successful)
         {
-            RequestDeposit(targetAccount.UserID, targetAccount.AccountNumber, depositAmount);
-            RequestWithdrawal(originAccount.UserID, originAccount.AccountNumber, withdrawalAmount);
+            RequestTransfer(originAccount, targetAccount, withdrawalAmount, depositAmount);
         }
 
         return statusCode;
