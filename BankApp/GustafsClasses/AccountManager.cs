@@ -10,7 +10,7 @@ namespace BankApp.GustafsClasses
     /*This class is the upper class of BankAccount and SavingsAccount.*/
     internal class AccountManager
     {
-        public List<BankAccount> bankAccountList = new List<BankAccount>();
+        public List<BankAccount> BankAccountList = new List<BankAccount>();
 
         public Dictionary<int, List<BankAccount>> BankAccountDictionary = new Dictionary<int, List<BankAccount>>();
         
@@ -46,15 +46,15 @@ namespace BankApp.GustafsClasses
             rather than individual spaces to have money in*/
             BankAccount userAccount = new BankAccount(userId);
 
-            bankAccountList.Add(userAccount);
-            BankAccountDictionary.Add(userId, bankAccountList);
+            BankAccountList.Add(userAccount);
+            BankAccountDictionary.Add(userId, BankAccountList);
         }
         //Used for creating accounts.
         public void CreateSavingsAccount(int userId, int SavingsAccountNumber)
         {
-            if (bankAccountList.Count > 0)
+            if (BankAccountList.Count > 0)
             {
-                foreach (var account in bankAccountList)
+                foreach (var account in BankAccountList)
                 {
                     if (account.GetUserId() == userId)
                     {
@@ -91,7 +91,7 @@ namespace BankApp.GustafsClasses
         //Method for accessing the savingsaccounts.
         public void GetAccounts( int userId)
         {
-            foreach (var bAccount in bankAccountList)
+            foreach (var bAccount in BankAccountList)
             {
                 if (bAccount.GetUserId() == userId)
                 {
@@ -119,9 +119,9 @@ namespace BankApp.GustafsClasses
             decimal totalBalance = 0; //Where we put together all of the money into a total value.
             decimal additionValue = 0;
 
-            foreach (var bAccount in bankAccountList)
+            foreach (var bAccount in BankAccountList)
             {
-                if (bankAccountList.Count > 0)
+                if (BankAccountList.Count > 0)
                 {
                     //Here we decide which currency to convert to.
                     Currency chosenValue = CheckCurrency();
