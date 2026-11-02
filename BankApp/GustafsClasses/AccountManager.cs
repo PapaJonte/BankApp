@@ -42,11 +42,11 @@ namespace BankApp.GustafsClasses
                 }
             }
         }
-        public void CreateAccount(int userId)
+        public void CreateAccount(int userId, int bankAccountNumber)
         {
             /*Creation of object of the BankAccount class to represent an account held by a user,
-            rather than individual spaces to have money in*/
-            BankAccount userAccount = new BankAccount(userId);
+            rather than individual spaces to have money in.*/
+            BankAccount userAccount = new BankAccount(userId, bankAccountNumber);
 
             BankAccountList.Add(userAccount);
             BankAccountDictionary.Add(userId, BankAccountList);
@@ -111,8 +111,6 @@ namespace BankApp.GustafsClasses
                     }
                 }
             }
-            //if statement as a safety measure to assure ourselves that the list is not null.
-            
         }
 
         //Puts balance of all savngs accounts together into a total value after converting them.
@@ -123,6 +121,7 @@ namespace BankApp.GustafsClasses
 
             foreach (var bAccount in BankAccountList)
             {
+                //Just to check if there is anything in the list.
                 if (BankAccountList.Count > 0)
                 {
                     //Here we choose Swedish crowns as the currency.
@@ -133,30 +132,29 @@ namespace BankApp.GustafsClasses
                     //Making sure the balance of all of the accounts are combined into a total balance.
                     foreach (var account in bAccount.SavingAccounts)
                     {
-                        if (account.GetCurrency() != chosenValue)
+                        //Checks if the account actually belongs to user by Comparing userId value.
+                        if (bAccount.GetUserId() == userId)
                         {
-                            //Don't be fooled, this is the same line of code.
-                            conversionTool.TryCalculateExchangeValue(
-                                account.GetCurrency(),
-                                chosenValue, account.GetBalance(),
-                                out additionValue);
+                            if (account.GetCurrency() != chosenValue)
+                            {
+                                //Don't be fooled, this is the same line of code.
+                                conversionTool.TryCalculateExchangeValue(
+                                    account.GetCurrency(),
+                                    chosenValue, account.GetBalance(),
+                                    out additionValue);
 
-                            totalBalance = totalBalance + additionValue;
-                        }
-                        else
-                        {
-                            totalBalance = totalBalance + account.GetBalance();
+                                totalBalance = totalBalance + additionValue;
+                            }
+                            else
+                            {
+                                totalBalance = totalBalance + account.GetBalance();
+                            }
                         }
                     }
-                    
-                }
-                else if (bAccount.SavingAccounts.Count == 1)
-                {
-                    Console.WriteLine("You only have one savings account.");
                 }
                 else
                 {
-                    Console.WriteLine("Error! You have no savings accounts on the bank.");
+                    Console.WriteLine("Error! You have no accounts on the bank.");
                 }
             }
             return totalBalance;
