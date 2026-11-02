@@ -1,13 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace BankApp
 {
-
+    /*public enum CreateUserResult
+    {
+        Success,
+        NotAllowed,
+        InvalidPersonalNumber,
+        UsernameTaken,
+        InvalidPassword,
+        InvalidEmail,
+        InvalidPhone
+    }*/
     internal class UserService
     {
-        //All users are stored in a list.
+        //All users are stored in a dictionary, with UserID as the key.
         private readonly Dictionary<int, User> _users =
              new Dictionary<int, User>();
         //Gives every user a unique internal ID (1, 2, 3 ...).
@@ -16,8 +24,8 @@ namespace BankApp
         //There should be at least one admin and owner from the beginning, skapar med testvärden för den enda admin-användaren som skapas automatiskt när programmet startar.
         public UserService()
         {
-            AddUser("000000-0000", "ownerpassword123", "owner@gmail.com", "0729216167", UserRole.Owner);
-            AddUser("111111-1111", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
+            AddUser("00000000-0000", "ownerpassword123", "owner@gmail.com", "0729216167", UserRole.Owner);
+            AddUser("11111111-1111", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
         }
 
         //Privat hjälpmetod som skapar och lagrar en ny User. Används av konstruktorn (default-admin) och av CreateUser.
@@ -43,7 +51,18 @@ namespace BankApp
             if (username == null)
                 return string.Empty;
 
-            return username.Replace("-", "").Trim();
+            return username.Replace("-", "").Replace(" ", "");
+        }
+
+        //Formats "199001011234" as "19900101-1234" for display in menus.
+        public string FormatPersonalNumber(string username)
+        {
+            string digits = NormalizeUsername(username);
+
+            if (digits.Length != 12)
+                return digits;
+
+            return digits.Insert(8, "-");
         }
 
         /* Hämta användare.
@@ -52,10 +71,10 @@ namespace BankApp
         public User? GetUserByUsername(string username)
         {
             string normalizedUsername = NormalizeUsername(username);
-            return _users.Values.FirstOrDefault(u => NormalizeUsername(u.Username) == normalizedUsername);
+            return _users.Values.FirstOrDefault(u => u.Username == normalizedUsername);
         }
 
-        //Använder TryGetValue
+        //Using TryGetValue
         public User? GetUserById(int userId)
         {
             if (_users.TryGetValue(userId, out User? user))
@@ -108,11 +127,11 @@ namespace BankApp
             if (!callerIsAdmin)
                 return false;
 
-            // Ingen kan skapa en ny Owner
+            // No one can create a new Owner.
             if (role == UserRole.Owner)
                 return false;
 
-            // Bara Owner får skapa Admin
+            // Only onwer can create Admin.
             if (role == UserRole.Admin && !callerIsOwner)
                 return false;
 
@@ -128,6 +147,47 @@ namespace BankApp
             AddUser(username, password, email, phoneNumber, role);
             return true;
         }
+
+        /*
+         public CreateUserResult CreateUser(bool callerIsAdmin, bool callerIsOwner, string username,
+    string password, string email, string phoneNumber,
+    UserRole role = UserRole.Customer)
+{
+    if (!callerIsAdmin)
+        return CreateUserResult.NotAllowed;
+
+    if (role == UserRole.Owner)
+        return CreateUserResult.NotAllowed;
+
+    if (role == UserRole.Admin && !callerIsOwner)
+        return CreateUserResult.NotAllowed;
+
+    if (!IsValidPersonalNumberFormat(username))
+        return CreateUserResult.InvalidPersonalNumber;
+
+    if (UsernameExists(username))
+        return CreateUserResult.UsernameTaken;
+
+    if (string.IsNullOrWhiteSpace(password))
+        return CreateUserResult.InvalidPassword;
+
+    if (string.IsNullOrWhiteSpace(email) || !email.Contains("@"))
+        return CreateUserResult.InvalidEmail;
+
+    if (string.IsNullOrWhiteSpace(phoneNumber))
+        return CreateUserResult.InvalidPhone;
+
+    AddUser(username, password, email, phoneNumber, role);
+    return CreateUserResult.Success;
+} 
+         * */
+
+
+
+
+
+
+
 
         /*
           UPPDATERA PERSONUPPGIFTER
