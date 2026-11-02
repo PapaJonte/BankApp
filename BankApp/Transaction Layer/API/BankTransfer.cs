@@ -4,12 +4,11 @@ using BankApp.Transaction_Layer.Enum;
 
 namespace BankApp.Transaction_Layer.API;
 
-public class BankTransfer(BankTransaction bankTransaction, ExchangeRate exchangeRateModule)
+public class BankTransfer(BankTransaction bankTransaction)
 {
 
     /// <summary>
-    /// Responsible for staging requested transfer of money. Handles and setup data so it is ready for transfer.
-    /// Requests transaction at transaction module, depending on answer returns a status code.
+    /// Delegates transfer of money to BankTransfer and returns a status code.
     /// </summary>
     /// <param name="">
     /// AccountData originAccount holds relevant data for account where money is being withdrawed.
@@ -22,32 +21,9 @@ public class BankTransfer(BankTransaction bankTransaction, ExchangeRate exchange
     /// </returns>
     public StatusCode TransferMoney(AccountData originAccount, AccountData targetAccount, decimal transferAmount, Currency transferCurrency)
     {
-        decimal withdrawalAmount = 0m, depositAmount = 0m;
-        StatusCode statusCode;
+        StatusCode transferCode = bankTransaction.TransferMoney(originAccount, targetAccount, transferAmount, transferCurrency);
 
-        if (originAccount.Currency == transferCurrency) //calculate how much we will deposit
-        {
-            statusCode = exchangeRateModule.TryCalculateExchangeValue(transferCurrency, targetAccount.Currency, transferAmount, out depositAmount);
-            withdrawalAmount = transferAmount;
-        }
-        else if (targetAccount.Currency == transferCurrency) //calculate how much we will withdraw
-        {
-            statusCode = exchangeRateModule.TryCalculateExchangeValue(targetAccount.Currency, originAccount.Currency, transferAmount, out withdrawalAmount);
-            depositAmount = transferAmount;
-        }
-        else//if transfer currency is outside both of accounts it is invalid.
-        {
-            statusCode = StatusCode.Invalid;
-        }
-
-        if (statusCode == StatusCode.Successful)
-        {
-            //verify account balance
-            bankTransaction.RequestDeposit(targetAccount.AccountNumber, depositAmount);
-            bankTransaction.RequestWithdrawal(originAccount.AccountNumber, withdrawalAmount);
-        }
-
-        return statusCode;
+        return transferCode;
     }
     
     /// <summary>
