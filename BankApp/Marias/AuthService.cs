@@ -4,26 +4,25 @@ using System.Text;
 
 namespace BankApp
 {
-    //Result of a logged in attempt. Can be used in menu.
+    // Result of a login attempt. Can be used in menu.
     public enum LoginResult
     {
         Success,
         WrongCredentials,
         LockedOut
     }
+
     internal class AuthService
     {
         private readonly UserService _userService;
 
-        //Current logged in user.
+        // Currently logged in user.
         public User? LoggedInUser { get; private set; }
 
         public AuthService(UserService userService)
         {
             _userService = userService;
         }
-
-
 
         public LoginResult Login(string username, string password)
         {
@@ -35,26 +34,31 @@ namespace BankApp
             if (user.IsLockedOut)
                 return LoginResult.LockedOut;
 
-            if (user.Password != password)
+            if (!user.CheckPassword(password))
             {
                 user.RegisterFailedLogin();
 
                 if (user.IsLockedOut)
                     return LoginResult.LockedOut;
 
-                return LoginResult.WrongCredentials; //fixar bugg.
+                return LoginResult.WrongCredentials;
             }
 
-            user.FailedLoginAttempts = 0;
+            user.ResetFailedLogins();
             LoggedInUser = user;
             return LoginResult.Success;
         }
+
         public void Logout()
         {
             LoggedInUser = null;
         }
 
-        //Authentication.
+        /* BEHÖRIGHET
+        Admin och Owner får göra "admin-saker" (t.ex. skapa användare,
+        låsa upp konton) - IsAdmin/IsLoggedInUserAdmin.
+        Owner har DÄRUTÖVER saker bara Owner får göra - IsOwner/IsLoggedInUserOwner. */
+
         public bool IsAdmin(User? user)
         {
             return user != null &&
@@ -66,27 +70,39 @@ namespace BankApp
             return IsAdmin(LoggedInUser);
         }
 
-        //Only owner can create new Admin accounts.
+        // Owner är en EGEN roll, inte "extra admin" - en Admin är INTE Owner.
+        public bool IsOwner(User? user)
+        {
+            return user != null && user.Role == UserRole.Owner;
+        }
+
+        public bool IsLoggedInUserOwner()
+        {
+            return IsOwner(LoggedInUser);
+        }
+
+        // Konkret skillnad enligt era user stories: bara Owner får skapa Admin-konton.
+        // En vanlig Admin kan bara skapa Customer-konton (kontrolleras i UserService.CreateUser).
         public bool CanCreateAdminAccount()
         {
             return LoggedInUser != null && LoggedInUser.Role == UserRole.Owner;
         }
-        //Unlocks a locked account.
+
+        // Unlocks a locked account.
         public bool UnlockUser(string username)
         {
-            if (!IsLoggedInUserAdmin()) //Confirms that the person that gets to unlock is an admin.
+            if (!IsLoggedInUserAdmin())
                 return false;
 
-            User? user = _userService.GetUserByUsername(username); //Finds the user that needs to be unlocked.
+            User? user = _userService.GetUserByUsername(username);
             if (user == null)
                 return false;
 
-            user.IsLockedOut = false; //Unlocking.
-            user.FailedLoginAttempts = 0; //resets the timer.
+            user.Unlock();
             return true;
         }
 
-        //Checks that a bank account belongs to the given user.
+        // Checks that a bank account belongs to the given user.
         public bool OwnsAccount(User? user, BankAccount? account)
         {
             if (user == null || account == null)
@@ -101,6 +117,4 @@ namespace BankApp
         }
     }
 }
-
-
 
