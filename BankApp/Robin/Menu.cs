@@ -57,7 +57,7 @@ namespace BankApp.Robin
             bool succesCreatedUser = _userService.CreateUser(true, false, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
             //User? user = _userService.GetUserByUsername(userName);
 
-            return true;
+            return succesCreatedUser;
         }
         public void ShowOwnerMenu()
         {
@@ -230,9 +230,10 @@ namespace BankApp.Robin
                         {
                             case 0:
                                 Console.Clear();
-                                CreateUser();
 
-                                bool succesCreatedUser = _userService.CreateUser(true, false, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
+                                //bool succesCreatedUser = _userService.CreateUser(true, false, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
+
+                                bool succesCreatedUser = CreateUser();
 
                                 if (succesCreatedUser)
                                 {
@@ -250,13 +251,13 @@ namespace BankApp.Robin
                                 // Unlock user
                                 Console.Clear();
                                 Console.WriteLine("Type in identity number : ");
-                                string userName = Console.ReadLine() ?? "";
+                                string userNameUnlock = Console.ReadLine() ?? "";
 
-                                bool userUnlocked = _authService.UnlockUser(userName);
+                                bool userUnlocked = _authService.UnlockUser(userNameUnlock);
 
                                 if (userUnlocked)
                                 {
-                                    Console.Write($"You unlocked user : {userName}");
+                                    Console.Write($"You unlocked user : {userNameUnlock}");
                                 }
                                 else
                                 {
@@ -467,7 +468,7 @@ namespace BankApp.Robin
                                         Console.WriteLine("\nLogin successful!");
                                         if (_authService.IsLoggedInUserAdmin())
                                         {
-                                            ShowAdminMenu();
+                                            ShowAdminMenu(1);
                                         }
 
                                         else
