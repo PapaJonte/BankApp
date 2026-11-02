@@ -47,6 +47,7 @@ namespace BankApp.GustafsClasses
             BankAccount userAccount = new BankAccount(userId);
 
             bankAccountList.Add(userAccount);
+            BankAccountDictionary.Add(userId, bankAccountList);
         }
         //Used for creating accounts.
         public void CreateSavingsAccount(int userId, int SavingsAccountNumber)
