@@ -38,7 +38,7 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
 
     private void RequestTransfer(AccountData origin, AccountData target, decimal withdrawalAmount, decimal depositAmount)
     {
-        stageTransaction.Stage_Transaction(origin, target,withdrawalAmount,depositAmount);
+        stageTransaction.Stage_Transaction(origin, target, withdrawalAmount, depositAmount);
     }
 
     public StatusCode WithdrawalStatus(int userID, int accountNumber, decimal amount)
@@ -92,6 +92,16 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
         }
 
         return statusCode;
+    }
+
+    public List<TransactionDataObject> GetTransactionHistoryOnUserID(int userID)
+    {
+        return stageTransaction.GetTransactionHistoryOnUserID(userID);
+    }
+
+    public List<TransactionDataObject> GetTransactionHistoryOnAccountID(int accountID)
+    {
+        return stageTransaction.GetTransactionHistoryOnAccountID(accountID);
     }
 }
 

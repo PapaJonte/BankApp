@@ -20,6 +20,17 @@ public class StageTransaction
         InitScheduler();
     }
 
+
+    public List<TransactionDataObject> GetTransactionHistoryOnUserID(int userID)
+    {
+        return transactionRegistry.GetAllTransactionsOnUserID(userID);
+    }
+
+    public List<TransactionDataObject> GetTransactionHistoryOnAccountID(int accountID)
+    {
+        return transactionRegistry.GetAllTransactionsOnAccountNumber(accountID);
+    }
+
     /// <summary>
     /// Responsible for staging requested transaction of money. Only single transactions.
     /// Creates a transaction data object and registers it at the transaction registry.
@@ -101,7 +112,7 @@ public class StageTransaction
                     accountBridge.Deposit(depositObject.userID, depositObject.AccountNumber, depositObject.Amount);
                     transactionRegistry.RegisterSuccessfulTransaction(depositObject);
                 }
-                else if(s.TryGetWithdrawalObject(out TransactionDataObject withdrawalObject))
+                else if (s.TryGetWithdrawalObject(out TransactionDataObject withdrawalObject))
                 {
                     if (accountBridge.CanWithdraw(withdrawalObject.userID, withdrawalObject.AccountNumber, withdrawalObject.Amount))
                     {
