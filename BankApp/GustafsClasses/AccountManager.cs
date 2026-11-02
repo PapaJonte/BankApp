@@ -125,8 +125,8 @@ namespace BankApp.GustafsClasses
             {
                 if (BankAccountList.Count > 0)
                 {
-                    //Here we decide which currency to convert to.
-                    Currency chosenValue = CheckCurrency();
+                    //Here we choose Swedish crowns as the currency.
+                    Currency chosenValue = Currency.SEK;
 
                     ExchangeRate conversionTool = new ExchangeRate();
 
@@ -143,7 +143,6 @@ namespace BankApp.GustafsClasses
 
                             totalBalance = totalBalance + additionValue;
                         }
-                        
                         else
                         {
                             totalBalance = totalBalance + account.GetBalance();
