@@ -121,8 +121,13 @@ namespace BankApp.GustafsClasses
 
             foreach (var bAccount in BankAccountList)
             {
+                //Just to check if there is anything in the list.
                 if (BankAccountList.Count > 0)
                 {
+                    if (bAccount.GetUserId() == userId)
+                    {
+
+                    }
                     //Here we choose Swedish crowns as the currency.
                     Currency chosenValue = Currency.SEK;
 
@@ -148,13 +153,9 @@ namespace BankApp.GustafsClasses
                     }
                     
                 }
-                else if (bAccount.SavingAccounts.Count == 1)
-                {
-                    Console.WriteLine("You only have one savings account.");
-                }
                 else
                 {
-                    Console.WriteLine("Error! You have no savings accounts on the bank.");
+                    Console.WriteLine("Error! You have no accounts on the bank.");
                 }
             }
             return totalBalance;
