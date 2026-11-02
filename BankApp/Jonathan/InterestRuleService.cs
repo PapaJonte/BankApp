@@ -15,6 +15,17 @@ namespace BankApp.Jonathan
             new InterestRule(90, 100, 0.0m)
         };
 
+        // Stores the base interest rates for different loan durations
+        private readonly Dictionary<(int Min, int Max), decimal> baseInterestRates = new Dictionary<(int Min, int Max), decimal>()
+        {
+            { (12, 24), 6.5m },
+            { (25, 48), 7.0m },
+            { (49, 72), 7.5m },
+            { (73, 96), 8.2m },
+            { (97, 120), 8.75m },
+            { (121, 144), 9.25m }
+        };
+
         public decimal GetInterestAdjustment(int creditScore)
         {
             if (creditScore < 0 || creditScore > 100)
@@ -50,6 +61,41 @@ namespace BankApp.Jonathan
             }
 
             throw new InvalidOperationException("No matching interest rule was found.");
+        }
+
+        // Gets the base interest rate based on loan duration
+        public decimal GetBaseInterestRate(int duration)
+        {
+            foreach (var rate in baseInterestRates)
+            {
+                if (duration >= rate.Key.Min && duration <= rate.Key.Max)
+                {
+                    return rate.Value;
+                }
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(duration), "Loan duration must be between 12 and 144 months.");
+        }
+
+        // Updates the base interest rate for an existing duration range
+        public bool UpdateBaseInterestRate(int minimumDuration, int maximumDuration, decimal newRate)
+        {
+            if (newRate < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(newRate), "Interest rate cannot be negative.");
+            }
+
+            var durationRange = (minimumDuration, maximumDuration);
+
+            // Checks if the duration range exists
+            if (!baseInterestRates.ContainsKey(durationRange))
+            {
+                return false;
+            }
+
+            // Updates the interest rate
+            baseInterestRates[durationRange] = newRate;
+            return true;
         }
     }
 }
