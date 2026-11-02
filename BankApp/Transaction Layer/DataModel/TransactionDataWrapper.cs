@@ -14,7 +14,7 @@ namespace BankApp.Transaction_Layer.DataModel;
 public readonly struct TransactionDataWrapper(TransactionDataObject[] dataObjects)
 {
 
-    public readonly bool IsTransfer => _dataObjects.Length == 2;
+    public readonly bool IsTransfer => _dataObjects.Length > 1;
     private readonly TransactionDataObject[] _dataObjects = dataObjects;
 
 

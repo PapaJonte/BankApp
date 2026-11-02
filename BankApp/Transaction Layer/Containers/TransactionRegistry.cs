@@ -1,4 +1,5 @@
 using System;
+using System.Transactions;
 using BankApp.Transaction_Layer.DataModel;
 
 namespace BankApp.Transaction_Layer.Data;
@@ -7,6 +8,7 @@ public class TransactionRegistry
 {
 
     private readonly Queue<TransactionDataWrapper> stagedTransactions = new(); //we'll use queue in case maybe we'd like to limit amount of transactions at a later stage.
+    private readonly List<TransactionDataObject> transactionHistory = [];
     private readonly Lock registryLock = new();
     /// <summary>
     /// Responsible for staging a requested transaction so it is ready to be processed later.
@@ -22,6 +24,28 @@ public class TransactionRegistry
         {
             stagedTransactions.Enqueue(transactionDataWrapper);
         }
+    }
+
+    /// <summary>
+    /// Adds a transaction object from a successful transaction into the history list
+    /// </summary>
+    /// <param name="">
+    /// TransactionDataObject transactionObject object with stored successful transaction data
+    /// </param>
+    /// <returns></returns>
+    public void RegisterSuccessfulTransaction(TransactionDataObject transactionObject)
+    {
+        transactionHistory.Add(transactionObject);
+    }
+
+    public List<TransactionDataObject> GetAllTransactionsOnUserID(int userID)
+    {
+        return [.. transactionHistory.Where(x => x.userID == userID)];
+    }
+
+    public List<TransactionDataObject> GetAllTransactionsOnAccountNumber(int accountNumber)
+    {
+        return [.. transactionHistory.Where(x => x.AccountNumber == accountNumber)];
     }
 
     /// <summary>
