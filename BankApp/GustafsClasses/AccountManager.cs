@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BankApp
+namespace BankApp.GustafsClasses
 {
     /*This class is the upper class of BankAccount and SavingsAccount.*/
     internal class AccountManager

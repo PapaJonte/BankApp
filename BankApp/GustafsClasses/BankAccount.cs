@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BankApp
+namespace BankApp.GustafsClasses
 {
     //Upper class of SavingsAccount
     internal class BankAccount

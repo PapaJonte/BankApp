@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BankApp
+namespace BankApp.GustafsClasses
 {
     internal class SavingsAccount
     {
