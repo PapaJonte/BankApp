@@ -14,24 +14,25 @@ namespace BankApp
     {
         public const int MaxFailedLoginAttempts = 3;
 
-        // Identitet - sätts bara i konstruktorn, kan aldrig ändras efteråt.
+        //Identity. Set only via constructor, never changeable.
         public int UserID { get; }
         public string Username { get; }
         public UserRole Role { get; }
 
-        // Kontaktuppgifter - går att läsa fritt, men bara ändra via UpdateUserInfo.
+        //Contact information, can be read freely, but only changed via UpdateUserInfo (user story 16).
         public string Email { get; private set; }
         public string PhoneNumber { get; private set; }
 
-        // Login security - går att läsa fritt (Robin behöver visa låsningsstatus),
-        // men bara ändra via RegisterFailedLogin / ResetFailedLogins / Unlock.
+        /* Login security - can be read freely (menu needs to show if user is locked out),
+        can only be changed via RegisterFailedLogin, ResetFailedLogins and Unlock (user story 3).*/
         public int FailedLoginAttempts { get; private set; }
         public bool IsLockedOut { get; private set; }
 
-        // Lösenordet lagras ALDRIG i klartext - bara som hash + salt.
+        // Password is never stored in clear text, only the hash and salt are stored.
         private byte[] _passwordHash;
         private byte[] _passwordSalt;
 
+        // Failed login attempts are counted to lock out the user after 3 failed attempts.
         public User(int userId, string username, string password,
                     string email, string phoneNumber, UserRole role = UserRole.Customer)
         {
@@ -70,7 +71,7 @@ namespace BankApp
             _passwordHash = HashPassword(newPassword, _passwordSalt);
         }
 
-        // INLOGGNINGSSPÄRR (user story 3)
+        // Failed Login Attempts (user story 3)
 
         public void RegisterFailedLogin()
         {
@@ -85,15 +86,15 @@ namespace BankApp
             FailedLoginAttempts = 0;
         }
 
-        // Används av admin via AuthService.UnlockUser.
+        // Used by admin via AuthService.UnlockUser.
         public void Unlock()
         {
             IsLockedOut = false;
             FailedLoginAttempts = 0;
         }
 
-        // PERSONUPPGIFTER (user story 16)
-        // Validering sköts av UserService innan den här anropas.
+        /* User information (user story 16)
+        Validation is handled by UserService before this method is called.*/
 
         public void UpdateUserInfo(string newEmail, string newPhone)
         {
@@ -102,4 +103,5 @@ namespace BankApp
         }
     }
 }
+
 

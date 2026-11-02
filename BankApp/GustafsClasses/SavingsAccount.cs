@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BankApp
+namespace BankApp.GustafsClasses
 {
     internal class SavingsAccount
     {
@@ -13,7 +13,7 @@ namespace BankApp
         private decimal Interest;
         private int SavingsAccountNumber; //For access to specific savings accounts.
 
-        public SavingsAccount (decimal Balance, Currency Currency, decimal Interest, int SavingsAccountNumber) : base ( )
+        public SavingsAccount (decimal Balance, Currency Currency, decimal Interest, int SavingsAccountNumber)
         {
             this.Balance = Balance;
             this.Currency = Currency;

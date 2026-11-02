@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 
 namespace BankApp
 {
@@ -21,18 +22,17 @@ namespace BankApp
 
     internal class UserService
     {
-        // Alla användare lagras i en dictionary med UserID som nyckel.
+        // All users are stored in memory in a dictionary, with the internal UserID as key.
         private readonly Dictionary<int, User> _users = new Dictionary<int, User>();
 
-        // Ger varje användare ett unikt internt ID (1, 2, 3 ...).
+        // Gives every user a unique internal ID, starting from 1. The ID is never reused, even if a user is deleted.
         private int _nextUserId = 1;
 
-        // Minsta längd på lösenord.
+        // Minimum password length. Used in validation and error messages.
         private const int MinPasswordLength = 6;
 
         /*
-         Det måste finnas en Owner och en Admin från start,
-         annars kan ingen skapa nya användare (user story 2).
+         Ther has to be an owner and admin from the beginning, or else no one can create new users (user story 2).
         */
         public UserService()
         {
@@ -55,15 +55,13 @@ namespace BankApp
 
             return newUser;
         }
- 
-        // PERSONNUMMER (användarnamn)
 
-        /*
-         Tar bort bindestreck och mellanslag så att "19900101-1234" och
-         "199001011234" alltid blir samma text internt. Används varje gång
-         vi sparar eller letar efter en användare, så att samma person inte
-         kan registreras flera gånger med olika skrivsätt.
-        */
+        /*Removes all dashes and spaces from a username.
+        This means "19900101-1234", "1990 0101 1234" and "199001011234" are all
+
+        treated as the same person, so nobody can register twice by typing
+        their personal number in a different format.
+        Returns an empty string if the username is null, so callers never get a null back.*/
         private string NormalizeUsername(string username)
         {
             if (username == null)
@@ -72,7 +70,10 @@ namespace BankApp
             return username.Replace("-", "").Replace(" ", "");
         }
 
-        // Formaterar "199001011234" som "19900101-1234" för visning i menyer.
+        /* Formats a personal number for display (YYYYMMDD-XXXX).
+         First normalizes the input. If the result is exactly 12 characters,
+         a dash is inserted before the last 4 digits (at index 8).
+         Otherwise the normalized string is returned without a dash.*/
         public string FormatPersonalNumber(string username)
         {
             string digits = NormalizeUsername(username);
@@ -83,7 +84,12 @@ namespace BankApp
             return digits.Insert(8, "-");
         }
 
-        // Formatkontroll: inte tomt, exakt 12 tecken och bara siffror.
+        /*
+  Checks if a username is a valid personal number.
+  Valid means: after removing dashes and spaces, it is exactly 12 characters
+   and every character is a digit.
+    Returns false if the username is null, empty or only whitespace.
+*/
         public bool IsValidPersonalNumberFormat(string username)
         {
             if (string.IsNullOrWhiteSpace(username))
@@ -97,13 +103,21 @@ namespace BankApp
             return digitsOnly.All(char.IsDigit);
         }
 
-        // ÖVRIG VALIDERING (återanvänds av både CreateUser och UpdateUserInfo)
-
+        /* Other validation methods used by both CreateUser and UpdateUserInfo.
+        These are public so that the menu can check before calling the service, to avoid unnecessary error messages.*/
         public bool IsValidPassword(string password)
         {
             return !string.IsNullOrWhiteSpace(password) && password.Length >= MinPasswordLength;
         }
 
+         
+         /*Simple email check (not a full email standard check).
+         Valid means:
+         - there is at least one character before the @
+         - there is a dot somewhere after the @, but not directly after it
+         - the email does not end with a dot
+         Example: "name@example.com" is valid, "name@.com" and "name@example." are not.
+        */
         public bool IsValidEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -115,6 +129,12 @@ namespace BankApp
             return at > 0 && email.IndexOf('.', at) > at + 1 && !email.EndsWith(".");
         }
 
+        /*
+        Checks if a phone number is valid:
+        - Spaces and dashes are removed first.
+        - A leading "+" (country code, e.g. +46) is allowed and removed before checking.
+        - The rest must be 7-15 digits.
+       */
         public bool IsValidPhone(string phone)
         {
             if (string.IsNullOrWhiteSpace(phone))
@@ -128,14 +148,19 @@ namespace BankApp
             return digits.Length >= 7 && digits.Length <= 15 && digits.All(char.IsDigit);
         }
 
-        // HÄMTA ANVÄNDARE
-        // Uppfyller: user story 1 (unikt användarnamn), 6 (hitta mottagare)
-
+        /* GET USERS
+        Covers user story 1 (unique username) and 6 (finding the receiver of a transfer). 
+         
+        
+        Finds a user by username (personal number).
+         The input is normalized first, so it works with or without dashes/spaces.
+         Returns null if no user is found.*/
         public User? GetUserByUsername(string username)
         {
             string normalizedUsername = NormalizeUsername(username);
             return _users.Values.FirstOrDefault(u => u.Username == normalizedUsername);
         }
+
 
         public User? GetUserById(int userId)
         {
@@ -156,17 +181,27 @@ namespace BankApp
             return GetUserByUsername(username) != null;
         }
 
-        /* ---------------------------------------------------------------
-         SKAPA ANVÄNDARE
-        Uppfyller: user story 2 ("administratören ska kunna skapa nya
-        användare i systemet").
-        caller = den som är inloggad (AuthService.LoggedInUser).
-        Vi skickar in själva användaren istället för bool-värden, så att
-        UserService själv kontrollerar rollen. Med bool kunde vem som helst
-        bara skicka in "true".
-        createdUser = den nya användaren, så att Gustaf direkt kan
-        öppna ett konto åt kunden. */
-
+        /* 
+               CREATE USER
+        Covers: user story 2 ("the administrator should be able to create new users").
+ 
+         Creates a new user if the caller has permission and all input is valid.
+ 
+         caller      = the user who is currently logged in (AuthService.LoggedInUser).
+                       We pass in the actual user object instead of a bool like "isAdmin",
+                       so UserService checks the role itself. With a bool, anyone could
+                       just pass in "true".
+         createdUser = the new user (or null if it failed).
+         role        = the role of the new user. Defaults to Customer.
+ 
+         Permission rules:
+         - The caller must be logged in and be at least Admin (Customers cannot create users).
+         - Nobody can create a new Owner.
+         - Only the Owner can create a new Admin.
+ 
+         The checks run in order and stop at the first error, and the returned
+         CreateUserResult tells the menu exactly what went wrong.
+        */
         public CreateUserResult CreateUser(User? caller, string username, string password,
             string email, string phoneNumber, out User? createdUser,
             UserRole role = UserRole.Customer)
@@ -205,9 +240,10 @@ namespace BankApp
         }
 
         /*
-         Översätter CreateUserResult till en läsbar svensk text, så att
-        menyn bara behöver skriva ut GetErrorMessage(result) istället
-         för att göra en egen switch på enumen i Menu.cs.
+        Translates a CreateUserResult into a readable message (in Swedish, since the app UI is Swedish).
+         This way the menu only has to print GetErrorMessage(result), instead of
+         writing its own switch on the enum in Menu.cs.
+         It is static because it does not use any data from a specific UserService instance.
         */
         public static string GetErrorMessage(CreateUserResult result)
         {
@@ -224,11 +260,11 @@ namespace BankApp
             };
         }
 
-        // UPPDATERA PERSONUPPGIFTER
-        // Uppfyller: user story 16 (extra).
-        // user skickas in från AuthService.LoggedInUser, så en användare
-        // kan bara ändra sina EGNA uppgifter.
-
+        /*Updates the email and phone number of a user.
+          The user is passed in from AuthService.LoggedInUser, so a user can
+          only change their OWN information.
+          Returns false if no user is logged in, or if the new email or phone is invalid.
+          Returns true if the update was saved. */
         public bool UpdateUserInfo(User? user, string newEmail, string newPhone)
         {
             if (user == null)
@@ -241,7 +277,15 @@ namespace BankApp
             return true;
         }
 
-        // BYTA LÖSENORD (t.ex. när admin satt ett startlösenord)
+        /*
+         CHANGE PASSWORD (for example when an admin has given the user a start password)
+         Changes the password of a user.
+         - The user must be logged in (not null).
+         - The old password must be correct, so nobody can change the password
+           of an unlocked computer without knowing it.
+         - The new password must pass the same rules as when creating a user.
+         Returns true if the password was changed, otherwise false.
+         */
         public bool ChangePassword(User? user, string oldPassword, string newPassword)
         {
             if (user == null)
