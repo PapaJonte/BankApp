@@ -3,6 +3,7 @@ using BankApp.Transaction_Layer.Enum;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
+using System.Security.Principal;
 using System.Text;
 
 namespace BankApp.GustafsClasses
@@ -156,6 +157,19 @@ namespace BankApp.GustafsClasses
                 }
             }
             return totalBalance;
+        }
+
+        public bool AccountOwnershipVerification(int userId, int bankAccountNr)
+        {
+            foreach( var account in BankAccountList)
+            {
+                if ( account.GetBankAccountNumber() == bankAccountNr && account.GetUserId() == userId)
+                {
+                    Console.WriteLine("Account found.");
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
