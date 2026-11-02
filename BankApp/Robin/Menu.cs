@@ -69,10 +69,7 @@ namespace BankApp.Robin
 
             bool succesCreatedUser = _userService.CreateUser(true, false, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
 
-            if (succesCreatedUser)
-            {
-                Console.WriteLine("Account created.");
-            }
+            
 
             //User? user = _userService.GetUserByUsername(userName);
 
@@ -266,6 +263,9 @@ namespace BankApp.Robin
                                     Console.WriteLine("Error!");
                                     
                                 }
+
+                                Console.ReadKey();
+
                                 break;
 
                             case 1:
@@ -489,7 +489,7 @@ namespace BankApp.Robin
                                         Console.WriteLine("\nLogin successful!");
                                         if (_authService.IsLoggedInUserAdmin())
                                         {
-                                            ShowAdminMenu(1);
+                                            ShowAdminMenu(_authService.LoggedInUser.UserID);
                                         }
 
                                         else
