@@ -25,18 +25,43 @@ public class BankTransfer(BankTransaction bankTransaction)
 
         return transferCode;
     }
-    
+
     /// <summary>
     /// Request a deposition of money based on params, return status code
     /// </summary>
     /// <param name="">
-    /// string accountNumber, number of account we deposit money to
+    /// AccountData account aacount to deposit money to
     /// decimal depositAmount, value we add to bank account.
     /// </param>
-    /// <returns></returns>
-    public StatusCode DepositMoney(string accountNumber, decimal depositAmount)
+    /// <returns>
+    /// StatusCode represent status of deposit request.
+    /// </returns>
+    public StatusCode DepositMoney(AccountData account, decimal depositAmount)
     {
-        bankTransaction.RequestDeposit(accountNumber, depositAmount);
+        bankTransaction.RequestDeposit(account.UserID, account.AccountNumber, depositAmount);
         return StatusCode.Successful;
     }
+    
+    /// <summary>
+    /// Request to withdraw money from account
+    /// </summary>
+    /// <param name="">
+    /// AccountData account account to withdraw money from.
+    /// decimal withdrawAmount amount to withdraw.
+    /// </param>
+    /// <returns>
+    /// StatusCode represents status of withdrawal request.
+    /// </returns>
+    public StatusCode WithdrawyMoney(AccountData account, decimal withdrawAmount)
+    {
+        StatusCode statusCode = bankTransaction.WithdrawalStatus(account.UserID, account.AccountNumber, withdrawAmount);
+
+        if (statusCode == StatusCode.Successful)
+        {
+            bankTransaction.RequestWithdrawal(account.UserID, account.AccountNumber, withdrawAmount);
+        }
+        
+        return statusCode;
+    }
+    
 }

@@ -1,0 +1,25 @@
+sequenceDiagram
+actor Customer
+participant BankTransfer as "BankTransfer «API»"
+participant BankTransaction as "BankTransaction «Controller»"
+participant ExchangeRate as "ExchangeRate «API»"
+participant StageTransaction
+participant TransactionRegistry
+participant TransactionScheduler
+Customer->>BankTransfer: TransferMoney(origin, target, amount, currency)
+BankTransfer->>BankTransaction: TransferMoney(...)
+BankTransaction->>ExchangeRate: TryCalculateExchangeValue(from, to, amount)
+ExchangeRate-->>BankTransaction: StatusCode + converted amount
+BankTransaction->>StageTransaction: Stage(target, deposit, Deposit)
+StageTransaction->>TransactionRegistry: RegisterStagedTransaction(TDO)
+BankTransaction->>StageTransaction: Stage(origin, withdrawal, Withdrawal)
+StageTransaction->>TransactionRegistry: RegisterStagedTransaction(TDO)
+BankTransaction-->>BankTransfer: StatusCode
+BankTransfer-->>Customer: StatusCode (staged, not yet posted)
+loop every 15 min (Task.Delay tick)
+  TransactionScheduler->>StageTransaction: OnSchedule()
+  StageTransaction->>TransactionRegistry: GetAllStagedTransactions()
+  TransactionRegistry-->>StageTransaction: List~TransactionDataObject~
+  StageTransaction->>StageTransaction: post deposits/withdrawals (TODO)
+  StageTransaction->>TransactionRegistry: ClearStagedTransactions()
+end

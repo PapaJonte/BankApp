@@ -1,6 +1,7 @@
 using BankApp.Transaction_Layer.Data;
 using BankApp.Transaction_Layer.DataModel;
 using BankApp.Transaction_Layer.Enum;
+using BankApp.Transaction_Layer.Interface;
 using BankApp.Transaction_Layer.Service;
 
 namespace BankApp.Transaction_Layer.Controller;
@@ -9,16 +10,18 @@ public class StageTransaction
 {
     private readonly TransactionScheduler transactionScheduler;
     private readonly TransactionRegistry transactionRegistry;
+    private readonly IAccountBridge accountBridge;
 
-    public StageTransaction(TransactionScheduler transactionScheduler, TransactionRegistry transactionRegistry)
+    public StageTransaction(TransactionScheduler transactionScheduler, TransactionRegistry transactionRegistry, IAccountBridge accountBridge)
     {
         this.transactionScheduler = transactionScheduler;
         this.transactionRegistry = transactionRegistry;
+        this.accountBridge = accountBridge;
         InitScheduler();
     }
 
     /// <summary>
-    /// Responsible for staging requested transaction of money. Handles and setup data so it is ready for processing.
+    /// Responsible for staging requested transaction of money. Only single transactions.
     /// Creates a transaction data object and registers it at the transaction registry.
     /// </summary>
     /// <param name="">
@@ -26,10 +29,31 @@ public class StageTransaction
     /// decimal amount, value the transaction requests to move.
     /// TransactionType transactionType, the type of transaction being staged (deposit or withdrawal).
     /// </param>
-    public void Stage(string accountNumber, decimal amount, TransactionType transactionType)
+    public void Stage_Single(int userID, int accountNumber, decimal amount, TransactionType transactionType)
     {
-        TransactionDataObject tdo = new(accountNumber, amount, transactionType);
-        transactionRegistry.RegisterStagedTransaction(tdo);
+        TransactionDataObject tdo = new(userID, accountNumber, amount, transactionType);
+        TransactionDataWrapper wrapper = transactionType == TransactionType.Deposit ? TransactionDataWrapper.ForDeposit(tdo) : TransactionDataWrapper.ForWithdrawal(tdo);
+        transactionRegistry.RegisterStagedTransaction(wrapper);
+    }
+
+    /// <summary>
+    /// Responsible for staging transactiomn between two accounts
+    /// </summary>
+    /// <param name="">
+    /// AccountData originAccount data object for withdrawal account
+    /// AccountData targetAccount data object for deposit account
+    /// decimal withdrawalAmount withdrawal amount
+    /// decimal depositAmount deposit amount
+    /// </param>
+    /// <returns></returns>
+    public void Stage_Transaction(AccountData originAccount, AccountData targetAccount, decimal withdrawalAmount, decimal depositAmount)
+    {
+        TransactionDataObject tdo_withdrawal = new(originAccount.UserID, originAccount.AccountNumber, withdrawalAmount, TransactionType.Withdrawal);
+        TransactionDataObject tdo_deposit = new(targetAccount.UserID, targetAccount.AccountNumber, depositAmount, TransactionType.Deposit);
+
+        TransactionDataWrapper wrapper = TransactionDataWrapper.ForTransaction(tdo_withdrawal, tdo_deposit);
+
+        transactionRegistry.RegisterStagedTransaction(wrapper);
     }
 
     #region Scheduler
@@ -43,17 +67,49 @@ public class StageTransaction
 
     /// <summary>
     /// Responsible for processing all staged transactions when the scheduler triggers.
-    /// Locks processing to keep it thread-safe, then drains and iterates the staged transactions.
+    /// If transfer between accounts or withdrawal check current withdrawal status before actually moving money. If sinfle deposit just add the money directly.
+    /// 
     /// </summary>
     private void OnSchedule()
     {
         var stagedTransactions = transactionRegistry.GetAllStagedTransactions();
+
         foreach (var s in stagedTransactions)
         {
-            //deposit and withdraw money
+            if (s.IsTransfer)
+            {
+                if (s.TryGetWithdrawalObject(out TransactionDataObject withdrawalObj))
+                {
+                    if (accountBridge.CanWithdraw(withdrawalObj.userID, withdrawalObj.AccountNumber, withdrawalObj.Amount))
+                    {
+                        if (s.TryGetDepositObject(out TransactionDataObject depositObject))
+                        {
+                            accountBridge.Withdraw(withdrawalObj.userID, withdrawalObj.AccountNumber, withdrawalObj.Amount);
+                            accountBridge.Deposit(depositObject.userID, depositObject.AccountNumber, depositObject.Amount);
+                        }
+
+                    }
+                }
+            }
+            else
+            {
+                if (s.TryGetDepositObject(out TransactionDataObject depositObject))
+                {
+                    accountBridge.Deposit(depositObject.userID, depositObject.AccountNumber, depositObject.Amount);
+                }
+                else if(s.TryGetWithdrawalObject(out TransactionDataObject withdrawalObject))
+                {
+                    if (accountBridge.CanWithdraw(withdrawalObject.userID, withdrawalObject.AccountNumber, withdrawalObject.Amount))
+                    {
+                        accountBridge.Withdraw(withdrawalObject.userID, withdrawalObject.AccountNumber, withdrawalObject.Amount);
+                    }
+                }
+            }
         }
+
         transactionRegistry.ClearStagedTransactions();
     }
+
     #endregion
 
 }

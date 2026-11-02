@@ -7,9 +7,9 @@ namespace BankApp;
 /// ASCII art branding for the app. The logo is rendered as stacked
 /// ASCII block letters, one word per line, so it stays legible
 /// and pops in the terminal.
-    /// </summary>
+/// </summary>
 public static class GoldenSack
-    {
+{
     /// <summary>
     /// "THE / GOLDEN / SACK" rendered as stacked ASCII block letters in a
     /// single multi-line string. Use <see cref="WriteLogo"/> to print it.
@@ -40,18 +40,18 @@ public static class GoldenSack
     /// lock), otherwise writes straight to <see cref="Console"/>.
     /// </summary>
     public static void WriteLogo(IConsole? console = null)
-        {
+    {
         if (console is null)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(Logo);
             Console.ResetColor();
             return;
-    }
+        }
 
         console.SetConsoleColor(ConsoleColor.Yellow);
         console.WriteCentered(Logo);
         console.SetConsoleColor(ConsoleColor.Gray);
-}
+    }
 }
 

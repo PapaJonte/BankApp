@@ -1,0 +1,59 @@
+classDiagram
+direction LR
+class User {
+  +UserID : int
+  +Username : string
+  +Password : string
+  +Email : string
+  +PhoneNumber : string
+  +Role : UserRole
+  +FailedLoginAttempts : int
+  +IsLockedOut : bool
+  +RegisterFailedLogin()
+  +UpdateUserInfo(newEmail, newPhone)
+}
+class UserRole {
+  <<enumeration>>
+  Customer
+  Admin
+  Owner
+}
+class LoginResult {
+  <<enumeration>>
+  Success
+  WrongCredentials
+  LockedOut
+}
+class UserService {
+  -_users : Dictionary~int, User~
+  -_nextUserId : int
+  +GetUserByUsername(username) User?
+  +GetUserById(userId) User?
+  +GetAllUsers() IReadOnlyList
+  +UsernameExists(username) bool
+  +IsValidPersonalNumberFormat(username) bool
+  +CreateUser(callerIsAdmin, callerIsOwner, username, password, email, phone, role) bool
+  +UpdateUserInfo(user, newEmail, newPhone) bool
+  -AddUser(username, password, email, phone, role)
+  -NormalizeUsername(username) string
+}
+class AuthService {
+  -_userService : UserService
+  +LoggedInUser : User?
+  +Login(username, password) LoginResult
+  +Logout()
+  +IsAdmin(user) bool
+  +IsLoggedInUserAdmin() bool
+  +CanCreateAdminAccount() bool
+  +UnlockUser(username) bool
+}
+class Menu {
+  <<external BankApp.Robin>>
+}
+Menu ..> AuthService : uses
+Menu ..> UserService : uses
+AuthService --> User : LoggedInUser
+AuthService --> UserService : delegates to
+UserService "1" *-- "1..*" User : stores
+User --> UserRole : Role
+AuthService ..> LoginResult : returns

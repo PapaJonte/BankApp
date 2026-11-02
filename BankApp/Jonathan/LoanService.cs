@@ -35,8 +35,13 @@ namespace BankApp.Jonathan
         // LOAN APPLICATIONS
         //
 
-        public Loan? ApplyForLoan(int userId, decimal requestedAmount, int duration, decimal totalAccountBalance)
+        public Loan? ApplyForLoan(int userId, decimal requestedAmount, int duration, decimal totalAccountBalance, string destinationAccountNumber)
         {
+            if (string.IsNullOrWhiteSpace(destinationAccountNumber))
+            {
+                return null;
+            }
+
             // Rejects loan durations outside the allowed range
             if (duration < 12 || duration > 144)
             {
@@ -83,6 +88,7 @@ namespace BankApp.Jonathan
 
             // Loan details
             newLoan.Duration = duration;
+            newLoan.SetDestinationAccount(destinationAccountNumber);
 
             // Interest and repayment details
             newLoan.InterestRate = interestRate;

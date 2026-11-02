@@ -23,6 +23,8 @@ namespace BankApp.Jonathan
         public decimal InterestPaid { get; private set; } = 0m;
         public int ConsecutiveMissedPayments { get; private set; } = 0;
 
+        // The regular bank accoun selected to receive the loan payout
+        public string DestinationAccountNumber { get; private set; } = string.Empty;
 
         // Creates a loan and sets its original and remaining balance
         public Loan(decimal amount)
@@ -36,6 +38,17 @@ namespace BankApp.Jonathan
             // Sets the original loan amount and remaining balance
             LoanAmount = amount;
             RemainingLoanBalance = amount;
+        }
+
+        // Assigns the destination account when the loan application is created
+        internal void SetDestinationAccount(string accountNumber)
+        {
+            if (string.IsNullOrWhiteSpace(accountNumber))
+            {
+                throw new ArgumentException(nameof(accountNumber), "A destination account number is required");
+            }
+
+            DestinationAccountNumber = accountNumber;
         }
 
         // Subtracts a repayment from the remaining loan balance

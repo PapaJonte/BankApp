@@ -15,3 +15,7 @@ The userId variable that represents the ID of the user may be returned with a me
 
 AccountManager
 This class may create objects
+## Documentation
+
+- [UML diagrams](docs/uml/README.md) — architecture overview, per-module class
+  diagrams and sequence diagrams, with editable Mermaid sources.
