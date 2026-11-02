@@ -29,16 +29,26 @@ namespace BankApp.Robin
             {
                 Console.WriteLine($"\nYour details" +
                   $"\n{user.Username}" +
-                  $"\n{user.Password}" +
                   $"\n{user.Email}" +
                   $"\n{user.PhoneNumber}" +
                   $"\n{user.Role}");
             }
         }
+
+        public void ShowLoggedInUser()
+        {
+            User? userDetails = _authService.LoggedInUser;
+
+            if (userDetails == null)
+            {
+                Console.WriteLine("No users logged in!");
+                return;
+            }
+        }
         public bool CreateUser()
         {
             Console.Clear();
-            Console.Write("\nPlease enter your details.");
+            Console.Write("\nPlease enter details.");
             Console.Write("\nPersonal identity number: ");
             string userName = Console.ReadLine() ?? "";
             if (_userService.UsernameExists(userName))
