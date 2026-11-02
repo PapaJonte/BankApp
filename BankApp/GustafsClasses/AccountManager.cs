@@ -14,7 +14,9 @@ namespace BankApp.GustafsClasses
 
         public Dictionary<int, List<BankAccount>> BankAccountDictionary = new Dictionary<int, List<BankAccount>>();
         
-        //This method is intended to support the CreateAccount() method below. It will be called upon when CreateAccount needs it. Don't call upon this method!
+        /*This method is intended to support the CreateAccount() method below.
+         * It will be called upon when CreateAccount needs it.
+         * Don't call upon this method!*/
         private Currency CheckCurrency()
         {
             //while loop around to make sure the user gives a correct value as currency.
