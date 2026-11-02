@@ -1,0 +1,125 @@
+classDiagram
+direction LR
+class IView {
+  <<interface>>
+  +HasBeenServed : bool
+  +GameState : GameState
+  +ViewState : ViewState
+  +Render(console, dt)
+  +ResetView()
+}
+class SplashView {
+  -config : SplashViewConfig
+  -currentFrame : int
+  +Render(console, dt)
+  +ResetView()
+}
+class GameView {
+  -config : GameViewConfig
+  -reels : List~ReelView~
+  -blinkGraphic : bool
+  +Render(console, dt)
+  +ResetView()
+  -RenderSpinning(console, dt)
+  -Resolve()
+  -OnReelResolveComplete()
+  -EvaluateCompleteText() string
+}
+class ReelView {
+  +OnResolveComplete : Action
+  -resolveComplete : bool
+  -sequenceSpeed : float
+  +Target(target, len, speed, decay)
+  +Render(console, dt)
+  +ResetView()
+}
+class ResultView {
+  -config : ResultViewConfig
+  -viewIndex : int
+  +Render(console, dt)
+  +ResetView()
+}
+class BalanceView {
+  +Target : decimal
+  -_displayed : decimal
+  +Render(console, dt)
+}
+class IViewUpdater {
+  <<interface>>
+  +Register(view)
+  +DeRegister(view)
+  +Tick(deltaTime)
+}
+class ViewUpdater {
+  -_console : IConsole
+  -_views : List~IView~
+  +Register(view)
+  +DeRegister(view)
+  +Tick(dt)
+}
+class UserInput {
+  -console : IConsole
+  +ReadKeyCode(key)
+  +TryReadKeyCode(key) bool
+}
+class IConsole {
+  <<interface>>
+  +Lock() IDisposable
+  +TryReadKey(out key) bool
+  +Write(text)
+  +WriteLine(text)
+  +WriteCentered(text)
+  +SetCursor(left, top)
+  +SetConsoleColor(color)
+  +ReadKey() ConsoleKeyInfo
+}
+class LockedConsole {
+  -_gate : object
+  +Lock() IDisposable
+  +TryReadKey(out key) bool
+}
+class ViewRegistry {
+  -_views : Dictionary~ViewType, IView~
+  +AddView(type, view)
+  +RemoveView(type) bool
+  +GetView(type) IView
+  +AllViews : IEnumerable
+}
+class ViewConfig {
+  <<abstract record>>
+  +Width : int
+  +Height : int
+  +Title : string
+}
+class SplashViewConfig {
+  +SponsorText : string
+  +Frames : 4 ASCII frames
+}
+class GameViewConfig {
+  +ReelCols
+  +ReelRows
+  +ReelWidth
+  +ReelGap
+  +ReelTop
+  +ResolveSlowDownSteps
+  +Banner
+  +CompleteText_Lost
+  +CompleteText_Won
+  +CompleteText_SackPot
+}
+class ResultViewConfig {
+  +LogoArt : string
+  +HoldSeconds
+}
+SplashView ..|> IView
+GameView ..|> IView
+ReelView ..|> IView
+ResultView ..|> IView
+BalanceView ..|> IView
+ViewUpdater ..|> IViewUpdater
+LockedConsole ..|> IConsole
+UserInput --> IConsole : reads via
+GameView "1" *-- "3" ReelView : positions
+SplashViewConfig --|> ViewConfig
+GameViewConfig --|> ViewConfig
+ResultViewConfig --|> ViewConfig

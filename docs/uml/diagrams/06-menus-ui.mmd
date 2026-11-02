@@ -1,0 +1,44 @@
+classDiagram
+direction LR
+class Menu {
+  -_loanMenu : LoanMenu
+  -_userService : UserService
+  -_authService : AuthService
+  +LoginMenu()
+  +CreateUser() bool
+  +ShowCreatedUsers()
+  +ShowAdminMenu(userId)
+  +ShowUserMenu()
+  +ShowOwnerMenu()
+}
+class LoanMenu {
+  -loanService : LoanService
+  -accountManager : AccountManager
+  +ShowLoanMenu(userId)
+  +ApplyForLoan(userId, amount, duration) Loan?
+  +ChangeLoanStatus(loanId, newStatus) bool
+}
+class Theme {
+  -style : Style
+  +Markup(input)
+}
+class EmailService {
+  +SendEmail(recipient, subject, body)
+}
+class UserService {
+  <<external Marias>>
+}
+class AuthService {
+  <<external Marias>>
+}
+class LoanService {
+  <<external Jonathan>>
+}
+class AccountManager {
+  <<external Gustaf>>
+}
+Menu --> LoanMenu : opens
+Menu ..> UserService : uses
+Menu ..> AuthService : uses
+LoanMenu ..> LoanService : uses
+LoanMenu ..> AccountManager : uses

@@ -1,0 +1,40 @@
+classDiagram
+direction LR
+class AccountManager {
+  -bankAccountList : List~BankAccount~
+  +CreateAccount(userId)
+  +CreateSavingsAccount(userId)
+  +GetAccounts(userId)
+  +GetTotalBalance(userId) decimal
+  -CheckCurrency() Currency
+}
+class BankAccount {
+  +savingAccounts : List~SavingsAccount~
+  -userId : int
+  +GetUserId() int
+}
+class SavingsAccount {
+  -Balance : decimal
+  -Currency : Currency
+  -Interest : decimal
+  +GetBalance() decimal
+  +GetCurrency() Currency
+  +GetInterest() decimal
+}
+class ExchangeRate {
+  <<external Transaction Layer API>>
+  -exchangeRateRegistry : ExchangeRateRegistry
+  +SetExchangeRate(c1, c2, rate)
+  +TryCalculateExchangeValue(c1, c2, value, out amount) StatusCode
+}
+class Currency {
+  <<enumeration external>>
+  EUR GBP NOK SEK USD
+  ...154 ISO-4217 codes
+}
+AccountManager "1" *-- "1..*" BankAccount : owns
+BankAccount "1" *-- "0..*" SavingsAccount : savingAccounts
+AccountManager ..> SavingsAccount : creates/reads
+AccountManager ..> ExchangeRate : uses
+SavingsAccount --> Currency : Currency
+ExchangeRate ..> Currency : keys

@@ -1,6 +1,10 @@
 ﻿using BankApp.Jonathan;
 using BankApp.Pull_The_Sack;
 using BankApp.Robin;
+using BankApp.Transaction_Layer.API;
+using BankApp.Transaction_Layer.Controller;
+using BankApp.Transaction_Layer.Data;
+using BankApp.Transaction_Layer.Service;
 using Spectre.Console;
 
 namespace BankApp
@@ -19,8 +23,24 @@ namespace BankApp
             AccountManager accountManager = new AccountManager();
             LoanMenu loanMenu = new LoanMenu(loanService, accountManager);
 
+            #region Transactions
+            AccountBridge accountBridge = new(accountManager);
+            #region  ExchangeRate Module
+            ExchangeRate exchangeRateModule = new();
+            #endregion
+            #region Transaction Module
+            TransactionScheduler transactionScheduler = new();
+            TransactionRegistry transactionRegistry = new();
+            StageTransaction transactionStaging = new(transactionScheduler, transactionRegistry, accountBridge);
+            BankTransaction bankTransactionModule = new(transactionStaging, exchangeRateModule, accountBridge);
+            #endregion
+            #region Transfer Module
+            BankTransfer bankTransferModule = new(bankTransactionModule);
+            #endregion
+            #endregion
+
             Menu menu = new Menu(userService, authService, loanMenu);
-            
+
 
             // Console.ReadKey();
 

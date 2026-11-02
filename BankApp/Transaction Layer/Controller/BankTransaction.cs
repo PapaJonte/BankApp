@@ -1,11 +1,13 @@
 using System;
+using BankApp.Pull_The_Sack.API;
 using BankApp.Transaction_Layer.API;
 using BankApp.Transaction_Layer.DataModel;
 using BankApp.Transaction_Layer.Enum;
+using BankApp.Transaction_Layer.Interface;
 
 namespace BankApp.Transaction_Layer.Controller;
 
-public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exchangeRateModule)
+public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exchangeRateModule, IAccountBridge AccountBridge)
 {
 
     /// <summary>
@@ -16,9 +18,9 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
     /// string accountNumber, number of the account we deposit money to.
     /// decimal amount, value we add to the bank account.
     /// </param>
-    public void RequestDeposit(string accountNumber, decimal amount)
+    public void RequestDeposit(int userID, int accountNumber, decimal amount)
     {
-        stageTransaction.Stage(accountNumber, amount, TransactionType.Deposit);
+        stageTransaction.Stage(userID, accountNumber, amount, TransactionType.Deposit);
     }
 
     /// <summary>
@@ -29,12 +31,18 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
     /// string accountNumber, number of the account we withdraw money from.
     /// decimal amount, value we remove from the bank account.
     /// </param>
-    public void RequestWithdrawal(string accountNumber, decimal amount)
+    public void RequestWithdrawal(int userID, int accountNumber, decimal amount)
     {
-        stageTransaction.Stage(accountNumber, amount, TransactionType.Withdrawal);
+        stageTransaction.Stage(userID, accountNumber, amount, TransactionType.Withdrawal);
     }
 
-        /// <summary>
+    public StatusCode WithdrawalStatus(int userID, int accountNumber, decimal amount)
+    {
+        StatusCode statusCode = AccountBridge.CanWithdraw(userID, accountNumber, amount) ? StatusCode.Successful : StatusCode.Failed;
+        return statusCode;
+    }
+
+    /// <summary>
     /// Responsible for staging requested transfer of money. Handles and setup data so it is ready for transfer.
     /// Requests transaction at transaction module, depending on answer returns a status code.
     /// </summary>
@@ -67,11 +75,16 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
             statusCode = StatusCode.Invalid;
         }
 
+        //Check if withdraw possible
         if (statusCode == StatusCode.Successful)
         {
-            //verify account balance
-            RequestDeposit(targetAccount.AccountNumber, depositAmount);
-            RequestWithdrawal(originAccount.AccountNumber, withdrawalAmount);
+            statusCode = WithdrawalStatus(originAccount.UserID, originAccount.AccountNumber, transferAmount);
+        }
+
+        if (statusCode == StatusCode.Successful)
+        {
+            RequestDeposit(targetAccount.UserID, targetAccount.AccountNumber, depositAmount);
+            RequestWithdrawal(originAccount.UserID, originAccount.AccountNumber, withdrawalAmount);
         }
 
         return statusCode;

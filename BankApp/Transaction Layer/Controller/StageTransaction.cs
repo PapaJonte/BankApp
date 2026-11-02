@@ -1,6 +1,7 @@
 using BankApp.Transaction_Layer.Data;
 using BankApp.Transaction_Layer.DataModel;
 using BankApp.Transaction_Layer.Enum;
+using BankApp.Transaction_Layer.Interface;
 using BankApp.Transaction_Layer.Service;
 
 namespace BankApp.Transaction_Layer.Controller;
@@ -9,11 +10,13 @@ public class StageTransaction
 {
     private readonly TransactionScheduler transactionScheduler;
     private readonly TransactionRegistry transactionRegistry;
+    private readonly IAccountBridge accountBridge;
 
-    public StageTransaction(TransactionScheduler transactionScheduler, TransactionRegistry transactionRegistry)
+    public StageTransaction(TransactionScheduler transactionScheduler, TransactionRegistry transactionRegistry, IAccountBridge accountBridge)
     {
         this.transactionScheduler = transactionScheduler;
         this.transactionRegistry = transactionRegistry;
+        this.accountBridge = accountBridge;
         InitScheduler();
     }
 
@@ -26,9 +29,9 @@ public class StageTransaction
     /// decimal amount, value the transaction requests to move.
     /// TransactionType transactionType, the type of transaction being staged (deposit or withdrawal).
     /// </param>
-    public void Stage(string accountNumber, decimal amount, TransactionType transactionType)
+    public void Stage(int userID, int accountNumber, decimal amount, TransactionType transactionType)
     {
-        TransactionDataObject tdo = new(accountNumber, amount, transactionType);
+        TransactionDataObject tdo = new(userID, accountNumber, amount, transactionType);
         transactionRegistry.RegisterStagedTransaction(tdo);
     }
 
@@ -48,10 +51,19 @@ public class StageTransaction
     private void OnSchedule()
     {
         var stagedTransactions = transactionRegistry.GetAllStagedTransactions();
+        
         foreach (var s in stagedTransactions)
         {
-            //deposit and withdraw money
+            if (s.TransactionType == TransactionType.Deposit)
+            {
+                accountBridge.Deposit(s.userID, s.AccountNumber, s.Amount);
+            }
+            else if (s.TransactionType == TransactionType.Withdrawal)
+            {
+                accountBridge.Withdraw(s.userID, s.AccountNumber, s.Amount);
+            }
         }
+        
         transactionRegistry.ClearStagedTransactions();
     }
     #endregion

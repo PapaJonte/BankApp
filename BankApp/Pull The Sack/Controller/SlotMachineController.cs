@@ -90,9 +90,12 @@ public class SlotMachineController(
                 {
                     machine.ResolveSpinResult();
                 }
+                
                 break;
             case GamePhase.Resolving:
+
                 view = viewRegistry.GetView(ViewType.GameView);
+
                 if (view.GameState.GamePhase != gameState.GamePhase)
                 {
                     view.GameState = gameState;
@@ -105,6 +108,7 @@ public class SlotMachineController(
                         machine.Apply();
                     }
                 }
+
                 break;
 
             case GamePhase.Result:

@@ -1,0 +1,116 @@
+classDiagram
+direction LR
+class GamblingFacade {
+  +GambleOnLoan(loan) IBankInterface
+}
+class Orchestrator {
+  +Start(loanAmount) SlotMachineController
+}
+class SlotMachineController {
+  <<global namespace>>
+  -machine : SlotMachine
+  -updater : IViewUpdater
+  -bank : IBankInterface
+  -userInput : UserInput
+  -viewRegistry : ViewRegistry
+  +PullTheSack() IBankInterface
+  -RunSession() IBankInterface
+  -StateControl(gameState)
+  -ServeViewToUpdater(type)
+  -RemoveViewFromUpdater(type)
+  -ClearAllViews()
+}
+class IBankInterface {
+  <<interface>>
+  +GetLoanAmount() decimal
+  +SetLoanAmount(amount)
+}
+class BankBridge {
+  -_loanAmount : decimal
+  +GetLoanAmount() decimal
+  +SetLoanAmount(amount)
+}
+class GameState {
+  <<record struct>>
+  +GamePhase : GamePhase
+  +Balance : decimal
+  +SpinCount : int
+  +SpinResult : SpinResult
+}
+class SpinResult {
+  <<record>>
+  +Symbols : IReadOnlyList~SlotSymbol~
+  +PayoutMultiplier : decimal
+}
+class IPayoutEvaluator {
+  <<interface>>
+  +Evaluate(symbols) decimal
+}
+class PayoutEvaluator {
+  -table : PayoutTable
+  +Evaluate(symbols) decimal
+}
+class PayoutTable {
+  +Entries : IReadOnlyList~PayoutEntry~
+  +GetPayoutValue(symbol) decimal
+  -GenerateTable()
+}
+class PayoutEntry {
+  <<record struct>>
+  +Symbol : SlotSymbol
+  +Multiplier : decimal
+}
+class SlotMachine {
+  +State : GameState
+  +StartGame()
+  +Spin()
+  +ResolveSpinResult()
+  +Apply()
+  +EndGame()
+  -UpdateGamePhase(phase)
+}
+class GameLoop {
+  -_glts : CancellationTokenSource
+  -_gameTime : Stopwatch
+  -updater : IViewUpdater
+  +StartGameLoopAsync()
+  +StopGameLoopAsync()
+  -RunAsync(...) Task
+}
+class Reel {
+  -_catalog : SymbolCatalog
+  -rnd : Random
+  +CurrentSymbol : SlotSymbol
+  +Spin()
+}
+class SymbolCatalog {
+  +Symbols : IReadOnlyDictionary~int, SlotSymbol~
+  +SymbolGraphic : IReadOnlyDictionary
+  +GetSymbolGraphicNullCheck(symbol) string
+}
+class SlotSymbol {
+  <<enumeration>>
+  Sackpot
+  Awesome
+  Coin
+  Star
+  Bar
+  Stash
+  Ampersand
+}
+GamblingFacade ..> Orchestrator : runs
+Orchestrator ..> SlotMachineController : create
+SlotMachineController --> SlotMachine : drives
+SlotMachineController ..> IBankInterface : bank handoff
+BankBridge ..|> IBankInterface
+SlotMachine --> GameState : State
+GameState --> SpinResult : SpinResult
+SlotMachine --> IPayoutEvaluator : evaluates via
+PayoutEvaluator ..|> IPayoutEvaluator
+PayoutEvaluator --> PayoutTable
+PayoutTable "1" *-- "7" PayoutEntry : Entries
+PayoutEntry --> SlotSymbol : Symbol
+SlotMachine "1" *-- "3" Reel : reels
+SlotMachine --> GameLoop : starts/stops
+Reel --> SymbolCatalog : rolls from
+SymbolCatalog --> SlotSymbol : maps

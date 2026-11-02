@@ -1,0 +1,49 @@
+flowchart TB
+subgraph ROOT["BankApp (root)"]
+  P["Program.Main() — composition root<br/>wires Theme, UserService, AuthService, CreditScoreService,<br/>InterestRuleService, LoanService, AccountManager, LoanMenu, Menu<br/>then runs menu.LoginMenu()"]
+  G["GoldenSack — ASCII logo writer (uses IConsole)"]
+end
+subgraph MARIAS["Users & Authentication — BankApp (Marias)"]
+  M1["User, UserRole, LoginResult"]
+  M2["UserService — in-memory registry (seeds Owner + Admin)"]
+  M3["AuthService — login, 3-strike lockout, role checks"]
+end
+subgraph ROBIN["Menus & Presentation — BankApp.Robin"]
+  R1["Menu — login + role menus"]
+  R2["LoanMenu — loan UI"]
+  R3["Theme — Spectre styling (unwired)"]
+  R4["EmailService — MailKit sender (unwired, global ns)"]
+end
+subgraph JONATHAN["Loans — BankApp.Jonathan"]
+  J1["Loan, LoanStatus"]
+  J2["LoanService — applications, approval, repayment (5x limit)"]
+  J3["CreditScoreService, InterestCalculator, InterestRuleService, InterestRule"]
+end
+subgraph GUSTAF["Accounts — BankApp (Gustaf)"]
+  GU1["AccountManager — console front-end"]
+  GU2["BankAccount — per-user identity"]
+  GU3["SavingsAccount — balance, currency, interest"]
+end
+subgraph TXN["Transaction Layer — BankApp.Transaction_Layer"]
+  T1["BankTransfer, ExchangeRate (API)"]
+  T2["BankTransaction, StageTransaction (Controller)"]
+  T3["TransactionScheduler, TransactionRegistry"]
+  T4["ExchangeRateRegistry, ExchangeRateCalculator"]
+  T5["BankTransactionServiceLocator + LocatorBootstrap"]
+end
+subgraph GAME["Pull The Sack — BankApp.Pull_The_Sack"]
+  GA1["GamblingFacade, Orchestrator"]
+  GA2["SlotMachineController (global ns), SlotMachine, Reel, SymbolCatalog"]
+  GA3["PayoutEvaluator, PayoutTable, SpinResult, GameState"]
+  GA4["Views: Splash/Game/Reel/Result + ViewUpdater, ViewRegistry, GameLoop"]
+  GA5["IConsole/LockedConsole, UserInput, BankBridge : IBankInterface"]
+end
+ROOT -.->|wires| MARIAS
+ROOT -.->|wires| ROBIN
+ROOT -.->|wires| JONATHAN
+ROOT -.->|wires| GUSTAF
+ROOT -.->|GoldenSack uses IConsole| GAME
+ROBIN -.->|login / user mgmt| MARIAS
+ROBIN -.->|loan menu| JONATHAN
+ROBIN -.->|balances| GUSTAF
+GUSTAF -.->|ExchangeRate, Currency| TXN
