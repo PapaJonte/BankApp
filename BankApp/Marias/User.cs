@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Security.Cryptography;
 
 namespace BankApp
@@ -11,30 +9,31 @@ namespace BankApp
         Admin,
         Owner
     }
+
     internal class User
     {
-        //User info
+        public const int MaxFailedLoginAttempts = 3;
+
+        // Identitet - sätts bara i konstruktorn, kan aldrig ändras efteråt.
         public int UserID { get; }
         public string Username { get; }
-        //Role
         public UserRole Role { get; }
 
-        public string Password { get; private set; }
+        // Kontaktuppgifter - går att läsa fritt, men bara ändra via UpdateUserInfo.
         public string Email { get; private set; }
         public string PhoneNumber { get; private set; }
 
-        //Login Security
+        // Login security - går att läsa fritt (Robin behöver visa låsningsstatus),
+        // men bara ändra via RegisterFailedLogin / ResetFailedLogins / Unlock.
         public int FailedLoginAttempts { get; private set; }
         public bool IsLockedOut { get; private set; }
 
-        //Password hashing and salting for security.
+        // Lösenordet lagras ALDRIG i klartext - bara som hash + salt.
         private byte[] _passwordHash;
         private byte[] _passwordSalt;
 
-        //Constructor
         public User(int userId, string username, string password,
                     string email, string phoneNumber, UserRole role = UserRole.Customer)
-
         {
             UserID = userId;
             Username = username;
@@ -42,22 +41,19 @@ namespace BankApp
             PhoneNumber = phoneNumber;
             Role = role;
 
-
-            //Hashing and salting the password for security.
             _passwordSalt = RandomNumberGenerator.GetBytes(16);
             _passwordHash = HashPassword(password, _passwordSalt);
 
-            //New users are not locked from the beginning.
             IsLockedOut = false;
             FailedLoginAttempts = 0;
-
         }
 
-        //Method for hashing the password with salt.
+        //Password
+
         private static byte[] HashPassword(string password, byte[] salt)
         {
-            using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100_000, HashAlgorithmName.SHA256);
-            return pbkdf2.GetBytes(32);
+            // New in .NET 7: Rfc2898DeriveBytes.Pbkdf2() - använder SHA256 och 100 000 iterationer.
+            return Rfc2898DeriveBytes.Pbkdf2(password, salt, 100_000, HashAlgorithmName.SHA256, 32);
         }
 
         // Jämför ett inskrivet lösenord mot den sparade hashen.
@@ -73,6 +69,8 @@ namespace BankApp
             _passwordSalt = RandomNumberGenerator.GetBytes(16);
             _passwordHash = HashPassword(newPassword, _passwordSalt);
         }
+
+        // INLOGGNINGSSPÄRR (user story 3)
 
         public void RegisterFailedLogin()
         {
@@ -94,18 +92,14 @@ namespace BankApp
             FailedLoginAttempts = 0;
         }
 
-        // ---------------------------------------------------------------
         // PERSONUPPGIFTER (user story 16)
         // Validering sköts av UserService innan den här anropas.
-        // ---------------------------------------------------------------
 
         public void UpdateUserInfo(string newEmail, string newPhone)
         {
             Email = newEmail;
             PhoneNumber = newPhone;
         }
-
-
     }
-
 }
+
