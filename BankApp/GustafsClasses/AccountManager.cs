@@ -128,12 +128,10 @@ namespace BankApp.GustafsClasses
                     Currency chosenValue = Currency.SEK;
 
                     ExchangeRate conversionTool = new ExchangeRate();
-
-                    //Making sure the balance of all of the accounts are combined into a total balance.
-                    foreach (var account in bAccount.SavingAccounts)
+                    if (bAccount.GetUserId() == userId)
                     {
-                        //Checks if the account actually belongs to user by Comparing userId value.
-                        if (bAccount.GetUserId() == userId)
+                        //Making sure the balance of all of the accounts are combined into a total balance.
+                        foreach (var account in bAccount.SavingAccounts)
                         {
                             if (account.GetCurrency() != chosenValue)
                             {
