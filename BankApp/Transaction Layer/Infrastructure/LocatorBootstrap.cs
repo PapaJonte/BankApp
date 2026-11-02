@@ -22,10 +22,10 @@ public static class LocatorBootstrap
         TransactionScheduler transactionScheduler = new();
         TransactionRegistry transactionRegistry = new();
         StageTransaction transactionStaging = new(transactionScheduler, transactionRegistry);
-        BankTransaction bankTransactionModule = new(transactionStaging);
+        BankTransaction bankTransactionModule = new(transactionStaging,exchangeRateModule);
         #endregion
         #region Transfer Module
-        BankTransfer bankTransferModule = new(bankTransactionModule, exchangeRateModule);
+        BankTransfer bankTransferModule = new(bankTransactionModule);
         #endregion
 
         serviceLocator.RegisterService(exchangeRateModule);
