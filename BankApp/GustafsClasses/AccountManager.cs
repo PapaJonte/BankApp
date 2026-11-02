@@ -124,10 +124,6 @@ namespace BankApp.GustafsClasses
                 //Just to check if there is anything in the list.
                 if (BankAccountList.Count > 0)
                 {
-                    if (bAccount.GetUserId() == userId)
-                    {
-
-                    }
                     //Here we choose Swedish crowns as the currency.
                     Currency chosenValue = Currency.SEK;
 
@@ -136,22 +132,25 @@ namespace BankApp.GustafsClasses
                     //Making sure the balance of all of the accounts are combined into a total balance.
                     foreach (var account in bAccount.SavingAccounts)
                     {
-                        if (account.GetCurrency() != chosenValue)
+                        //Checks if the account actually belongs to user by Comparing userId value.
+                        if (bAccount.GetUserId() == userId)
                         {
-                            //Don't be fooled, this is the same line of code.
-                            conversionTool.TryCalculateExchangeValue(
-                                account.GetCurrency(),
-                                chosenValue, account.GetBalance(),
-                                out additionValue);
+                            if (account.GetCurrency() != chosenValue)
+                            {
+                                //Don't be fooled, this is the same line of code.
+                                conversionTool.TryCalculateExchangeValue(
+                                    account.GetCurrency(),
+                                    chosenValue, account.GetBalance(),
+                                    out additionValue);
 
-                            totalBalance = totalBalance + additionValue;
-                        }
-                        else
-                        {
-                            totalBalance = totalBalance + account.GetBalance();
+                                totalBalance = totalBalance + additionValue;
+                            }
+                            else
+                            {
+                                totalBalance = totalBalance + account.GetBalance();
+                            }
                         }
                     }
-                    
                 }
                 else
                 {
