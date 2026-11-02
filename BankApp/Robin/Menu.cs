@@ -365,7 +365,7 @@ namespace BankApp.Robin
                         {
                             case 0:
                                 Console.WriteLine("Accounts");
-                                ShowCreatedUsers();
+                                ShowLoggedInUser();
                                 Console.ReadKey();
                                 break;
 
