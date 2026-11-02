@@ -159,16 +159,17 @@ namespace BankApp.GustafsClasses
             return totalBalance;
         }
 
-        public void AccountOwnershipVerification(int userId, int bankAccountNr)
+        public bool AccountOwnershipVerification(int userId, int bankAccountNr)
         {
             foreach( var account in BankAccountList)
             {
                 if ( account.GetBankAccountNumber() == bankAccountNr && account.GetUserId() == userId)
                 {
                     Console.WriteLine("Account found.");
+                    return true;
                 }
             }
-            
+            return false;
         }
     }
 }
