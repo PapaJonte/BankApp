@@ -44,6 +44,9 @@ namespace BankApp.Robin
                 Console.WriteLine("No users logged in!");
                 return;
             }
+            Console.WriteLine($"\n{userDetails.Username}" +
+                $"\n{userDetails.Email}");
+
         }
         public bool CreateUser()
         {
@@ -65,6 +68,12 @@ namespace BankApp.Robin
             string userPhoneNumber = Console.ReadLine() ?? "";
 
             bool succesCreatedUser = _userService.CreateUser(true, false, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
+
+            if (succesCreatedUser)
+            {
+                Console.WriteLine("Account created.");
+            }
+
             //User? user = _userService.GetUserByUsername(userName);
 
             return succesCreatedUser;
@@ -128,13 +137,15 @@ namespace BankApp.Robin
                         {
                             case 0:
                                 // Create admin
+                                Console.Clear();
                                 Console.WriteLine("Accounts");
                                 ShowCreatedUsers();
                                 Console.ReadKey();
                                 break;
 
                             case 1:
-                                // 
+                                //
+                                Console.Clear();
                                 Console.WriteLine("Transaction history");
                                 break;
 
