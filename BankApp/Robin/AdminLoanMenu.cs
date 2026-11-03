@@ -1,5 +1,6 @@
 ﻿using BankApp.Jonathan;
 using BankApp.Transaction_Layer.API;
+using BankApp.GustafsClasses;
 using System;
 using System.Collections.Generic;
 using System.Text;
