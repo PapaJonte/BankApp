@@ -7,7 +7,6 @@ using BankApp.Transaction_Layer.Data;
 using BankApp.Transaction_Layer.Service;
 using BankApp.GustafsClasses;
 using Spectre.Console;
-using BankApp.GustafsClasses;
 
 namespace BankApp
 {
@@ -23,7 +22,6 @@ namespace BankApp
             InterestRuleService interestRuleService = new InterestRuleService();
             LoanService loanService = new LoanService(interestRuleService, creditScoreService);
             AccountManager accountManager = new AccountManager();
-            LoanMenu loanMenu = new LoanMenu(loanService, accountManager); //This object appears to demand an object of BankTransfer as an additional parameter.
 
             #region Transactions
             AccountBridge accountBridge = new(accountManager);

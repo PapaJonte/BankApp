@@ -156,6 +156,8 @@ namespace BankApp.Robin
                                 //
                                 Console.Clear();
                                 Console.WriteLine("Transaction history");
+                                //Maria: lade till Console.ReadKey() för programmet visade inte meddelandet innan.
+                                Console.ReadKey();
                                 break;
 
                             case 2:
@@ -515,6 +517,8 @@ namespace BankApp.Robin
                                     if (userLoggedIn == LoginResult.LockedOut)
                                     {
                                         Console.WriteLine("Your account is locked!");
+                                        //Maria: lade till Console.ReadKey() för programmet visade inte meddelandet innan.
+                                        Console.ReadKey();
                                         wrongUserInfo = false;
                                     }
                                 }
