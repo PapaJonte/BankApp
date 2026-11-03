@@ -23,7 +23,7 @@ public class PayoutEvaluator(PayoutTable table) : IPayoutEvaluator
         decimal payoutMultiplier = .5m;
 
         var bestCount = symbols
-                        .GroupBy(x => x) //skapar IGrouping<key = SlotSymbol, element = IEnumerable<SlotSymbol>>
+                        .GroupBy(x => x) //create IGrouping<key = SlotSymbol, element = IEnumerable<SlotSymbol>>
                         .OrderByDescending(s => s.Count())
                         .First();
 
