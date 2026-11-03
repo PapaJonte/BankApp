@@ -42,7 +42,7 @@ public class StageTransaction
     /// </param>
     public void Stage_Single(int userID, int accountNumber, decimal amount, TransactionType transactionType)
     {
-        TransactionDataObject tdo = new(userID, accountNumber, amount, transactionType);
+        TransactionDataObject tdo = new(userID, accountNumber, amount, transactionType, DateTime.Now.Date);
         TransactionDataWrapper wrapper = transactionType == TransactionType.Deposit ? TransactionDataWrapper.ForDeposit(tdo) : TransactionDataWrapper.ForWithdrawal(tdo);
         transactionRegistry.RegisterStagedTransaction(wrapper);
     }
@@ -59,8 +59,8 @@ public class StageTransaction
     /// <returns></returns>
     public void Stage_Transaction(AccountData originAccount, AccountData targetAccount, decimal withdrawalAmount, decimal depositAmount)
     {
-        TransactionDataObject tdo_withdrawal = new(originAccount.UserID, originAccount.AccountNumber, withdrawalAmount, TransactionType.Withdrawal);
-        TransactionDataObject tdo_deposit = new(targetAccount.UserID, targetAccount.AccountNumber, depositAmount, TransactionType.Deposit);
+        TransactionDataObject tdo_withdrawal = new(originAccount.UserID, originAccount.AccountNumber, withdrawalAmount, TransactionType.Withdrawal, DateTime.Now.Date);
+        TransactionDataObject tdo_deposit = new(targetAccount.UserID, targetAccount.AccountNumber, depositAmount, TransactionType.Deposit, DateTime.Now.Date);
 
         TransactionDataWrapper wrapper = TransactionDataWrapper.ForTransaction(tdo_withdrawal, tdo_deposit);
 
