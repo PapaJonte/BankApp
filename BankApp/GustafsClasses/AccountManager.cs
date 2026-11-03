@@ -119,7 +119,7 @@ namespace BankApp.GustafsClasses
         {
             decimal totalBalance = 0; //Where we put together all of the money into a total value.
             decimal additionValue = 0;
-
+            ExchangeRate conversionTool = new ExchangeRate();
             foreach (var bAccount in BankAccountList)
             {
                 //Just to check if there is anything in the list.
@@ -128,7 +128,7 @@ namespace BankApp.GustafsClasses
                     //Here we choose Swedish crowns as the currency.
                     Currency chosenValue = Currency.SEK;
 
-                    ExchangeRate conversionTool = new ExchangeRate();
+                    
                     if (bAccount.GetUserId() == userId)
                     {
                         //Making sure the balance of all of the accounts are combined into a total balance.
