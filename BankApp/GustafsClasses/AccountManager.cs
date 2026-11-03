@@ -88,7 +88,6 @@ namespace BankApp.GustafsClasses
                     }
                 }
             }
-             
         }
 
         //Method for accessing the savingsaccounts.
@@ -120,15 +119,14 @@ namespace BankApp.GustafsClasses
             decimal totalBalance = 0; //Where we put together all of the money into a total value.
             decimal additionValue = 0;
             ExchangeRate conversionTool = new ExchangeRate();
-            foreach (var bAccount in BankAccountList)
+            //Just to check if there is anything in the list.
+            if (BankAccountList.Count > 0)
             {
-                //Just to check if there is anything in the list.
-                if (BankAccountList.Count > 0)
+                foreach (var bAccount in BankAccountList)
                 {
                     //Here we choose Swedish crowns as the currency.
                     Currency chosenValue = Currency.SEK;
 
-                    
                     if (bAccount.GetUserId() == userId)
                     {
                         //Making sure the balance of all of the accounts are combined into a total balance.
@@ -150,12 +148,13 @@ namespace BankApp.GustafsClasses
                             }
                         }
                     }
-                }
-                else
-                {
-                    Console.WriteLine("Error! You have no accounts on the bank.");
-                }
+                } 
             }
+            else
+            {
+                Console.WriteLine("Error! You have no accounts on the bank.");
+            }
+            
             return totalBalance;
         }
 
