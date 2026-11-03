@@ -101,7 +101,6 @@ public class StageTransaction
                             transactionRegistry.RegisterSuccessfulTransaction(withdrawalObj);
                             transactionRegistry.RegisterSuccessfulTransaction(depositObject);
                         }
-
                     }
                 }
             }
