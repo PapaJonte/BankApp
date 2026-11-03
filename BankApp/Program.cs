@@ -7,6 +7,7 @@ using BankApp.Transaction_Layer.Data;
 using BankApp.Transaction_Layer.Service;
 using BankApp.GustafsClasses;
 using Spectre.Console;
+using BankApp.GustafsClasses;
 
 namespace BankApp
 {
@@ -34,9 +35,11 @@ namespace BankApp
             TransactionRegistry transactionRegistry = new();
             StageTransaction transactionStaging = new(transactionScheduler, transactionRegistry, accountBridge);
             BankTransaction bankTransactionModule = new(transactionStaging, exchangeRateModule, accountBridge);
-            #endregion
-            #region Transfer Module
             BankTransfer bankTransferModule = new(bankTransactionModule);
+            #endregion
+            LoanMenu loanMenu = new LoanMenu(loanService, accountManager,bankTransferModule);
+
+            #region Transfer Module
             #endregion
             #endregion
 
