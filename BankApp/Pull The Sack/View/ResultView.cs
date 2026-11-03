@@ -28,7 +28,7 @@ public class ResultView(ResultViewConfig config) : IView
 
         if (GameState.SpinResult!.PayoutMultiplier < 1)
         {
-            console.WriteCentered($"Congratulations! You took a {GameState.Balance} loan on a {GameState.Balance * GameState.SpinResult.PayoutMultiplier} Payout! Wow! You truly are an idiot.");
+            console.WriteCentered($"Congratulations! You took a {GameState.Balance} loan on a {GameState.Balance * GameState.SpinResult.PayoutMultiplier} Payout! Try to win back your money at LiveForGambling.com!");
         }
         else
         {
