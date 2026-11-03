@@ -15,7 +15,7 @@ namespace BankApp.GustafsClasses
 
         public Dictionary<int, List<BankAccount>> BankAccountDictionary = new Dictionary<int, List<BankAccount>>();
         
-        /*This method is intended to support the CreateAccount() method below.
+        /*This method is intended to support the CreateAccount() method below by selecting and identifying currency.
          * It will be called upon when CreateAccount needs it.
          * Don't call upon this method!*/
         private Currency CheckCurrency()
@@ -43,6 +43,7 @@ namespace BankApp.GustafsClasses
                 }
             }
         }
+        //This method will create a bank account. Not to be confused with a savings account. Bank accounts store the savings accounts.
         public void CreateAccount(int userId, int bankAccountNumber)
         {
             /*Creation of object of the BankAccount class to represent an account held by a user,
@@ -52,7 +53,7 @@ namespace BankApp.GustafsClasses
             BankAccountList.Add(userAccount);
             BankAccountDictionary.Add(userId, BankAccountList);
         }
-        //Used for creating accounts.
+        //Used for creating savings accounts. The savings accounts store the balance.
         public void CreateSavingsAccount(int userId, int SavingsAccountNumber)
         {
             if (BankAccountList.Count > 0)
@@ -90,7 +91,9 @@ namespace BankApp.GustafsClasses
             }
         }
 
-        //Method for accessing the savingsaccounts.
+        /*Method for accessing the savingsaccounts.
+         * Method does not return anything.
+         * It merely allows you to see the balance and currency of savingsAccounts.*/
         public void GetAccounts( int userId)
         {
             foreach (var bAccount in BankAccountList)
@@ -113,7 +116,7 @@ namespace BankApp.GustafsClasses
             }
         }
 
-        //Puts balance of all savngs accounts together into a total value after converting them.
+        //Puts balance of all savngs accounts of a user together into a total value after converting them to SEK.
         public decimal GetTotalBalance(int userId)
         {
             decimal totalBalance = 0; //Where we put together all of the money into a total value.
@@ -157,7 +160,7 @@ namespace BankApp.GustafsClasses
             
             return totalBalance;
         }
-
+        //Verifies ownership of Bank Account by bank account number and user ID. Will return a bool value depending on result.
         public bool AccountOwnershipVerification(int userId, int bankAccountNr)
         {
             foreach( var account in BankAccountList)
