@@ -4,5 +4,5 @@ namespace BankApp.Transaction_Layer.Interface;
 
 public interface IViewTransactionStatisticBridge
 {
-
+    
 }
