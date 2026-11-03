@@ -6,6 +6,7 @@ using BankApp.Transaction_Layer.Controller;
 using BankApp.Transaction_Layer.Data;
 using BankApp.Transaction_Layer.Service;
 using Spectre.Console;
+using BankApp.GustafsClasses;
 
 namespace BankApp
 {
@@ -21,8 +22,6 @@ namespace BankApp
             InterestRuleService interestRuleService = new InterestRuleService();
             LoanService loanService = new LoanService(interestRuleService, creditScoreService);
             AccountManager accountManager = new AccountManager();
-            LoanMenu loanMenu = new LoanMenu(loanService, accountManager);
-
             #region Transactions
             AccountBridge accountBridge = new(accountManager);
             #region  ExchangeRate Module
@@ -33,9 +32,11 @@ namespace BankApp
             TransactionRegistry transactionRegistry = new();
             StageTransaction transactionStaging = new(transactionScheduler, transactionRegistry, accountBridge);
             BankTransaction bankTransactionModule = new(transactionStaging, exchangeRateModule, accountBridge);
-            #endregion
-            #region Transfer Module
             BankTransfer bankTransferModule = new(bankTransactionModule);
+            #endregion
+            LoanMenu loanMenu = new LoanMenu(loanService, accountManager,bankTransferModule);
+
+            #region Transfer Module
             #endregion
             #endregion
 

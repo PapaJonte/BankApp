@@ -71,13 +71,21 @@ namespace BankApp.Robin
             Console.Write("\nPhone number: ");
             string userPhoneNumber = Console.ReadLine() ?? "";
 
-            bool succesCreatedUser = _userService.CreateUser(true, false, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
+            //Maria: Gammal metod, ger error.
+            //bool succesCreatedUser = _userService.CreateUser(true, false, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
 
-            
+            // Maria: Ny metod
+             CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
+
+           Console.WriteLine($"\n{UserService.GetErrorMessage(result)}");
+           Console.ReadKey();
+
+           return result == CreateUserResult.Success;
+
 
             //User? user = _userService.GetUserByUsername(userName);
 
-            return succesCreatedUser;
+            //Maria: Kommenterar bort : return succesCreatedUser;
         }
         public void ShowOwnerMenu()
         {
