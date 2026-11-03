@@ -2,6 +2,7 @@ using System;
 using BankApp.Transaction_Layer.Controller;
 using BankApp.Transaction_Layer.DataModel.Transaction_Statistical_Objects;
 using BankApp.Transaction_Layer.Enum;
+using Spectre.Console;
 
 namespace BankApp.Transaction_Layer.Service;
 
@@ -53,8 +54,48 @@ public class TransactionStatisticFilter(StageTransaction stageTransaction)
         return status;
     }
 
+    public StatusCode TryGetFullTransactionAmount(int userID, out decimal totalAmount)
+    {
+        totalAmount = default;
+        var transactions = stageTransaction.GetTransactionHistoryOnUserID(userID);
+        StatusCode status = EvaluateStatusCode(transactions);
 
-    private StatusCode EvaluateStatusCode<T>(IReadOnlyList<T> list)
+        if (status == StatusCode.Successful)
+        {
+            totalAmount = transactions.Sum(x => x.Amount);
+        }
+
+        return status;
+    }
+
+    public StatusCode TryGetTransactionsByDate(int userID, out IReadOnlyDictionary<int,List<TransactionDate>> orderedTransactionDict)
+    {
+        orderedTransactionDict = new Dictionary<int, List<TransactionDate>>();
+        Dictionary<int, List<TransactionDate>> tmpTransactions = [];
+
+        var transactions = stageTransaction.GetTransactionHistoryOnUserID(userID);
+        StatusCode status = EvaluateStatusCode(transactions);
+
+        if (status == StatusCode.Successful)
+        {
+            var orderedGroup = transactions.GroupBy(x => x.AccountNumber)
+                                            .OrderByDescending(o => o.Sum(s => s.Amount));//order the group by accounts with most money since it seems relevant to user.
+            foreach (var grp in orderedGroup)
+            {
+                tmpTransactions.Add(grp.Key, []);
+                foreach (var tobj in grp)
+                {
+                    tmpTransactions[grp.Key].Add(new TransactionDate(tobj.TransactionDate, tobj.Amount));
+                }
+            }
+            orderedTransactionDict = tmpTransactions;
+        }
+
+        return status;
+    }
+
+
+    private StatusCode EvaluateStatusCode<T>(List<T> list)
     {
         StatusCode code = StatusCode.Successful;
 

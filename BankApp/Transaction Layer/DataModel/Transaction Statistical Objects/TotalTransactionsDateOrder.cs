@@ -3,19 +3,35 @@ using BankApp.Transaction_Layer.Interface;
 
 namespace BankApp.Transaction_Layer.DataModel.Transaction_Statistical_Objects;
 
-public record struct TotalTransactionsDateOrder(int UserID, int AccountID, IReadOnlyList<TransactionDataObject> UnOrderedTransactionList) : IRequestStatus
+public record struct TotalTransactionsDateOrder(int UserID, IReadOnlyDictionary<int, List<TransactionDate>> TransactionDictionary) : IRequestStatus
 {
     public StatusCode StatusCode { get; init; }
 
-    public readonly IReadOnlyList<TransactionDataObject> GetTransactionDateOrderDescending()
+    public readonly IReadOnlyList<TransactionDate> GetTransactionDateOrderDescending(int accountNumber)
     {
-        IReadOnlyList<TransactionDataObject> orderedList = [.. UnOrderedTransactionList.OrderByDescending(x => x.TransactionDate)];
-        return orderedList;
+        if(TransactionDictionary.TryGetValue(accountNumber, out List<TransactionDate>? UnOrderedTransactionList))
+        {
+            if(UnOrderedTransactionList != null)
+            {
+                IReadOnlyList<TransactionDate> orderedList = [.. UnOrderedTransactionList.OrderByDescending(x => x.Date)];
+                return orderedList;
+            }
+        }
+
+        return [];
     }
 
-    public readonly IReadOnlyList<TransactionDataObject> GetTransactionDateOrderAscending()
+    public readonly IReadOnlyList<TransactionDate> GetTransactionDateOrderAscending(int accountNumber)
     {
-        IReadOnlyList<TransactionDataObject> orderedList = [.. UnOrderedTransactionList.OrderBy(x => x.TransactionDate)];
-        return orderedList;
+        if(TransactionDictionary.TryGetValue(accountNumber, out List<TransactionDate>? UnOrderedTransactionList))
+        {
+            if(UnOrderedTransactionList != null)
+            {
+                IReadOnlyList<TransactionDate> orderedList = [.. UnOrderedTransactionList.OrderBy(x => x.Date)];
+                return orderedList;
+            }
+        }
+
+        return [];
     }
 }

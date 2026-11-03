@@ -24,7 +24,25 @@ public class BankTransferStatistic(TransactionStatisticFilter transactionStatist
 
         return accPopCount;
     }
+
+    public TotalTransactionAmount FullTransactionAmount(int userID)
+    {
+        StatusCode status = transactionStatisticFilter.TryGetFullTransactionAmount(userID, out decimal totalAmount);
+
+        TotalTransactionAmount totalTransactionAmount = new(userID, totalAmount);
+
+        return totalTransactionAmount;
+    }
     
-    
+    public TotalTransactionsDateOrder TransactionsByDate(int userID)
+    {
+        StatusCode status = transactionStatisticFilter.TryGetTransactionsByDate(userID, out IReadOnlyDictionary<int, List<TransactionDate>> orderedTransactionDict);
+
+        Dictionary<int, List<TransactionDate>> transactionDates = [];
+
+        TotalTransactionsDateOrder dateOrder = new(userID, orderedTransactionDict);
+
+        return dateOrder;
+    } 
 
 }
