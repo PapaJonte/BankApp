@@ -7,50 +7,50 @@ namespace BankApp.GustafsClasses
 {
     internal class SavingsAccount
     {
-        private decimal Balance; //Ammount in the account.
-        private Currency Currency; //Currency of Account.
+        private decimal balance; //Ammount in the account.
+        private Currency currency; //Currency of Account.
 
-        private decimal Interest;
-        private int SavingsAccountNumber; //For access to specific savings accounts.
+        private decimal interest;
+        private int savingsAccountNumber; //For access to specific savings accounts.
 
         public SavingsAccount (decimal Balance, Currency Currency, decimal Interest, int SavingsAccountNumber)
         {
-            this.Balance = Balance;
-            this.Currency = Currency;
-            this.Interest = Interest;
-            this.SavingsAccountNumber = SavingsAccountNumber;
+            Balance = balance;
+            Currency = currency;
+            Interest = interest;
+            SavingsAccountNumber = savingsAccountNumber;
         }
         //For transfer of balance. Bool determines if you add or remove balance.
         public void TransferBalance(decimal transferSum, bool addMore)
         {
             if (addMore == true)
             {
-                Balance = Balance + transferSum;
+                balance = balance + transferSum;
             }
             else
             {
-                Balance = Balance - transferSum;
+                balance = balance - transferSum;
             }
         }
 
         //Method that returns account balance.
         public decimal GetBalance()
         {
-            return Balance;
+            return balance;
         }
         public Currency GetCurrency()
         {
-            return Currency;
+            return currency;
         }
         //Method that returns interest.
         public decimal GetInterest()
         {
-            return Interest;
+            return interest;
         }
 
         public int GetSavingsAccountNumber()
         {
-            return SavingsAccountNumber;
+            return savingsAccountNumber;
         }
     }
 }
