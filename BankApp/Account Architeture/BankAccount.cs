@@ -43,5 +43,33 @@ namespace BankApp.GustafsClasses
         {
             return bankAccountNumber;
         }
+
+        //For transfer of balance. Bool determines if you add or remove balance.
+        public void TransferBalance(decimal transferSum, bool addMore)
+        {
+            if (addMore == true)
+            {
+                balance = balance + transferSum;
+            }
+            else
+            {
+                balance = balance - transferSum;
+            }
+        }
+
+        //Method that returns account balance.
+        public decimal GetBalance()
+        {
+            return balance;
+        }
+        public Currency GetCurrency()
+        {
+            return currency;
+        }
+        //Method that returns interest.
+        public decimal GetInterest()
+        {
+            return interest;
+        }
     }
 }
