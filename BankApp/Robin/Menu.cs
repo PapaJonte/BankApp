@@ -77,10 +77,10 @@ namespace BankApp.Robin
             */
             CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
 
-           Console.WriteLine($"\n{UserService.GetErrorMessage(result)}");
-           Console.ReadKey();
+            Console.WriteLine($"\n{UserService.GetErrorMessage(result)}");
+            Console.ReadKey();
 
-           return result == CreateUserResult.Success;
+            return result == CreateUserResult.Success;
         }
         public void ShowOwnerMenu()
         {
