@@ -9,13 +9,16 @@ namespace BankApp.Robin
 
         //private readonly Theme theme;
         private readonly LoanMenu _loanMenu;
+
+        private readonly AdminLoanMenu _adminLoanMenu;
         private readonly UserService _userService;
         private readonly AuthService _authService;
         // CONSTRUCTOR INJECTION: We require UserService to be passed in when Menu is created
 
         // Passes both fields into our constructor so we can use the methods from Maria's class.
-        public Menu(UserService userService, AuthService authService, LoanMenu loanMenu)
+        public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu)
         {
+            _adminLoanMenu = adminLoanMenu ?? throw new ArgumentNullException(nameof(adminLoanMenu));
             _loanMenu = loanMenu ?? throw new ArgumentNullException(nameof(loanMenu));
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -206,18 +209,6 @@ namespace BankApp.Robin
                                 Console.Clear();
 
                                 bool succesCreatedUser = CreateUser();
-
-                                if (succesCreatedUser)
-                                {
-                                    Console.WriteLine("Success!");
-                                }
-
-                                else
-                                {
-                                    Console.WriteLine("Error!");
-
-                                }
-
                                 Console.ReadKey();
 
                                 break;
@@ -243,7 +234,8 @@ namespace BankApp.Robin
 
                             case 2:
                                 // Loans
-                                _loanMenu.ShowLoanMenu(userId);
+                                _adminLoanMenu.ShowAdminLoanMenu(_authService.LoggedInUser.UserID);
+                                
                                 break;
 
                             case 3:
