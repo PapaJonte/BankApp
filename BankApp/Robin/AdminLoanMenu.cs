@@ -1,5 +1,7 @@
 ﻿using BankApp.Jonathan;
 using BankApp.Transaction_Layer.API;
+using BankApp.Transaction_Layer.DataModel;
+using BankApp.Transaction_Layer.Enum;
 using BankApp.GustafsClasses;
 using System;
 using System.Collections.Generic;
@@ -10,11 +12,13 @@ namespace BankApp.Robin
     {
         private readonly LoanService loanService;
         private readonly AccountManager accountManager;
+        private readonly BankTransfer bankTransfer;
 
-        public AdminLoanMenu(LoanService loanService, AccountManager accountManager)
+        public AdminLoanMenu(LoanService loanService, AccountManager accountManager, BankTransfer bankTransfer)
         {
             this.loanService = loanService;
             this.accountManager = accountManager;
+            this.bankTransfer = bankTransfer;
         }
 
         // Displays the menu
@@ -117,6 +121,20 @@ namespace BankApp.Robin
                                     break;
                                 }
 
+                                // Convert the stored destination account number to an integer
+                                if (!int.TryParse(loan.DestinationAccountNumber, out int destinationAccountNumber))
+                                {
+                                    Console.WriteLine("Invalid destination account number.");
+                                    break;
+                                }
+
+                                // Verify that the destination account belongs to the customer
+                                if (!accountManager.AccountOwnershipVerification(loan.UserId, destinationAccountNumber))
+                                {
+                                    Console.WriteLine("The destination account could not be verified.");
+                                    break;
+                                }
+
                                 // Retrieve the customer's total account balance
                                 decimal totalAccountBalance = accountManager.GetTotalBalance(loan.UserId);
 
@@ -125,9 +143,22 @@ namespace BankApp.Robin
 
                                 if (approved)
                                 {
-                                    Console.WriteLine($"Loan #{loanId} approved.");
+                                    if (loan.PayoutRequested)
+                                    {
+                                        Console.WriteLine("A payout has already been requested for this loan.");
+                                        break;
+                                    }
+                                    // Create the account data required by the transaction system
+                                    AccountData destinationAccount = new AccountData(loan.UserId, destinationAccountNumber, Currency.SEK);
+
+                                    // TO DO: Connect the loan payout once account currency and deposit processing have been verified
+                                    // bankTransfer.DepositMoney(destinationAccount, loan.LoanAmount);
+
+                                    // TO DO: Call loan.MarkPayoutRequested() only after the deposit request has been accepted by the transaction system
+
+                                    Console.WriteLine($"Loan #{loanId} approved.\n" +
+                                        $"Payout of {loan.LoanAmount:N2} SEK prepared for account {destinationAccount.AccountNumber}.");
                                 }
-                                // TO DO: Validate the customer's destination account
 
                                 // TO DO: Connect the payout to the transaction system
                                 else

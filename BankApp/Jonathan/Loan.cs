@@ -15,6 +15,7 @@ namespace BankApp.Jonathan
         public decimal TotalInterest { get; set; }
         public decimal TotalRepayment { get; set; }
         public LoanStatus Status { get; private set; } = LoanStatus.Pending;
+        public bool PayoutRequested { get; private set; } = false;
         
         // Repayment tracking
         public DateTime? ApprovalDate { get; private set; }
@@ -148,6 +149,21 @@ namespace BankApp.Jonathan
             {
                 NextPaymentDate = null;
             }
+        }
+
+        internal void MarkPayoutRequested()
+        {
+            if (Status != LoanStatus.Approved)
+            {
+                throw new InvalidOperationException("Only approved loans can have a payout requested.");
+            }
+
+            if (PayoutRequested)
+            {
+                throw new InvalidOperationException("The loan payout has already been requested.");
+            }
+
+            PayoutRequested = true;
         }
     }
 }
