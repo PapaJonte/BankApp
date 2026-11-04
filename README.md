@@ -18,6 +18,9 @@ This class has various different methods for handling the two other Account clas
 Other than that there happens to be a method for calculating the total balance of all accounts of a user, there is a method for printing out the balance and currency of account of a user, and there is one private method for choosing currency for created accounts.
 Otherwise all methods are public, for selection of currency is only required for internal processes.
 
+
+
+
 ## Documentation
 
 - [UML diagrams](docs/uml/README.md) — architecture overview, per-module class

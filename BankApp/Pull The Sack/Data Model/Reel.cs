@@ -7,7 +7,6 @@ namespace BankApp.Pull_The_Sack.Data_Model;
 /// </summary>
 public class Reel(SymbolCatalog catalog)
 {
-    private readonly SymbolCatalog _catalog = catalog;
     private readonly Random rnd = new();
 
     /// <summary>The symbol currently on the payline for this reel.</summary>
@@ -21,7 +20,7 @@ public class Reel(SymbolCatalog catalog)
     /// <returns></returns>
     public void Spin()
     {
-        int rolledSymbol = rnd.Next(0, _catalog.Symbols.Count);
-        CurrentSymbol = _catalog.Symbols[rolledSymbol];
+        int rolledSymbol = rnd.Next(0, catalog.Symbols.Count);
+        CurrentSymbol = catalog.Symbols[rolledSymbol];
     }
 }

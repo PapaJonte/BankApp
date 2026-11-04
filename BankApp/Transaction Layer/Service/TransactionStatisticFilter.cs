@@ -1,8 +1,6 @@
-using System;
 using BankApp.Transaction_Layer.Controller;
 using BankApp.Transaction_Layer.DataModel.Transaction_Statistical_Objects;
 using BankApp.Transaction_Layer.Enum;
-using Spectre.Console;
 
 namespace BankApp.Transaction_Layer.Service;
 

@@ -2,9 +2,8 @@ using BankApp.Transaction_Layer.Data;
 using BankApp.Transaction_Layer.DataModel;
 using BankApp.Transaction_Layer.Enum;
 using BankApp.Transaction_Layer.Interface;
-using BankApp.Transaction_Layer.Service;
 
-namespace BankApp.Transaction_Layer.Controller;
+namespace BankApp.Transaction_Layer.Service;
 
 public class StageTransaction
 {
