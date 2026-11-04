@@ -13,12 +13,13 @@ namespace BankApp.GustafsClasses
         private decimal interest;
         private int savingsAccountNumber; //For access to specific savings accounts.
 
-        public SavingsAccount (decimal Balance, Currency Currency, decimal Interest, int SavingsAccountNumber)
+        public SavingsAccount (decimal balance, Currency currency, decimal interest, int savingsAccountNumber)
         {
-            Balance = balance;
-            Currency = currency;
-            Interest = interest;
-            SavingsAccountNumber = savingsAccountNumber;
+            this.balance = balance;
+            this.currency = currency;
+
+            this.interest = interest;
+            this.savingsAccountNumber = savingsAccountNumber;
         }
         //For transfer of balance. Bool determines if you add or remove balance.
         public void TransferBalance(decimal transferSum, bool addMore)
