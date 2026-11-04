@@ -354,7 +354,18 @@ namespace BankApp.Robin
                 {
                     Console.WriteLine("\n[ ] Transaction history");
                 }
+
                 if (selectedIndex == 2)
+                {
+                    Console.WriteLine("\n[X] Loans");
+                }
+
+                else
+                {
+                    Console.WriteLine("\n[ ] Loans");
+                }
+
+                if (selectedIndex == 3)
                 {
                     Console.WriteLine("\n[X] Log out");
                 }
@@ -369,11 +380,11 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 3) % 3;
+                        selectedIndex = (selectedIndex - 1 + 4) % 4;
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 3;
+                        selectedIndex = (selectedIndex + 1) % 4;
                         break;
 
                     case ConsoleKey.Enter:
