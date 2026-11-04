@@ -205,8 +205,6 @@ namespace BankApp.Robin
                             case 0:
                                 Console.Clear();
 
-                                //bool succesCreatedUser = _userService.CreateUser(true, false, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
-
                                 bool succesCreatedUser = CreateUser();
 
                                 if (succesCreatedUser)
@@ -294,46 +292,6 @@ namespace BankApp.Robin
                     "Log out",
                 };
 
-                //if (selectedIndex == 0)
-                //{
-                //    Console.WriteLine("\n[X] View accounts");
-                //}
-
-                //else
-                //{
-                //    Console.WriteLine("\n[ ] View accounts");
-                //}
-
-                //if (selectedIndex == 1)
-                //{
-                //    Console.WriteLine("\n[X] Transaction history");
-                //}
-
-                //else
-                //{
-                //    Console.WriteLine("\n[ ] Transaction history");
-                //}
-
-                //if (selectedIndex == 2)
-                //{
-                //    Console.WriteLine("\n[X] Loans");
-                //}
-
-                //else
-                //{
-                //    Console.WriteLine("\n[ ] Loans");
-                //}
-
-                //if (selectedIndex == 3)
-                //{
-                //    Console.WriteLine("\n[X] Log out");
-                //}
-
-                //else
-                //{
-                //    Console.WriteLine("\n[ ] Log out");
-                //}
-
                 for (int i = 0; i < options.Length; i++)
                 {
                     if (i == selectedIndex)
@@ -412,36 +370,6 @@ namespace BankApp.Robin
                     "Log in",
                     "Exit",
                 };
-
-                //if (selectedIndex == 0)
-                //{
-                //    Console.WriteLine("\n[X] Log in");
-                //}
-
-                //else
-                //{
-                //    Console.WriteLine("\n[ ] Log in");
-                //}
-
-                ////if (selectedIndex == 1)
-                ////{
-                ////    Console.WriteLine("\n[X] Create account");
-                ////}
-
-                ////else
-                ////{
-                ////    Console.WriteLine("\n[ ] Create account");
-                ////}
-
-                //if (selectedIndex == 1)
-                //{
-                //    Console.WriteLine("\n[X] Exit");
-                //}
-
-                //else
-                //{
-                //    Console.WriteLine("\n[ ] Exit");
-                //}
 
                 for (int i = 0; i < options.Length; i++)
                 {
@@ -523,7 +451,6 @@ namespace BankApp.Robin
                                 }
 
                                 break;
-
                             //case 1:
                             //    Console.CursorVisible = true;
                             //    CreateUser();
