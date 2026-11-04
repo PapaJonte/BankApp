@@ -182,7 +182,6 @@ public class GameView : IView
         if (GameState.SpinResult.Symbols.Count != reels.Count)
         {
             throw new FormatException("Spin Result does not match reels count!");
-
         }
 
         string[] targetSymbols = new string[GameState.SpinResult.Symbols.Count];

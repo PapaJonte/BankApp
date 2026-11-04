@@ -63,24 +63,4 @@ public class BankTransfer(BankTransaction bankTransaction)
 
         return statusCode;
     }
-
-    /// <summary>
-    /// Returns all transaction history connected to a user id
-    /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
-    public List<TransactionDataObject> GetTransactionHistoryOnUserID(int userID)
-    {
-        return bankTransaction.GetTransactionHistoryOnUserID(userID);
-    }
-    /// <summary>
-    /// returns all transactions history connected to a account id
-    /// </summary>
-    /// <param name=""></param>
-    /// <returns></returns>
-    public List<TransactionDataObject> GetTransactionHistoryOnAccountID(int accountID)
-    {
-        return bankTransaction.GetTransactionHistoryOnAccountID(accountID);
-    }
-
 }

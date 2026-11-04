@@ -1,8 +1,10 @@
 ﻿using BankApp.Jonathan;
 using BankApp.Transaction_Layer.API;
+using BankApp.GustafsClasses;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using BankApp.Transaction_Layer.Interface;
 
 namespace BankApp.Robin
 {
@@ -10,14 +12,14 @@ namespace BankApp.Robin
     {
         private readonly LoanService loanService;
         private readonly AccountManager accountManager;
-        private readonly BankTransfer bankTransfer;
+        private readonly IViewTransactionStatisticBridge bankTransferStatistics;
 
         // Constructor
-        public LoanMenu(LoanService loanService, AccountManager accountManager, BankTransfer bankTransfer)
+        public LoanMenu(LoanService loanService, AccountManager accountManager, IViewTransactionStatisticBridge bankTransferStatistics)
         {
             this.loanService = loanService;
             this.accountManager = accountManager;
-            this.bankTransfer = bankTransfer;
+            this.bankTransferStatistics = bankTransferStatistics;
         }
 
         // Handles loan applications

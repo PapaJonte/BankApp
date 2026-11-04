@@ -7,7 +7,7 @@ using BankApp.Transaction_Layer.Interface;
 
 namespace BankApp.Transaction_Layer.Controller;
 
-public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exchangeRateModule, IAccountBridge AccountBridge)
+public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exchangeRateModule, IAccountBridge accountBridge)
 {
 
     /// <summary>
@@ -43,7 +43,7 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
 
     public StatusCode WithdrawalStatus(int userID, int accountNumber, decimal amount)
     {
-        StatusCode statusCode = AccountBridge.CanWithdraw(userID, accountNumber, amount) ? StatusCode.Successful : StatusCode.Failed;
+        StatusCode statusCode = accountBridge.CanWithdraw(userID, accountNumber, amount) ? StatusCode.Successful : StatusCode.Failed;
         return statusCode;
     }
 
@@ -92,16 +92,6 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
         }
 
         return statusCode;
-    }
-
-    public List<TransactionDataObject> GetTransactionHistoryOnUserID(int userID)
-    {
-        return stageTransaction.GetTransactionHistoryOnUserID(userID);
-    }
-
-    public List<TransactionDataObject> GetTransactionHistoryOnAccountID(int accountID)
-    {
-        return stageTransaction.GetTransactionHistoryOnAccountID(accountID);
     }
 }
 
