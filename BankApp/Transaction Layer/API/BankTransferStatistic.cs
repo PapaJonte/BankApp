@@ -29,7 +29,7 @@ public class BankTransferStatistic(TransactionStatisticFilter transactionStatist
     {
         StatusCode status = transactionStatisticFilter.TryGetFullTransactionAmount(userID, out decimal totalAmount);
 
-        TotalTransactionAmount totalTransactionAmount = new(userID, totalAmount);
+        TotalTransactionAmount totalTransactionAmount = new(userID, totalAmount){ StatusCode = status};
 
         return totalTransactionAmount;
     }
@@ -40,7 +40,7 @@ public class BankTransferStatistic(TransactionStatisticFilter transactionStatist
 
         Dictionary<int, List<TransactionDate>> transactionDates = [];
 
-        TotalTransactionsDateOrder dateOrder = new(userID, orderedTransactionDict);
+        TotalTransactionsDateOrder dateOrder = new(userID, orderedTransactionDict) {StatusCode = status};
 
         return dateOrder;
     } 
