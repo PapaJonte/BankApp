@@ -132,23 +132,19 @@ namespace BankApp.GustafsClasses
 
                     if (bAccount.GetUserId() == userId)
                     {
-                        //Making sure the balance of all of the accounts are combined into a total balance.
-                        foreach (var account in bAccount.SavingAccounts)
+                        if (bAccount.GetCurrency() != chosenValue)
                         {
-                            if (account.GetCurrency() != chosenValue)
-                            {
-                                //Don't be fooled, this is the same line of code.
-                                conversionTool.TryCalculateExchangeValue(
-                                    account.GetCurrency(),
-                                    chosenValue, account.GetBalance(),
-                                    out additionValue);
+                            //Don't be fooled, this is the same line of code.
+                            conversionTool.TryCalculateExchangeValue(
+                                bAccount.GetCurrency(),
+                                chosenValue, bAccount.GetBalance(),
+                                out additionValue);
 
-                                totalBalance = totalBalance + additionValue;
-                            }
-                            else
-                            {
-                                totalBalance = totalBalance + account.GetBalance();
-                            }
+                            totalBalance = totalBalance + additionValue;
+                        }
+                        else
+                        {
+                            totalBalance = totalBalance + bAccount.GetBalance();
                         }
                     }
                 } 
