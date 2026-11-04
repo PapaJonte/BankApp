@@ -18,7 +18,7 @@ This class has various different methods for handling the two other Account clas
 Other than that there happens to be a method for calculating the total balance of all accounts of a user, there is a method for printing out the balance and currency of account of a user, and there is one private method for choosing currency for created accounts.
 Otherwise all methods are public, for selection of currency is only required for internal processes.
 
-//Transaction Layer
+---TRANSACTION LAYER---
 
 --API--
 
@@ -118,7 +118,7 @@ Handles running the scheduler (async) with an interval. Fires event every set in
 TransactionStatisticFilter:
 Filters stored transactions into data objects that can be read from view.
 
-//Pull The Sack
+---PULL THE SACK---
 
 --API--
 
