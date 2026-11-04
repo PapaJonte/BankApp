@@ -427,17 +427,17 @@ namespace BankApp.Robin
                     Console.WriteLine("\n[ ] Log in");
                 }
 
+                //if (selectedIndex == 1)
+                //{
+                //    Console.WriteLine("\n[X] Create account");
+                //}
+
+                //else
+                //{
+                //    Console.WriteLine("\n[ ] Create account");
+                //}
+
                 if (selectedIndex == 1)
-                {
-                    Console.WriteLine("\n[X] Create account");
-                }
-
-                else
-                {
-                    Console.WriteLine("\n[ ] Create account");
-                }
-
-                if (selectedIndex == 2)
                 {
                     Console.WriteLine("\n[X] Exit");
                 }
@@ -452,12 +452,12 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 3) % 3;
+                        selectedIndex = (selectedIndex - 1 + 2) % 2;
 
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 3;
+                        selectedIndex = (selectedIndex + 1) % 2;
                         break;
 
                     case ConsoleKey.Enter:
@@ -514,15 +514,15 @@ namespace BankApp.Robin
 
                                 break;
 
+                            //case 1:
+                            //    Console.CursorVisible = true;
+                            //    CreateUser();
+                            //    Console.ReadKey();
+                            //    break;
+
                             case 1:
                                 Console.CursorVisible = true;
-                                CreateUser();
-                                Console.ReadKey();
-                                break;
-
-                            case 2:
-                                Console.CursorVisible = true;
-                                Console.WriteLine("Exit");
+                                Console.WriteLine("Exiting....");
                                 userMenu = false;
                                 break;
                         }
