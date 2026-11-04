@@ -147,6 +147,23 @@ namespace BankApp.GustafsClasses
                             totalBalance = totalBalance + bAccount.GetBalance();
                         }
                     }
+                    foreach (var sAccount in bAccount.SavingAccounts)
+                    {
+                        if (sAccount.GetCurrency() != chosenValue)
+                        {
+                            //Don't be fooled, this is the same line of code.
+                            conversionTool.TryCalculateExchangeValue(
+                                sAccount.GetCurrency(),
+                                chosenValue, sAccount.GetBalance(),
+                                out additionValue);
+
+                            totalBalance = totalBalance + additionValue;
+                        }
+                        else
+                        {
+                            totalBalance = totalBalance + bAccount.GetBalance();
+                        }
+                    }
                 } 
             }
             else
