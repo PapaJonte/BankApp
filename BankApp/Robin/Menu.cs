@@ -71,21 +71,16 @@ namespace BankApp.Robin
             Console.Write("\nPhone number: ");
             string userPhoneNumber = Console.ReadLine() ?? "";
 
-            //Maria: Gammal metod, ger error.
-            //bool succesCreatedUser = _userService.CreateUser(true, false, userName, userPass, userEmail, userPhoneNumber, UserRole.Customer);
-
-            // Maria: Ny metod
-             CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
+            /*Maria: Updated to use the new CreateUser, it passes the currently
+            logged-in user (instead of plain bools) so the role check happens for real,
+            and reads the CreateUserResult enum to show the exact reason on failure instead of a generic true/false.
+            */
+            CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
 
            Console.WriteLine($"\n{UserService.GetErrorMessage(result)}");
            Console.ReadKey();
 
            return result == CreateUserResult.Success;
-
-
-            //User? user = _userService.GetUserByUsername(userName);
-
-            //Maria: Kommenterar bort : return succesCreatedUser;
         }
         public void ShowOwnerMenu()
         {
