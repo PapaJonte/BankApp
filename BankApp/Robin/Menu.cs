@@ -1,7 +1,7 @@
 ﻿using Spectre.Console;
 using BankApp.Pull_The_Sack.Interface;
 namespace BankApp.Robin
-    
+
 {
     internal class Menu
     {
@@ -10,8 +10,8 @@ namespace BankApp.Robin
 
         //private readonly Theme theme;
 
-        
-        
+
+
         private readonly LoanMenu _loanMenu;
         private readonly UserService _userService;
         private readonly AuthService _authService;
@@ -24,7 +24,7 @@ namespace BankApp.Robin
             _loanMenu = loanMenu ?? throw new ArgumentNullException(nameof(loanMenu));
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            
+
         }
         public void ShowCreatedUsers()
         {
@@ -58,12 +58,6 @@ namespace BankApp.Robin
             Console.Write("\nPlease enter details.");
             Console.Write("\nPersonal identity number: ");
             string userName = Console.ReadLine() ?? "";
-            if (_userService.UsernameExists(userName))
-            {
-                Console.WriteLine("\nError: This personal identity number is already registered!");
-                Console.ReadKey();
-                return false;
-            }
             Console.Write("\nPassword: ");
             string userPass = Console.ReadLine() ?? "";
             Console.Write("\nEmail: ");
@@ -77,10 +71,18 @@ namespace BankApp.Robin
             */
             CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
 
-            Console.WriteLine($"\n{UserService.GetErrorMessage(result)}");
-            Console.ReadKey();
+            string userMessage = UserService.GetErrorMessage(userResult);
 
-            return result == CreateUserResult.Success;
+            if (userResult == CreateUserResult.Success)
+            {
+                Console.WriteLine(userMessage);
+                return true;
+            }
+            else
+            {
+                Console.WriteLine(userMessage);
+                return false;
+            }
         }
         public void ShowOwnerMenu()
         {
@@ -269,7 +271,7 @@ namespace BankApp.Robin
                                 else
                                 {
                                     Console.WriteLine("Error!");
-                                    
+
                                 }
 
                                 Console.ReadKey();
@@ -418,7 +420,7 @@ namespace BankApp.Robin
             {
                 Console.CursorVisible = false;
                 Console.Clear();
-            global::BankApp.GoldenSack.WriteLogo();
+                global::BankApp.GoldenSack.WriteLogo();
 
                 if (selectedIndex == 0)
                 {
@@ -430,17 +432,17 @@ namespace BankApp.Robin
                     Console.WriteLine("\n[ ] Log in");
                 }
 
+                //if (selectedIndex == 1)
+                //{
+                //    Console.WriteLine("\n[X] Create account");
+                //}
+
+                //else
+                //{
+                //    Console.WriteLine("\n[ ] Create account");
+                //}
+
                 if (selectedIndex == 1)
-                {
-                    Console.WriteLine("\n[X] Create account");
-                }
-
-                else
-                {
-                    Console.WriteLine("\n[ ] Create account");
-                }
-
-                if (selectedIndex == 2)
                 {
                     Console.WriteLine("\n[X] Exit");
                 }
@@ -455,12 +457,12 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 3) % 3;
+                        selectedIndex = (selectedIndex - 1 + 2) % 2;
 
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 3;
+                        selectedIndex = (selectedIndex + 1) % 2;
                         break;
 
                     case ConsoleKey.Enter:
@@ -518,15 +520,15 @@ namespace BankApp.Robin
 
                                 break;
 
+                            //case 1:
+                            //    Console.CursorVisible = true;
+                            //    CreateUser();
+                            //    Console.ReadKey();
+                            //    break;
+
                             case 1:
                                 Console.CursorVisible = true;
-                                CreateUser();
-                                Console.ReadKey();
-                                break;
-
-                            case 2:
-                                Console.CursorVisible = true;
-                                Console.WriteLine("Exit");
+                                Console.WriteLine("Exiting....");
                                 userMenu = false;
                                 break;
                         }
