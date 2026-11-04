@@ -17,10 +17,10 @@ namespace BankApp.GustafsClasses
 
         /*Constructor making sure that we have applied an id to the account,
         to distinguish it from others.*/
-        public BankAccount(int UserId , int BankAccountNumber)
+        public BankAccount(int userId, int bankAccountNumber)
         {
-            UserId = userId;
-            BankAccountNumber = bankAccountNumber;
+            this.userId = userId;
+            this.bankAccountNumber = bankAccountNumber;
         }
 
         public int GetUserId()

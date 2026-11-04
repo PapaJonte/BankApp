@@ -7,7 +7,6 @@ using BankApp.Transaction_Layer.Data;
 using BankApp.Transaction_Layer.Service;
 using BankApp.GustafsClasses;
 using Spectre.Console;
-using BankApp.GustafsClasses;
 using BankApp.Transaction_Layer.Interface;
 
 namespace BankApp

@@ -65,7 +65,11 @@ namespace BankApp.Robin
             Console.Write("\nPhone number: ");
             string userPhoneNumber = Console.ReadLine() ?? "";
 
-            CreateUserResult userResult = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? user, UserRole.Customer);
+            /*Maria: Updated to use the new CreateUser, it passes the currently
+            logged-in user (instead of plain bools) so the role check happens for real,
+            and reads the CreateUserResult enum to show the exact reason on failure instead of a generic true/false.
+            */
+            CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
 
             string userMessage = UserService.GetErrorMessage(userResult);
 
@@ -149,6 +153,7 @@ namespace BankApp.Robin
                                 //
                                 Console.Clear();
                                 Console.WriteLine("Transaction history");
+                                Console.ReadKey();
                                 break;
 
                             case 2:
@@ -508,6 +513,7 @@ namespace BankApp.Robin
                                     if (userLoggedIn == LoginResult.LockedOut)
                                     {
                                         Console.WriteLine("Your account is locked!");
+                                        Console.ReadKey();
                                         wrongUserInfo = false;
                                     }
                                 }
