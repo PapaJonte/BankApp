@@ -1,7 +1,7 @@
 ﻿using Spectre.Console;
 using BankApp.Pull_The_Sack.Interface;
 namespace BankApp.Robin
-    
+
 {
     internal class Menu
     {
@@ -10,8 +10,8 @@ namespace BankApp.Robin
 
         //private readonly Theme theme;
 
-        
-        
+
+
         private readonly LoanMenu _loanMenu;
         private readonly UserService _userService;
         private readonly AuthService _authService;
@@ -24,7 +24,7 @@ namespace BankApp.Robin
             _loanMenu = loanMenu ?? throw new ArgumentNullException(nameof(loanMenu));
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            
+
         }
         public void ShowCreatedUsers()
         {
@@ -58,12 +58,6 @@ namespace BankApp.Robin
             Console.Write("\nPlease enter details.");
             Console.Write("\nPersonal identity number: ");
             string userName = Console.ReadLine() ?? "";
-            if (_userService.UsernameExists(userName))
-            {
-                Console.WriteLine("\nError: This personal identity number is already registered!");
-                Console.ReadKey();
-                return false;
-            }
             Console.Write("\nPassword: ");
             string userPass = Console.ReadLine() ?? "";
             Console.Write("\nEmail: ");
@@ -73,20 +67,18 @@ namespace BankApp.Robin
 
             CreateUserResult userResult = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? user, UserRole.Customer);
 
-            if(userResult == CreateUserResult.Success)
+            string userMessage = UserService.GetErrorMessage(userResult);
+
+            if (userResult == CreateUserResult.Success)
             {
-                Console.WriteLine("Succes!");
+                Console.WriteLine(userMessage);
                 return true;
             }
             else
             {
-                string errorMessage =  UserService.GetErrorMessage(userResult);
-
-                Console.WriteLine(errorMessage);
-
+                Console.WriteLine(userMessage);
                 return false;
             }
-            
         }
         public void ShowOwnerMenu()
         {
@@ -274,7 +266,7 @@ namespace BankApp.Robin
                                 else
                                 {
                                     Console.WriteLine("Error!");
-                                    
+
                                 }
 
                                 Console.ReadKey();
@@ -423,7 +415,7 @@ namespace BankApp.Robin
             {
                 Console.CursorVisible = false;
                 Console.Clear();
-            global::BankApp.GoldenSack.WriteLogo();
+                global::BankApp.GoldenSack.WriteLogo();
 
                 if (selectedIndex == 0)
                 {
