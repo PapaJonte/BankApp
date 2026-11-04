@@ -44,11 +44,11 @@ namespace BankApp.GustafsClasses
             }
         }
         //This method will create a bank account. Not to be confused with a savings account. Bank accounts store the savings accounts.
-        public void CreateAccount(int userId, int bankAccountNumber)
+        public void CreateAccount(int userId, int bankAccountNumber, decimal balance, decimal interest, Currency currency)
         {
             /*Creation of object of the BankAccount class to represent an account held by a user,
             rather than individual spaces to have money in.*/
-            BankAccount userAccount = new BankAccount(userId, bankAccountNumber);
+            BankAccount userAccount = new BankAccount(userId, bankAccountNumber, balance, interest, currency);
 
             BankAccountList.Add(userAccount);
             BankAccountDictionary.Add(userId, BankAccountList);
@@ -132,23 +132,36 @@ namespace BankApp.GustafsClasses
 
                     if (bAccount.GetUserId() == userId)
                     {
-                        //Making sure the balance of all of the accounts are combined into a total balance.
-                        foreach (var account in bAccount.SavingAccounts)
+                        if (bAccount.GetCurrency() != chosenValue)
                         {
-                            if (account.GetCurrency() != chosenValue)
-                            {
-                                //Don't be fooled, this is the same line of code.
-                                conversionTool.TryCalculateExchangeValue(
-                                    account.GetCurrency(),
-                                    chosenValue, account.GetBalance(),
-                                    out additionValue);
+                            //Don't be fooled, this is the same line of code.
+                            conversionTool.TryCalculateExchangeValue(
+                                bAccount.GetCurrency(),
+                                chosenValue, bAccount.GetBalance(),
+                                out additionValue);
 
-                                totalBalance = totalBalance + additionValue;
-                            }
-                            else
-                            {
-                                totalBalance = totalBalance + account.GetBalance();
-                            }
+                            totalBalance = totalBalance + additionValue;
+                        }
+                        else
+                        {
+                            totalBalance = totalBalance + bAccount.GetBalance();
+                        }
+                    }
+                    foreach (var sAccount in bAccount.SavingAccounts)
+                    {
+                        if (sAccount.GetCurrency() != chosenValue)
+                        {
+                            //Don't be fooled, this is the same line of code.
+                            conversionTool.TryCalculateExchangeValue(
+                                sAccount.GetCurrency(),
+                                chosenValue, sAccount.GetBalance(),
+                                out additionValue);
+
+                            totalBalance = totalBalance + additionValue;
+                        }
+                        else
+                        {
+                            totalBalance = totalBalance + bAccount.GetBalance();
                         }
                     }
                 } 
