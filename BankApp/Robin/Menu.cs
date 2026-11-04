@@ -5,13 +5,9 @@ namespace BankApp.Robin
 {
     internal class Menu
     {
-
         // Creates private fields for UserService and AuthService
 
         //private readonly Theme theme;
-
-
-
         private readonly LoanMenu _loanMenu;
         private readonly UserService _userService;
         private readonly AuthService _authService;
@@ -20,11 +16,9 @@ namespace BankApp.Robin
         // Passes both fields into our constructor so we can use the methods from Maria's class.
         public Menu(UserService userService, AuthService authService, LoanMenu loanMenu)
         {
-
             _loanMenu = loanMenu ?? throw new ArgumentNullException(nameof(loanMenu));
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-
         }
         public void ShowCreatedUsers()
         {
@@ -38,7 +32,6 @@ namespace BankApp.Robin
                   $"\n{user.Role}");
             }
         }
-
         public void ShowLoggedInUser()
         {
             User? userDetails = _authService.LoggedInUser;
@@ -92,33 +85,25 @@ namespace BankApp.Robin
                 Console.CursorVisible = false;
                 Console.Clear();
 
-                if (selectedIndex == 0)
+                string[] options =
                 {
-                    Console.WriteLine("\n[X] View accounts");
-                }
+                    "View accounts",
+                    "Transaction history",
+                    "Log out",
+                };
 
-                else
+                for (int i = 0; i < options.Length; i++)
                 {
-                    Console.WriteLine("\n[ ] View accounts");
-                }
-
-                if (selectedIndex == 1)
-                {
-                    Console.WriteLine("\n[X] Transaction history");
-                }
-
-                else
-                {
-                    Console.WriteLine("\n[ ] Transaction history");
-                }
-                if (selectedIndex == 2)
-                {
-                    Console.WriteLine("\n[X] Log out");
-                }
-
-                else
-                {
-                    Console.WriteLine("\n[ ] Log out");
+                    if (i == selectedIndex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"> {options[i]}");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.WriteLine(options[i]);
+                    }
                 }
 
                 ConsoleKey key = Console.ReadKey(true).Key;
@@ -177,64 +162,30 @@ namespace BankApp.Robin
                 Console.CursorVisible = false;
                 Console.Clear();
 
-                if (selectedIndex == 0)
+                string[] options =
                 {
-                    Console.WriteLine("\n[X] Create new users");
+                    "Create new users",
+                    "Unlock user account",
+                    "Loans",
+                    "Exchange rate",
+                    "Interest rate",
+                    "Log out",
+                };
+
+                for (int i = 0; i < options.Length; i++)
+                {
+                    if (i == selectedIndex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"> {options[i]}");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.WriteLine(options[i]);
+                    }
                 }
 
-                else
-                {
-                    Console.WriteLine("\n[ ] Create new users");
-                }
-
-                if (selectedIndex == 1)
-                {
-                    Console.WriteLine("\n[X] Unlock user account");
-                }
-
-                else
-                {
-                    Console.WriteLine("\n[ ] Unlock user account");
-                }
-
-
-                if (selectedIndex == 2)
-                {
-                    Console.WriteLine("\n[X] Loans");
-                }
-
-                else
-                {
-                    Console.WriteLine("\n[ ] Loans");
-                }
-                if (selectedIndex == 3)
-                {
-                    Console.WriteLine("\n[X] Exchange rates");
-                }
-
-                else
-                {
-                    Console.WriteLine("\n[ ] Exchange rates");
-                }
-
-                if (selectedIndex == 4)
-                {
-                    Console.WriteLine("\n[X] Interest rate");
-                }
-
-                else
-                {
-                    Console.WriteLine("\n[ ] Interest rate");
-                }
-                if (selectedIndex == 5)
-                {
-                    Console.WriteLine("\n[X] Log out");
-                }
-
-                else
-                {
-                    Console.WriteLine("\n[ ] Log out");
-                }
                 ConsoleKey key = Console.ReadKey(true).Key;
 
                 switch (key)
@@ -335,44 +286,66 @@ namespace BankApp.Robin
                 Console.CursorVisible = false;
                 Console.Clear();
 
-                if (selectedIndex == 0)
+                string[] options =
                 {
-                    Console.WriteLine("\n[X] View accounts");
-                }
+                    "View accounts",
+                    "Transaction history",
+                    "Loans",
+                    "Log out",
+                };
 
-                else
-                {
-                    Console.WriteLine("\n[ ] View accounts");
-                }
+                //if (selectedIndex == 0)
+                //{
+                //    Console.WriteLine("\n[X] View accounts");
+                //}
 
-                if (selectedIndex == 1)
-                {
-                    Console.WriteLine("\n[X] Transaction history");
-                }
+                //else
+                //{
+                //    Console.WriteLine("\n[ ] View accounts");
+                //}
 
-                else
-                {
-                    Console.WriteLine("\n[ ] Transaction history");
-                }
+                //if (selectedIndex == 1)
+                //{
+                //    Console.WriteLine("\n[X] Transaction history");
+                //}
 
-                if (selectedIndex == 2)
-                {
-                    Console.WriteLine("\n[X] Loans");
-                }
+                //else
+                //{
+                //    Console.WriteLine("\n[ ] Transaction history");
+                //}
 
-                else
-                {
-                    Console.WriteLine("\n[ ] Loans");
-                }
+                //if (selectedIndex == 2)
+                //{
+                //    Console.WriteLine("\n[X] Loans");
+                //}
 
-                if (selectedIndex == 3)
-                {
-                    Console.WriteLine("\n[X] Log out");
-                }
+                //else
+                //{
+                //    Console.WriteLine("\n[ ] Loans");
+                //}
 
-                else
+                //if (selectedIndex == 3)
+                //{
+                //    Console.WriteLine("\n[X] Log out");
+                //}
+
+                //else
+                //{
+                //    Console.WriteLine("\n[ ] Log out");
+                //}
+
+                for (int i = 0; i < options.Length; i++)
                 {
-                    Console.WriteLine("\n[ ] Log out");
+                    if (i == selectedIndex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"> {options[i]}");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.WriteLine(options[i]);
+                    }
                 }
 
                 ConsoleKey key = Console.ReadKey(true).Key;
@@ -401,6 +374,12 @@ namespace BankApp.Robin
                                 break;
 
                             case 2:
+                                Console.WriteLine("Loans");
+                                _loanMenu.ShowLoanMenu(_authService.LoggedInUser.UserID);
+
+                                break;
+
+                            case 3:
                                 _authService.Logout();
                                 userMenu = false;
                                 break;
@@ -428,34 +407,54 @@ namespace BankApp.Robin
                 Console.Clear();
                 global::BankApp.GoldenSack.WriteLogo();
 
-                if (selectedIndex == 0)
+                string[] options =
                 {
-                    Console.WriteLine("\n[X] Log in");
-                }
+                    "Log in",
+                    "Exit",
+                };
 
-                else
-                {
-                    Console.WriteLine("\n[ ] Log in");
-                }
-
-                //if (selectedIndex == 1)
+                //if (selectedIndex == 0)
                 //{
-                //    Console.WriteLine("\n[X] Create account");
+                //    Console.WriteLine("\n[X] Log in");
                 //}
 
                 //else
                 //{
-                //    Console.WriteLine("\n[ ] Create account");
+                //    Console.WriteLine("\n[ ] Log in");
                 //}
 
-                if (selectedIndex == 1)
-                {
-                    Console.WriteLine("\n[X] Exit");
-                }
+                ////if (selectedIndex == 1)
+                ////{
+                ////    Console.WriteLine("\n[X] Create account");
+                ////}
 
-                else
+                ////else
+                ////{
+                ////    Console.WriteLine("\n[ ] Create account");
+                ////}
+
+                //if (selectedIndex == 1)
+                //{
+                //    Console.WriteLine("\n[X] Exit");
+                //}
+
+                //else
+                //{
+                //    Console.WriteLine("\n[ ] Exit");
+                //}
+
+                for (int i = 0; i < options.Length; i++)
                 {
-                    Console.WriteLine("\n[ ] Exit");
+                    if (i == selectedIndex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"> {options[i]}");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.WriteLine(options[i]);
+                    }
                 }
 
                 ConsoleKey key = Console.ReadKey(true).Key;
