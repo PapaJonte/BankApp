@@ -28,8 +28,44 @@ namespace BankApp.Robin
             // Gets the customers combined total balance
             decimal totalAccountBalance = accountManager.GetTotalBalance(userId);
 
-            // TO DO: Replace with customer's selected regular bank account
-            string destinationAccountNumber = "TEST-ACCOUNT-001";
+            // Retrieve all bank accounts belonging to the customer
+            List<BankAccount> customerAccounts = accountManager.BankAccountList
+                .Where(account => account.GetUserId() == userId)
+                .ToList();
+
+            // Check whether the customer has any available accounts
+            if (customerAccounts.Count == 0)
+            {
+                Console.WriteLine("You have no bank accounts available.");
+                return null;
+            }
+
+            // Display the customer's available bank accounts
+            Console.WriteLine("\nSelect an account to receive your loan;");
+
+            foreach (BankAccount account in customerAccounts)
+            {
+                Console.WriteLine($"Account number: {account.GetBankAccountNumber()}");
+            }
+
+            // Ask the customer which account should receive the loan
+            Console.WriteLine("Enter the destination account number: ");
+
+            if (!int.TryParse(Console.ReadLine(), out int selectedAccountNumber))
+            {
+                Console.WriteLine("Invalid account number.");
+                return null;
+            }
+
+            // Verify that the selected account belongs to the customer
+            if (!accountManager.AccountOwnershipVerification(userId, selectedAccountNumber))
+            {
+                Console.WriteLine("The selected account does not belong to you.");
+                return null;
+            }
+
+            // Convert the account number to a string for the transaction system
+            string destinationAccountNumber = selectedAccountNumber.ToString();
 
             // Validates and calculates interest etc.
             Loan? loan = loanService.ApplyForLoan(userId, requestedAmount, duration, totalAccountBalance, destinationAccountNumber);
