@@ -19,7 +19,7 @@ namespace BankApp.GustafsClasses
         /*This method is intended to support the CreateAccount() method below by selecting and identifying currency.
          * It will be called upon when CreateAccount needs it.
          * Don't call upon this method!*/
-        public Currency CheckCurrency()
+        public static Currency CheckCurrency()
         {
             //while loop around to make sure the user gives a correct value as currency.
             while ( true)
