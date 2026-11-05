@@ -70,12 +70,12 @@ namespace BankApp.Robin
             and reads the CreateUserResult enum to show the exact reason on failure instead of a generic true/false.
             */
             CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
-            _accountManager.CreateAccount(createdUser.UserID, 0m);
 
             string userMessage = UserService.GetErrorMessage(result);
 
             if (result == CreateUserResult.Success)
             {
+                _accountManager.CreateAccount(createdUser.UserID, 0m);
                 Console.WriteLine(userMessage);
                 return true;
             }
@@ -245,7 +245,7 @@ namespace BankApp.Robin
                             case 2:
                                 // Loans
                                 _adminLoanMenu.ShowAdminLoanMenu(_authService.LoggedInUser.UserID);
-                                
+
                                 break;
 
                             case 3:
@@ -289,6 +289,7 @@ namespace BankApp.Robin
                 string[] options =
                 {
                     "View accounts",
+                    "Create bank account",
                     "Transaction history",
                     "Loans",
                     "Log out",
@@ -313,11 +314,11 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 4) % 4;
+                        selectedIndex = (selectedIndex - 1 + 5) % 5;
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 4;
+                        selectedIndex = (selectedIndex + 1) % 5;
                         break;
 
                     case ConsoleKey.Enter:
@@ -330,16 +331,22 @@ namespace BankApp.Robin
                                 break;
 
                             case 1:
-                                Console.WriteLine("Transaction history");
+
+                                _accountManager.CreateAccount(createdUser.UserID, 0m);
+
                                 break;
 
                             case 2:
+                                Console.WriteLine("Transaction history");
+                                break;
+
+                            case 3:
                                 Console.WriteLine("Loans");
                                 _loanMenu.ShowLoanMenu(_authService.LoggedInUser.UserID);
 
                                 break;
 
-                            case 3:
+                            case 4:
                                 _authService.Logout();
                                 userMenu = false;
                                 break;
