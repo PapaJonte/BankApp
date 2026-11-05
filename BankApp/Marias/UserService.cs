@@ -41,9 +41,14 @@ namespace BankApp
         public UserService(AccountManager accountManager)
         {
             _accountManager = accountManager;
-            
+
             AddUser("00000000-0000", "ownerpassword123", "owner@gmail.com", "0729216167", UserRole.Owner);
             AddUser("11111111-1111", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
+
+#if DEBUG
+            AddUser("21111111-1111", "2", "a@gmail.com", "0729216167", UserRole.Customer);
+#endif
+
         }
 
         /*
@@ -61,6 +66,7 @@ namespace BankApp
 
             return newUser;
         }
+
         public void LogUser(int userId)
         {
             _loggedInUser = new LoggedInUser(userId);
@@ -69,6 +75,7 @@ namespace BankApp
         {
             return _loggedInUser;
         }
+
         /*Removes all dashes and spaces from a username.
         This means "19900101-1234", "1990 0101 1234" and "199001011234" are all
 
@@ -123,14 +130,14 @@ namespace BankApp
             return !string.IsNullOrWhiteSpace(password) && password.Length >= MinPasswordLength;
         }
 
-         
-         /*Simple email check (not a full email standard check).
-         Valid means:
-         - there is at least one character before the @
-         - there is a dot somewhere after the @, but not directly after it
-         - the email does not end with a dot
-         Example: "name@example.com" is valid, "name@.com" and "name@example." are not.
-        */
+
+        /*Simple email check (not a full email standard check).
+        Valid means:
+        - there is at least one character before the @
+        - there is a dot somewhere after the @, but not directly after it
+        - the email does not end with a dot
+        Example: "name@example.com" is valid, "name@.com" and "name@example." are not.
+       */
         public bool IsValidEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
