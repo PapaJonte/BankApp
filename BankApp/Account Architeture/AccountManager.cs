@@ -84,6 +84,10 @@ namespace BankApp.GustafsClasses
                             balance, Currency.SEK, interest, AccountNrGenerator());
 
                         account.SavingAccounts.Add(savingsAccount);
+                        if (account.SavingsAccountDictionary.Count == 0)
+                        {
+                            account.SavingsAccountDictionary.Add(userId, account.SavingAccounts);
+                        }
                     }
                 }
             }
