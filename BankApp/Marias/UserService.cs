@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.NetworkInformation;
 using BankApp.GustafsClasses;
+using BankApp.Marias;
 
 namespace BankApp
 {
@@ -25,7 +26,7 @@ namespace BankApp
     {
         // All users are stored in memory in a dictionary, with the internal UserID as key.
         private readonly Dictionary<int, User> _users = new Dictionary<int, User>();
-
+        private LoggedInUser? _loggedInUser;
         // Gives every user a unique internal ID, starting from 1. The ID is never reused, even if a user is deleted.
         private int _nextUserId = 1;
 
@@ -60,7 +61,14 @@ namespace BankApp
 
             return newUser;
         }
-
+        public void LogUser(int userId)
+        {
+            _loggedInUser = new LoggedInUser(userId);
+        }
+        public LoggedInUser? GetLoggedInUser()
+        {
+            return _loggedInUser;
+        }
         /*Removes all dashes and spaces from a username.
         This means "19900101-1234", "1990 0101 1234" and "199001011234" are all
 
