@@ -97,55 +97,6 @@ namespace BankApp.Robin
             return loan;
         }
 
-        // Legacy status helper, the admin menu handles the active approval flow
-        public bool ChangeLoanStatus(int loanId, LoanStatus newStatus)
-        {
-            // Gets the loan using its loand ID
-            Loan? loan = loanService.GetLoanById(loanId);
-
-            // Checks if the loan exists
-            if (loan == null)
-            {
-                Console.WriteLine("Loan could not be found.");
-                return false;
-            }
-
-            // Gets the customer's total balance from their bank accounts
-            decimal totalAccountBalance;
-            try
-            {
-                totalAccountBalance = accountManager.GetTotalBalance(loan.UserId);
-            }
-            catch (InvalidOperationException)
-            {
-                Console.WriteLine("The loan status could not be changed becase an exchange rate is unavailable.");
-                return false;
-            }
-
-            // Attempts to update the loan status
-            bool statusChanged = loanService.ChangeLoanStatus(loanId, newStatus, totalAccountBalance);
-
-            // Checks if the status was succesfully changed
-            if (!statusChanged)
-            {
-                Console.WriteLine("Loan status could not be changed");
-                return false;
-            }
-
-            if (statusChanged && newStatus == LoanStatus.Approved)
-            {
-                string destinationAccountNumber = loan.DestinationAccountNumber;
-                decimal payoutAmount = loan.LoanAmount;
-
-                Console.WriteLine($"Loan #{loan.LoanId} approved " +
-                    $"Payout of {payoutAmount} SEK prepared for {destinationAccountNumber}.");
-            }
-
-            // Confirms that the loan status has been updated
-            Console.WriteLine($"Loan status changed to {newStatus}.");
-            return true;
-        }
-
         // Repayment amount and source account
         private void PrepareLoanRepayment(int userId, int loanId)
         {
