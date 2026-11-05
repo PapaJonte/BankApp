@@ -4,6 +4,9 @@ using System.Text;
 
 namespace BankApp.Jonathan
 {
+    /// <summary>
+    /// Stores customer credit scores in memory and keeps them between 0 and 100
+    /// </summary>
     internal class CreditScoreService
     {
         // Store each customer's credit score using their customer ID
@@ -17,6 +20,7 @@ namespace BankApp.Jonathan
                 return creditScore;
             }
 
+            // A customer starts at 100 before any repayment history is recorded
             creditScores.Add(userId, 100);
             return 100;
         }
@@ -52,7 +56,7 @@ namespace BankApp.Jonathan
 
         public void IncreaseCreditScore(int userId, int amount)
         {
-            // Prevents negative or zro adjustments
+            // Prevents negative or zero adjustments
             if (amount <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(amount), "The increase must be greater than zero.");

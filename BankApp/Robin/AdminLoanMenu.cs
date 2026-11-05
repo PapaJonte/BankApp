@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Text;
 namespace BankApp.Robin
 {
+    /// <summary>
+    /// Admin menu for reviewing applications and updating loan pricing rules
+    /// </summary>
     internal class AdminLoanMenu
     {
         private readonly LoanService loanService;
@@ -21,6 +24,7 @@ namespace BankApp.Robin
             this.bankTransfer = bankTransfer;
         }
 
+        // Interest-rule settings
         private void UpdateCreditScoreAdjustment()
         {
             // Show the existing brackets so the admin can choose which rule to update
