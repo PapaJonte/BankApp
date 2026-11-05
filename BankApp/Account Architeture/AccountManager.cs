@@ -1,5 +1,6 @@
 ﻿using BankApp.Transaction_Layer.API;
 using BankApp.Transaction_Layer.Enum;
+using BankApp.Transaction_Layer.Service;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
@@ -46,32 +47,9 @@ namespace BankApp.GustafsClasses
         //Generates random number for Account numbers of both savings accounts and bank accounts.
         private int AccountNrGenerator()
         {
-            Random random = new Random();
-            /*The while loop is a security measure that ensures that each account number for both savings,
-             * and bank accounts are unique by repeating when the number is identical to an already existing one in the bank.*/
-            while (true)
-            {
-                //Creating account number.
-                int accountNumber = random.Next(000000000, 999999999);
-                //Checking each bank account for identical integers.
-                foreach (var bAccount in BankAccountList)
-                {
-                    if (bAccount.GetBankAccountNumber() != accountNumber)
-                    {
-
-                        return accountNumber;
-                    }
-                    //Checking each savings account for identical integers.
-                    foreach (var sAccount in bAccount.SavingAccounts)
-                    {
-                        if (sAccount.GetSavingsAccountNumber() != accountNumber)
-                        {
-
-                            return accountNumber;
-                        }
-                    }
-                }
-            }
+            
+            int accountNumber = UniqueIDGenerator.GenerateUniqueID();
+            return accountNumber;
         }
         //This method will create a bank account. Not to be confused with a savings account. Bank accounts store the savings accounts.
         public decimal CreateAccount(int userId, decimal balance)
@@ -87,7 +65,7 @@ namespace BankApp.GustafsClasses
             return interest;
         }
         //Used for creating savings accounts. The savings accounts store the balance.
-        public decimal CreateSavingsAccount(int userId)
+        public decimal CreateSavingsAccount(int userId, decimal balance)
         {
             Enum.GetValues<Currency>();
             //Return data.
@@ -98,30 +76,10 @@ namespace BankApp.GustafsClasses
                 {
                     if (account.GetUserId() == userId)
                     {
-                        /*I have made the assumption that the Console.WriteLine() statement is no longer necessary,
-                         * for communicating the interest value,
-                         since interest has now become the return value.*/
+                        SavingsAccount savingsAccount = new SavingsAccount(
+                            balance, Currency.SEK, interest, AccountNrGenerator());
 
-                        /*Console.WriteLine(
-                            "You get " + interest + " in interest.");
-                        Console.WriteLine(
-                            "Write how much money you want in the account.");*/
-
-                        string stringInput = Console.ReadLine();
-                        int convertedInput;
-
-                        //Safety system against incorrect input.
-                        if (Int32.TryParse(stringInput, out convertedInput))
-                        {
-                            SavingsAccount savingsAccount = new SavingsAccount(
-                            convertedInput, Currency.SEK, interest, AccountNrGenerator() );
-
-                            account.SavingAccounts.Add(savingsAccount);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Error! You must write a number.");
-                        }
+                        account.SavingAccounts.Add(savingsAccount);
                     }
                 }
             }
