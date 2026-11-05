@@ -19,7 +19,7 @@ namespace BankApp.GustafsClasses
         /*This method is intended to support the CreateAccount() method below by selecting and identifying currency.
          * It will be called upon when CreateAccount needs it.
          * Don't call upon this method!*/
-        private Currency CheckCurrency()
+        public static Currency CheckCurrency()
         {
             //while loop around to make sure the user gives a correct value as currency.
             while ( true)
@@ -61,7 +61,11 @@ namespace BankApp.GustafsClasses
                 balance, interest, Currency.SEK);
 
             BankAccountList.Add(userAccount);
-            BankAccountDictionary.Add(userId, BankAccountList);
+            if (BankAccountDictionary.Count == 0)
+            {
+                BankAccountDictionary.Add(userId, BankAccountList);
+            }
+            
             return interest;
         }
         //Used for creating savings accounts. The savings accounts store the balance.
@@ -80,6 +84,10 @@ namespace BankApp.GustafsClasses
                             balance, Currency.SEK, interest, AccountNrGenerator());
 
                         account.SavingAccounts.Add(savingsAccount);
+                        if (account.SavingsAccountDictionary.Count == 0)
+                        {
+                            account.SavingsAccountDictionary.Add(userId, account.SavingAccounts);
+                        }
                     }
                 }
             }
