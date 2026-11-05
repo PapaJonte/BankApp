@@ -87,7 +87,7 @@ namespace BankApp.GustafsClasses
             return interest;
         }
         //Used for creating savings accounts. The savings accounts store the balance.
-        public decimal CreateSavingsAccount(int userId)
+        public decimal CreateSavingsAccount(int userId, decimal balance)
         {
             Enum.GetValues<Currency>();
             //Return data.
@@ -98,30 +98,10 @@ namespace BankApp.GustafsClasses
                 {
                     if (account.GetUserId() == userId)
                     {
-                        /*I have made the assumption that the Console.WriteLine() statement is no longer necessary,
-                         * for communicating the interest value,
-                         since interest has now become the return value.*/
+                        SavingsAccount savingsAccount = new SavingsAccount(
+                            balance, Currency.SEK, interest, AccountNrGenerator());
 
-                        /*Console.WriteLine(
-                            "You get " + interest + " in interest.");
-                        Console.WriteLine(
-                            "Write how much money you want in the account.");*/
-
-                        string stringInput = Console.ReadLine();
-                        int convertedInput;
-
-                        //Safety system against incorrect input.
-                        if (Int32.TryParse(stringInput, out convertedInput))
-                        {
-                            SavingsAccount savingsAccount = new SavingsAccount(
-                            convertedInput, Currency.SEK, interest, AccountNrGenerator() );
-
-                            account.SavingAccounts.Add(savingsAccount);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Error! You must write a number.");
-                        }
+                        account.SavingAccounts.Add(savingsAccount);
                     }
                 }
             }
