@@ -39,11 +39,36 @@ public class StageTransaction
     /// decimal amount, value the transaction requests to move.
     /// TransactionType transactionType, the type of transaction being staged (deposit or withdrawal).
     /// </param>
-    public void Stage_Single(int userID, int accountNumber, decimal amount, TransactionType transactionType)
+    public StatusCode Stage_Single(int userID, int accountNumber, decimal amount, TransactionType transactionType, bool stage)
     {
+        StatusCode status = StatusCode.Successful;
+
         TransactionDataObject tdo = new(userID, accountNumber, amount, transactionType, DateTime.Now.Date);
-        TransactionDataWrapper wrapper = transactionType == TransactionType.Deposit ? TransactionDataWrapper.ForDeposit(tdo) : TransactionDataWrapper.ForWithdrawal(tdo);
-        transactionRegistry.RegisterStagedTransaction(wrapper);
+        if (!stage)
+        {
+            TransactionDataWrapper wrapper = transactionType == TransactionType.Deposit ? TransactionDataWrapper.ForDeposit(tdo) : TransactionDataWrapper.ForWithdrawal(tdo);
+            transactionRegistry.RegisterStagedTransaction(wrapper);
+        }
+        else
+        {
+            if (transactionType == TransactionType.Deposit)
+            {
+                Deposit(tdo);
+            }
+            else if (transactionType == TransactionType.Withdrawal)
+            {
+                if (accountBridge.CanWithdraw(tdo.userID, tdo.AccountNumber, tdo.Amount))
+                {
+                    WithDraw(tdo);
+                }
+                else
+                {
+                    status = StatusCode.Failed;
+                }
+            }
+        }
+
+        return status;
     }
 
     /// <summary>
@@ -82,7 +107,7 @@ public class StageTransaction
     /// </summary>
     private void OnSchedule()
     {
-        var stagedTransactions = transactionRegistry.GetAllStagedTransactions();
+        var stagedTransactions = transactionRegistry.GetAllStagedTransactions(true);
 
         foreach (var s in stagedTransactions)
         {
@@ -94,11 +119,8 @@ public class StageTransaction
                     {
                         if (s.TryGetDepositObject(out TransactionDataObject depositObject))
                         {
-                            accountBridge.Withdraw(withdrawalObj.userID, withdrawalObj.AccountNumber, withdrawalObj.Amount);
-                            accountBridge.Deposit(depositObject.userID, depositObject.AccountNumber, depositObject.Amount);
-
-                            transactionRegistry.RegisterSuccessfulTransaction(withdrawalObj);
-                            transactionRegistry.RegisterSuccessfulTransaction(depositObject);
+                            WithDraw(withdrawalObj);
+                            Deposit(depositObject);
                         }
                     }
                 }
@@ -107,21 +129,29 @@ public class StageTransaction
             {
                 if (s.TryGetDepositObject(out TransactionDataObject depositObject))
                 {
-                    accountBridge.Deposit(depositObject.userID, depositObject.AccountNumber, depositObject.Amount);
-                    transactionRegistry.RegisterSuccessfulTransaction(depositObject);
+                    Deposit(depositObject);
                 }
                 else if (s.TryGetWithdrawalObject(out TransactionDataObject withdrawalObject))
                 {
                     if (accountBridge.CanWithdraw(withdrawalObject.userID, withdrawalObject.AccountNumber, withdrawalObject.Amount))
                     {
-                        accountBridge.Withdraw(withdrawalObject.userID, withdrawalObject.AccountNumber, withdrawalObject.Amount);
-                        transactionRegistry.RegisterSuccessfulTransaction(withdrawalObject);
+                        WithDraw(withdrawalObject);
                     }
                 }
             }
         }
+    }
 
-        transactionRegistry.ClearStagedTransactions();
+    private void WithDraw(TransactionDataObject withdrawalObject)
+    {
+        accountBridge.Withdraw(withdrawalObject.userID, withdrawalObject.AccountNumber, withdrawalObject.Amount);
+        transactionRegistry.RegisterSuccessfulTransaction(withdrawalObject);
+    }
+
+    private void Deposit(TransactionDataObject depositObject)
+    {
+        accountBridge.Deposit(depositObject.userID, depositObject.AccountNumber, depositObject.Amount);
+        transactionRegistry.RegisterSuccessfulTransaction(depositObject);
     }
 
     #endregion

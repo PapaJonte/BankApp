@@ -6,6 +6,7 @@ using BankApp.Transaction_Layer.Enum;
 using BankApp.Transaction_Layer.Interface;
 using BankApp.Transaction_Layer.Service;
 using Org.BouncyCastle.Asn1.X509;
+using Spectre.Console;
 
 namespace BankApp.Transaction_Layer.Controller;
 
@@ -35,7 +36,7 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
 
         if (status == StatusCode.Successful)
         {
-            stageTransaction.Stage_Single(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit);
+            status = stageTransaction.Stage_Single(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit,true);
         }
 
         return status;
@@ -49,9 +50,10 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
     /// string accountNumber, number of the account we withdraw money from.
     /// decimal amount, value we remove from the bank account.
     /// </param>
-    public void RequestWithdrawal(int userID, int accountNumber, decimal amount)
+    public StatusCode RequestWithdrawal(int userID, int accountNumber, decimal amount)
     {
-        stageTransaction.Stage_Single(userID, accountNumber, amount, TransactionType.Withdrawal);
+        StatusCode status = stageTransaction.Stage_Single(userID, accountNumber, amount, TransactionType.Withdrawal, false);
+        return status;
     }
 
     private void RequestTransfer(AccountData origin, AccountData target, decimal withdrawalAmount, decimal depositAmount)
