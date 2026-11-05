@@ -15,7 +15,7 @@ public static class GoldenSack
     /// single multi-line string. Use <see cref="WriteLogo"/> to print it.
     /// </summary>
     public const string Logo =
-@"           ████████╗██╗  ██╗███████╗
+@"             ████████╗██╗  ██╗███████╗
              ╚══██╔══╝██║  ██║██╔════╝
                 ██║   ███████║█████╗
                 ██║   ██╔══██║██╔══╝
@@ -32,6 +32,8 @@ public static class GoldenSack
           ███████╗███████║██║     █████╔╝
           ╚════██║██╔══██║██║     ██╔═██╗
           ███████║██║  ██║╚██████╗██║  ██╗
+
+          Sponsored by LiveForGambling.com
 ";
 
     /// <summary>
@@ -39,19 +41,11 @@ public static class GoldenSack
     /// <see cref="IConsole"/> when supplied (so it respects the console
     /// lock), otherwise writes straight to <see cref="Console"/>.
     /// </summary>
-    public static void WriteLogo(IConsole? console = null)
-    {
-        if (console is null)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(Logo);
-            Console.ResetColor();
-            return;
-        }
-
-        console.SetConsoleColor(ConsoleColor.Yellow);
-        console.WriteCentered(Logo);
-        console.SetConsoleColor(ConsoleColor.Gray);
+    public static void WriteLogo()
+    {   
+        LogoConsole.SetConsoleColor(ConsoleColor.Yellow);
+        LogoConsole.WriteCentered(Logo);
+        LogoConsole.SetConsoleColor(ConsoleColor.Gray);
     }
 }
 
