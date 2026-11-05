@@ -15,7 +15,12 @@ namespace BankApp.GustafsClasses
         public List<BankAccount> BankAccountList = new List<BankAccount>();
 
         public Dictionary<int, List<BankAccount>> BankAccountDictionary = new Dictionary<int, List<BankAccount>>();
-        
+        private readonly ExchangeRate conversionTool;
+
+        public AccountManager(ExchangeRate conversionTool)
+        {
+            this.conversionTool = conversionTool ?? throw new ArgumentNullException(nameof(conversionTool));
+        }
         /*This method is intended to support the CreateAccount() method below by selecting and identifying currency.
          * It will be called upon when CreateAccount needs it.
          * Don't call upon this method!*/
