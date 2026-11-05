@@ -39,7 +39,7 @@ namespace BankApp.Robin
                   $"\n{user.Role}");
             }
         }
-        public void ShowLoggedInUser()
+        public void ShowLoggedInUser(int userId)
         {
             User? userDetails = _authService.LoggedInUser;
 
@@ -50,6 +50,8 @@ namespace BankApp.Robin
             }
             Console.WriteLine($"\n{userDetails.Username}" +
                 $"\n{userDetails.Email}");
+            _accountManager.GetAccounts(userId);
+              
 
         }
         public bool CreateUser()
@@ -326,13 +328,13 @@ namespace BankApp.Robin
                         {
                             case 0:
                                 Console.WriteLine("Accounts");
-                                ShowLoggedInUser();
+                                ShowLoggedInUser(_userService.GetLoggedInUser().UserId);
                                 Console.ReadKey();
                                 break;
 
                             case 1:
-
-                                _accountManager.CreateAccount(createdUser.UserID, 0m);
+                                Console.Clear();
+                                _accountManager.CreateAccount(_userService.GetLoggedInUser().UserId, 0m);
 
                                 break;
 
