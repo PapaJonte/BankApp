@@ -44,13 +44,12 @@ namespace BankApp.GustafsClasses
             }
         }
         //This method will create a bank account. Not to be confused with a savings account. Bank accounts store the savings accounts.
-        //Make interest into return data.
-        public decimal CreateAccount(int userId, int bankAccountNumber, decimal balance)
+        public decimal CreateAccount(int userId, decimal balance)
         {
             decimal interest = 0.5m;
             /*Creation of object of the BankAccount class to represent an account held by a user,
             rather than individual spaces to have money in.*/
-            BankAccount userAccount = new BankAccount(userId, bankAccountNumber,
+            BankAccount userAccount = new BankAccount(userId, AccountNrGenerator(),
                 balance, interest, CheckCurrency()) ;
 
             BankAccountList.Add(userAccount);
@@ -58,7 +57,7 @@ namespace BankApp.GustafsClasses
             return interest;
         }
         //Used for creating savings accounts. The savings accounts store the balance.
-        public decimal CreateSavingsAccount(int userId, int SavingsAccountNumber)
+        public decimal CreateSavingsAccount(int userId)
         {
             //Return data.
             decimal interest = 0.5m;
@@ -83,7 +82,7 @@ namespace BankApp.GustafsClasses
                         if (Int32.TryParse(stringInput, out convertedInput))
                         {
                             SavingsAccount savingsAccount = new SavingsAccount(
-                            convertedInput, CheckCurrency(), interest, SavingsAccountNumber);
+                            convertedInput, CheckCurrency(), interest, AccountNrGenerator() );
 
                             account.SavingAccounts.Add(savingsAccount);
                         }
