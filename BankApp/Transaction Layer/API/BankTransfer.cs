@@ -58,13 +58,13 @@ public class BankTransfer(BankTransaction bankTransaction)
     /// <returns>
     /// StatusCode represents status of withdrawal request.
     /// </returns>
-    public StatusCode WithdrawyMoney(AccountData account, decimal withdrawAmount)
+    public StatusCode WithdrawMoney(AccountData account, decimal withdrawAmount)
     {
         StatusCode status = bankTransaction.WithdrawalStatus(account.UserID, account.AccountNumber, withdrawAmount);
 
         if (status == StatusCode.Successful)
         {
-            bankTransaction.RequestWithdrawal(account.UserID, account.AccountNumber, withdrawAmount);
+            status = bankTransaction.RequestWithdrawal(account.UserID, account.AccountNumber, withdrawAmount);
         }
 
         return status;

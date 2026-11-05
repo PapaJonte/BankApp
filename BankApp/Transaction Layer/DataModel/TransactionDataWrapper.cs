@@ -1,6 +1,7 @@
 using System;
 using System.Transactions;
 using BankApp.Transaction_Layer.Enum;
+using BankApp.Transaction_Layer.Service;
 
 namespace BankApp.Transaction_Layer.DataModel;
 
@@ -11,9 +12,10 @@ namespace BankApp.Transaction_Layer.DataModel;
 /// <param name=""></param>
 /// <returns></returns>
 
-public readonly struct TransactionDataWrapper(TransactionDataObject[] dataObjects)
+public readonly struct TransactionDataWrapper(TransactionDataObject[] dataObjects, int TransactionID)
 {
 
+    public readonly int TransactionID = TransactionID; 
     public readonly bool IsTransfer => _dataObjects.Length > 1;
     private readonly TransactionDataObject[] _dataObjects = dataObjects;
 
@@ -88,7 +90,7 @@ public readonly struct TransactionDataWrapper(TransactionDataObject[] dataObject
             throw new FormatException("transaction object passed is not a deposit object");
         }
 
-        TransactionDataWrapper tdw = new([transactionObject]);
+        TransactionDataWrapper tdw = new([transactionObject], UniqueIDGenerator.GenerateUniqueID());
 
         return tdw;
     }
@@ -107,7 +109,7 @@ public readonly struct TransactionDataWrapper(TransactionDataObject[] dataObject
             throw new FormatException("transaction object passed is not a withdrawal object");
         }
 
-        TransactionDataWrapper tdw = new([transactionObject]);
+        TransactionDataWrapper tdw = new([transactionObject], UniqueIDGenerator.GenerateUniqueID());
 
         return tdw;
     }
@@ -131,7 +133,7 @@ public readonly struct TransactionDataWrapper(TransactionDataObject[] dataObject
             throw new FormatException("transaction object passed is not a deposit object");
         }
 
-        TransactionDataWrapper tdw = new([withdrawalObject, depositObject]);
+        TransactionDataWrapper tdw = new([withdrawalObject, depositObject], UniqueIDGenerator.GenerateUniqueID());
 
         return tdw;
     }

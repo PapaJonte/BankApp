@@ -56,11 +56,15 @@ public class TransactionRegistry
     /// <returns>
     /// List of TransactionDataObject representing all currently staged transactions
     /// </returns>
-    public List<TransactionDataWrapper> GetAllStagedTransactions()
+    public List<TransactionDataWrapper> GetAllStagedTransactions(bool clearOnReturn)
     {
         lock (registryLock)
         {
             List<TransactionDataWrapper> transactions = [.. stagedTransactions];
+            if(clearOnReturn)
+            {
+                stagedTransactions.Clear();
+            }
             return transactions;
         }
     }
@@ -74,7 +78,7 @@ public class TransactionRegistry
     {
         lock (registryLock)
         {
-            stagedTransactions.Clear();
+           stagedTransactions.Clear();
         }
     }
 
