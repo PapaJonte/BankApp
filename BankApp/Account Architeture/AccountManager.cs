@@ -191,8 +191,8 @@ namespace BankApp.GustafsClasses
             }
             return false;
         }
-        //Change this one into private and put it inside of methods that create accounts.
-        public static int AccountNrGenerator()
+        //Generates random number for Account numbers of both savings accounts and bank accounts.
+        private int AccountNrGenerator()
         {
             Random random = new Random();
             int accountNumber = random.Next(000000000, 999999999);
