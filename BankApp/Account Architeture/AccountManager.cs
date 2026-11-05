@@ -43,14 +43,44 @@ namespace BankApp.GustafsClasses
                 }
             }
         }
+        //Generates random number for Account numbers of both savings accounts and bank accounts.
+        private int AccountNrGenerator()
+        {
+            Random random = new Random();
+            /*The while loop is a security measure that ensures that each account number for both savings,
+             * and bank accounts are unique by repeating when the number is identical to an already existing one in the bank.*/
+            while (true)
+            {
+                //Creating account number.
+                int accountNumber = random.Next(000000000, 999999999);
+                //Checking each bank account for identical integers.
+                foreach (var bAccount in BankAccountList)
+                {
+                    if (bAccount.GetBankAccountNumber() != accountNumber)
+                    {
+
+                        return accountNumber;
+                    }
+                    //Checking each savings account for identical integers.
+                    foreach (var sAccount in bAccount.SavingAccounts)
+                    {
+                        if (sAccount.GetSavingsAccountNumber() != accountNumber)
+                        {
+
+                            return accountNumber;
+                        }
+                    }
+                }
+            }
+        }
         //This method will create a bank account. Not to be confused with a savings account. Bank accounts store the savings accounts.
         public decimal CreateAccount(int userId, decimal balance)
         {
             decimal interest = 0.5m;
             /*Creation of object of the BankAccount class to represent an account held by a user,
-            rather than individual spaces to have money in.*/
+            that may both contain balance, and savingsAccounts.*/
             BankAccount userAccount = new BankAccount(userId, AccountNrGenerator(),
-                balance, interest, CheckCurrency()) ;
+                balance, interest, CheckCurrency() );
 
             BankAccountList.Add(userAccount);
             BankAccountDictionary.Add(userId, BankAccountList);
@@ -192,37 +222,6 @@ namespace BankApp.GustafsClasses
             }
             return false;
         }
-        //Generates random number for Account numbers of both savings accounts and bank accounts.
-        private int AccountNrGenerator()
-        {
-            Random random = new Random();
-            /*The while loop is a security measure that ensures that each account number for both savings,
-             * and bank accounts are unique by repeating when the number is identical to an already existing one in the bank.*/
-            while (true)
-            {
-                //Creating account number.
-                int accountNumber = random.Next(000000000, 999999999);
-                //Checking each bank account for identical integers.
-                foreach (var bAccount in BankAccountList)
-                {
-                    if (bAccount.GetBankAccountNumber() != accountNumber)
-                    {
-
-                        return accountNumber;
-                    }
-                    //Checking each savings account for identical integers.
-                    foreach (var sAccount in bAccount.SavingAccounts)
-                    {
-                        if (sAccount.GetSavingsAccountNumber() != accountNumber)
-                        {
-
-                            return accountNumber;
-                        }
-                    }
-                }
-            }
-            
-            
-        }
+        
     }
 }
