@@ -1,5 +1,8 @@
+
 using BankApp.GustafsClasses;
+using BankApp.Transaction_Layer.Enum;
 using BankApp.Transaction_Layer.Interface;
+using Org.BouncyCastle.Asn1.Cms;
 
 namespace BankApp.Transaction_Layer.Controller;
 
@@ -14,14 +17,22 @@ internal class AccountBridge(AccountManager accountManager) : IAccountBridge
 
     public void Deposit(int userID, int accountNumber, decimal amount)
     {
-        var savingsAccount = GetSavingsAccount(userID, accountNumber);
-        savingsAccount.TransferBalance(amount, true);
+        var accs = GetAccounts(userID, accountNumber);
+        if (accs.Item1.GetThresholdNotification(amount, TransactionType.Deposit) >= amount)
+        {
+            //call notification service when impl
+        }
+        accs.Item2.TransferBalance(amount, true);
     }
 
     public void Withdraw(int userID, int accountNumber, decimal amount)
     {
-        var savingAccount = GetSavingsAccount(userID, accountNumber);
-        savingAccount.TransferBalance(amount,false);
+        var accs = GetAccounts(userID, accountNumber);
+        if (accs.Item1.GetThresholdNotification(amount, TransactionType.Withdrawal) >= amount)
+        {
+            //call notification service when impl
+        }
+        accs.Item2.TransferBalance(amount, false);
     }
 
     private SavingsAccount GetSavingsAccount(int userID, int accountNumber)
@@ -34,4 +45,32 @@ internal class AccountBridge(AccountManager accountManager) : IAccountBridge
 
         return savingsAccount;
     }
+
+    private (BankAccount, SavingsAccount) GetAccounts(int userID, int accountNumber)
+    {
+        BankAccount? bankAccount = null;
+        SavingsAccount savingsAccount;
+        var bankAccounts = accountManager.BankAccountDictionary[userID] ?? throw new NullReferenceException($"No accounts connected to user ID {userID}");
+
+        foreach (var b in bankAccounts)
+        {
+            foreach (var s in b.SavingAccounts)
+            {
+                if (s.GetSavingsAccountNumber() == accountNumber)
+                {
+                    bankAccount = b;
+                    break;
+                }
+            }
+        }
+
+        if (bankAccount == null) throw new NullReferenceException($"Could not find bank account for user {userID} and account number{accountNumber}");
+
+        savingsAccount = bankAccount.SavingAccounts.FirstOrDefault(x => x.GetSavingsAccountNumber() == accountNumber) ?? throw new NullReferenceException($"No savings account connected to account number {accountNumber}");
+
+        (BankAccount, SavingsAccount) bns = new(bankAccount, savingsAccount);
+
+        return bns;
+    }
+
 }
