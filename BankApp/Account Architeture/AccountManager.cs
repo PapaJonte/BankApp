@@ -47,9 +47,8 @@ namespace BankApp.GustafsClasses
         public void CreateAccount(int userId, int bankAccountNumber, decimal balance, decimal interest, Currency currency)
         {
             /*Creation of object of the BankAccount class to represent an account held by a user,
-            rather than individual spaces to have money in.
-            Will need to add the CheckCurrency method in here instead of currency.*/
-            BankAccount userAccount = new BankAccount(userId, bankAccountNumber, balance, interest, currency);
+            rather than individual spaces to have money in.*/
+            BankAccount userAccount = new BankAccount(userId, bankAccountNumber, balance, interest, CheckCurrency());
 
             BankAccountList.Add(userAccount);
             BankAccountDictionary.Add(userId, BankAccountList);
