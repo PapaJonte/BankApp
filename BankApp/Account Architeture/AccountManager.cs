@@ -99,23 +99,34 @@ namespace BankApp.GustafsClasses
          * It merely allows you to see the balance and currency of savingsAccounts.*/
         public void GetAccounts( int userId)
         {
-            foreach (var bAccount in BankAccountList)
+            if (BankAccountList.Count != 0)
             {
-                if (bAccount.GetUserId() == userId)
+                foreach (var bAccount in BankAccountList)
                 {
-                    if (bAccount.SavingAccounts.Count > 0 )
+                    if (bAccount.GetUserId() == userId)
                     {
-                        foreach (var sAccount in bAccount.SavingAccounts)
+                        Console.WriteLine(bAccount.GetBalance() + " " + bAccount.GetCurrency());
+
+                        if (bAccount.SavingAccounts.Count > 0)
                         {
-                            //Displays balance and currency of account.
-                            Console.WriteLine(sAccount.GetBalance() + " " + sAccount.GetCurrency() );
+                            foreach (var sAccount in bAccount.SavingAccounts)
+                            {
+                                //Displays balance and currency of account.
+                                Console.WriteLine(
+                                    sAccount.GetBalance() + " " + sAccount.GetCurrency()
+                                    );
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("You have no savings accounts in the bank.");
                         }
                     }
-                    else
-                    {
-                        Console.WriteLine("Error! You have no accounts in the bank.");
-                    }
                 }
+            }
+            else
+            {
+                Console.WriteLine("Error! You have no accounts in the bank.");
             }
         }
 
