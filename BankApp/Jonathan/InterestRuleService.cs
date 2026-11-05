@@ -33,6 +33,12 @@ namespace BankApp.Jonathan
                 throw new ArgumentOutOfRangeException(nameof(creditScore), "Credit score must be between 0 and 100.");
             }
 
+            // A perfect credit score always get the base interest rate
+            if (creditScore == 100)
+            {
+                return 0m;
+            }
+
             foreach (InterestRule rule in interestRules)
             {
                 if (creditScore >= rule.MinimumCreditScore && creditScore <= rule.MaximumCreditScore)
