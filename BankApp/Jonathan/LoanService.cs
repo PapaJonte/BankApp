@@ -76,6 +76,9 @@ namespace BankApp.Jonathan
             // Fetch calculators from our InterestCalculator class
             InterestCalculator calculator = new InterestCalculator(interestRuleService);
 
+            // Apply any outstanding score deductions before pricing the new loan
+            UpdateLatePayments(userId, DateTime.Today);
+
             int creditScore = creditScoreService.GetCreditScore(userId);
 
             decimal interestRate = calculator.GetInterestRate(duration, creditScore);
@@ -296,11 +299,6 @@ namespace BankApp.Jonathan
                             // Updates the loan status
                             loan.UpdateStatus(newStatus);
 
-                            // Starts the monthly repayment schedule if the loan was approved
-                            if (newStatus == LoanStatus.Approved)
-                            {
-                                loan.StartRepaymentSchedule(DateTime.Today);
-                            }
                             return true;
                         }
                     }
@@ -338,6 +336,34 @@ namespace BankApp.Jonathan
             return true;
         }
 
+        public bool ConfirmLoanPayout(int loanId, DateTime creditedDate)
+        {
+            // Only a confirmed deposit for an approved loan starts repayment
+            Loan? loan = GetLoanById(loanId);
+            
+            if (loan == null || loan.Status != LoanStatus.Approved)
+            {
+                return false;
+            }
+                
+            loan.StartRepaymentSchedule(creditedDate);
+            return true;
+        }
+
+        public void UpdateLatePayments(int userId, DateTime today)
+        {
+            foreach (Loan loan in GetCustomersLoan(userId))
+            {
+                // Repeated checks only charge bills that have become due since the last check
+                int newDeductions = loan.UpdateLateBills(today);
+                
+                if (newDeductions > 0)
+                {
+                    creditScoreService.DecreaseCreditScore(userId, newDeductions * 10);
+                }
+            }
+        }
+
         public bool RepayLoan(int loanId, decimal paymentAmount)
         {
             // Find the loan
@@ -363,12 +389,6 @@ namespace BankApp.Jonathan
                         return false;
                     }
 
-                    // Checks if the payment exceeds the remaining loan balance
-                    if (paymentAmount > loan.RemainingLoanBalance)
-                    {
-                        return false;
-                    }
-
                     // Gets the current month of the loan
                     int currentMonth = loan.PaymentsCompleted + 1;
 
@@ -388,8 +408,8 @@ namespace BankApp.Jonathan
                     // Calculates the interest based on the remaining loan balance
                     decimal interest = calculator.CalculateMonthlyInterest(loan.RemainingLoanBalance, loan.InterestRate);
 
-                    // Calculates the total monthly payment
-                    decimal monthlyPayment = amortization + interest;
+                    // A late payment must cover principal, interest and all accumulated fees
+                    decimal monthlyPayment = amortization + interest + loan.LateFees;
 
                     // Checks that the payment matches the required total payment
                     if (paymentAmount != monthlyPayment)

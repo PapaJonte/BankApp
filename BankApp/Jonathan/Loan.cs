@@ -18,13 +18,18 @@ namespace BankApp.Jonathan
         public bool PayoutRequested { get; private set; } = false;
         
         // Repayment tracking
-        public DateTime? ApprovalDate { get; private set; }
+        public DateTime? PayoutDate { get; private set; }
         public DateTime? NextPaymentDate { get; private set; }
         public int PaymentsCompleted { get; private set; } = 0;
         public decimal InterestPaid { get; private set; } = 0m;
-        public int ConsecutiveMissedPayments { get; private set; } = 0;
+        public int LateBillsIssued { get; private set; }
 
-        // The regular bank accoun selected to receive the loan payout
+        // First missed payment adds a 75 SEK fee, the next adds 150 SEK each
+        public decimal LateFees => LateBillsIssued == 0 ? 0m : 75m + (LateBillsIssued - 1) * 150m;
+        // Adds a 7 day deadline to pay the new penalty bill
+        public DateTime? LateBillDeadLine => LateBillsIssued > 0 && NextPaymentDate is DateTime dueDate ? dueDate.AddDays(LateBillsIssued * 7) : null;
+
+        // The regular bank account selected to receive the loan payout
         public string DestinationAccountNumber { get; private set; } = string.Empty;
 
         // Creates a loan and sets its original and remaining balance
@@ -93,23 +98,23 @@ namespace BankApp.Jonathan
             Status = newStatus;
         }
 
-        internal void StartRepaymentSchedule(DateTime approvalDate)
+        internal void StartRepaymentSchedule(DateTime creditedDate)
         {
+            // A repeated confirmation must preserve the original repayment schedule
+            if (PayoutDate.HasValue)
+            {
+                return;
+            }
+
             // Checks that the loan has been approved
             if (Status != LoanStatus.Approved)
             {
                 throw new InvalidOperationException("Only approved loans can start a repayment schedule.");
             }
 
-            // Prevents the repayment schedule from being started more than once
-            if (ApprovalDate.HasValue)
-            {
-                throw new InvalidOperationException("The repayment schedule has already started.");
-            }
-
-            // Sets the approval date and the first monthly payment date
-            ApprovalDate = approvalDate;
-            NextPaymentDate = approvalDate.AddMonths(1);
+            // The first installment is due one month after the payout is credited
+            NextPaymentDate = creditedDate.Date.AddMonths(1);
+            PayoutDate = creditedDate.Date;
         }
 
         internal void RecordMonthlyPayment(decimal interestAmount, decimal amortizationAmount)
@@ -146,8 +151,8 @@ namespace BankApp.Jonathan
             // Increases the number of completed monthly payments
             PaymentsCompleted++;
 
-            // Resets the missed payment counter after a succesful payment
-            ConsecutiveMissedPayments = 0;
+            // The confirmed payment covers the installment and all its late fees
+            LateBillsIssued = 0;
 
             // Moves the next payment date forward by one month
             if (PaymentsCompleted < Duration && RemainingLoanBalance > 0)
@@ -173,6 +178,28 @@ namespace BankApp.Jonathan
             }
 
             PayoutRequested = true;
+        }
+
+        internal int UpdateLateBills(DateTime today)
+        {
+            if (NextPaymentDate is not DateTime dueDate || today.Date <= dueDate.Date)
+            {
+                return 0;
+            }
+
+            // Issue the first bill the day after the due date, then one every 7 days
+            int daysLate = (today.Date - dueDate.Date).Days;
+            int billsDue = 1 + (daysLate - 1) / 7;
+
+            if (billsDue <= LateBillsIssued)
+            {
+                return 0;
+            }
+
+            // Count only newly issued bills after the first one for score deductions
+            int newDeductions = billsDue - Math.Max(1, LateBillsIssued);
+            LateBillsIssued = billsDue;
+            return newDeductions;
         }
     }
 }

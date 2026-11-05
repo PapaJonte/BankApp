@@ -17,7 +17,10 @@ namespace BankApp
         {
 
             Theme theme = new Theme();
-            AccountManager accountManager = new AccountManager();
+            #region  ExchangeRate Module
+            ExchangeRate exchangeRateModule = new();
+            #endregion
+            AccountManager accountManager = new AccountManager(exchangeRateModule);
             UserService userService = new UserService(accountManager);
             AuthService authService = new AuthService(userService);
             CreditScoreService creditScoreService = new CreditScoreService();
@@ -26,9 +29,7 @@ namespace BankApp
 
             #region Transactions
             AccountBridge accountBridge = new(accountManager);
-            #region  ExchangeRate Module
-            ExchangeRate exchangeRateModule = new();
-            #endregion
+            
             #region Transaction Module
             TransactionScheduler transactionScheduler = new();
             TransactionRegistry transactionRegistry = new();

@@ -25,19 +25,6 @@ namespace BankApp.Robin
         // Handles loan applications
         public Loan? ApplyForLoan(int userId, decimal requestedAmount, int duration)
         {
-            // Gets the customers combined total balance
-            decimal totalAccountBalance;
-
-            try
-            {
-                totalAccountBalance = accountManager.GetTotalBalance(userId);
-            }
-            catch (InvalidOperationException)
-            {
-                Console.WriteLine("Your total balance could not be calculated because an exchange rate is unavailable. Please try again later.");
-                return null;
-            }
-
             // Retrieve all bank accounts belonging to the customer
             List<BankAccount> customerAccounts = accountManager.BankAccountList
                 .Where(account => account.GetUserId() == userId)
@@ -50,12 +37,12 @@ namespace BankApp.Robin
                 return null;
             }
 
-            // Display the customer's available bank accounts
-            Console.WriteLine("\nSelect an account to receive your loan;");
+            // List the customer's payout account and their currencies
+            Console.WriteLine("\nSelect an account to receive your loan:");
 
             foreach (BankAccount account in customerAccounts)
             {
-                Console.WriteLine($"Account number: {account.GetBankAccountNumber()}");
+                Console.WriteLine($"Account number: {account.GetBankAccountNumber()} ({account.GetCurrency()})");
             }
 
             // Ask the customer which account should receive the loan
@@ -74,6 +61,19 @@ namespace BankApp.Robin
                 return null;
             }
 
+            // Gets the customers combined total balance
+            decimal totalAccountBalance;
+
+            try
+            {
+                totalAccountBalance = accountManager.GetTotalBalance(userId);
+            }
+            catch (InvalidOperationException)
+            {
+                Console.WriteLine("Your total balance could not be calculated because an exchange rate is unavailable. Please try again later.");
+                return null;
+            }
+
             // Convert the account number to a string for the transaction system
             string destinationAccountNumber = selectedAccountNumber.ToString();
 
@@ -88,9 +88,9 @@ namespace BankApp.Robin
             }
 
             // Display the loan details
-            Console.WriteLine($"Loan ID: {loan.LoanId}\nLoan amount: {loan.LoanAmount} SEK\n" +
-                $"Interest rate: {loan.InterestRate}%\nTotal interest: {loan.TotalInterest}\n" +
-                $"Total repayment: {loan.TotalRepayment}\nStatus: {loan.Status}");
+            Console.WriteLine($"Application submitted.\nLoan ID: {loan.LoanId}\nStatus: {loan.Status}\nLoan amount: {loan.LoanAmount} SEK\n" +
+                $"Term: {loan.Duration} months\nInterest rate: {loan.InterestRate}%\nTotal interest over the loan term: {loan.TotalInterest:N2} SEK\n" +
+                $"Total repayment: {loan.TotalRepayment:N2} SEK");
             return loan;
         }
 
@@ -152,40 +152,61 @@ namespace BankApp.Robin
             return true;
         }
 
-        // Handles a customer's loan repayment
-        // TO DO: Connect to the withdrawal system when ready
-        public bool RepayLoan(int userId, int loanId, decimal paymentAmount)
+        private void PrepareLoanRepayment(int userId, int loanId)
         {
-            // Find the requested loan and verify that it belongs to the customer
-            Loan? loan = loanService.GetCustomersLoan(userId).Find(loanItem => loanItem.LoanId == loanId);
+            // Only show payment details for a loan owned by this customer
+            Loan? loan = loanService.GetCustomersLoan(userId).Find(item => item.LoanId == loanId);
 
             if (loan == null)
             {
                 Console.WriteLine("Loan not found.");
-                return false;
+                return;
             }
 
-            // Only approved loans can be repaid
-            if (loan.Status != LoanStatus.Approved)
+            if (loan.NextPaymentDate is not DateTime dueDate)
             {
-                Console.WriteLine("Only approved loans can be repaid.");
-                return false;
+                Console.WriteLine("There is no scheduled payment for this loan.");
+                return;
             }
 
-            // Validate the repayment amount
-            if (paymentAmount <= 0 || paymentAmount > loan.RemainingLoanBalance)
+            // The repay amount includes any fees on the current installment
+            decimal paymentAmount = loanService.GetMonthlyPayment(loanId) + loan.LateFees;
+
+            if (loan.LateBillDeadLine is DateTime deadline)
             {
-                Console.WriteLine("Invalid repayment amount.");
-                return false;
+                Console.WriteLine($"Late payment. Pay {paymentAmount:N2} SEK by {deadline:yy-MM-dd}.");
+            }
+            else
+            {
+                Console.WriteLine($"Installment due on {dueDate:yy-MM-dd}: {paymentAmount:N2} SEK");
             }
 
-            // TO DO: Whitdraw the payment from the customer's selected account
+            // List only regular bank accounts owned by this customer
+            var accounts = accountManager.BankAccountList
+                .Where(account => account.GetUserId() == userId)
+                .ToList();
 
-            // TO DO: Only update the loan balance after payment is confirmed
+            if (accounts.Count == 0)
+            {
+                Console.WriteLine("You have no regular accounts to pay from.");
+                return;
+            }
 
-            Console.WriteLine($"Repayment of {paymentAmount} SEK, validated for loan #{loanId}. " +
-                $"Payment processing is not yet connected.");
-            return true;
+            // Show the customer's regular accounts before asking them to choose
+            foreach (BankAccount account in accounts)
+            {
+                Console.WriteLine($"{account.GetBankAccountNumber()} ({account.GetCurrency()})");
+            }
+
+            Console.WriteLine("Enter the account number to pay from: ");
+            
+            if(!int.TryParse(Console.ReadLine(), out int accountNumber) || !accounts.Any(account => account.GetBankAccountNumber() == accountNumber))
+            {
+                Console.WriteLine("Select one of the listed accounts,");
+                return;
+            }
+
+            Console.WriteLine($"Selected account: {accountNumber}. Payments are unavailable right now.");
         }
 
 
@@ -241,23 +262,36 @@ namespace BankApp.Robin
                     case ConsoleKey.Enter:
                         Console.Clear();
 
+                        // Refresh overdue bills before handling the selected loan option
+                        loanService.UpdateLatePayments(userId, DateTime.Today);
+
                         switch (selectedOption)
                         {
                             case 0:
                                 // Apply for a new loan
                                 Console.Write("Enter the loan amount (SEK): ");
 
-                                if (!decimal.TryParse(Console.ReadLine(), out decimal amount))
+                                // Safeguard to positive amounts rounded to two decimal points
+                                if (!decimal.TryParse(Console.ReadLine(), out decimal amount) || amount <= 0m || amount != decimal.Round(amount, 2))
                                 {
-                                    Console.WriteLine("Invalid loan amount.");
+                                    Console.WriteLine("Enter a positive amount with at most two decimal points.");
                                     break;
                                 }
 
                                 Console.Write("Enter the duration in months (12-144): ");
 
-                                if (!int.TryParse(Console.ReadLine(), out int duration))
+                                // Safeguard to stay within the available loan duration
+                                if (!int.TryParse(Console.ReadLine(), out int duration) || duration < 12 || duration > 144)
                                 {
-                                    Console.WriteLine("Invalid duration.");
+                                    Console.WriteLine("Enter a duration between 12 and 144 months.");
+                                    break;
+                                }
+
+                                // Each monthly installment must repay at least one öre of principal
+                                decimal minimumAmount = duration / 100m;
+                                if (amount < minimumAmount)
+                                {
+                                    Console.WriteLine($"The minimum amount for this term is {minimumAmount:N2} SEK.");
                                     break;
                                 }
 
@@ -278,9 +312,32 @@ namespace BankApp.Robin
                                     foreach (Loan loan in loans)
                                     {
                                         Console.WriteLine($"\nLoan ID: {loan.LoanId}");
-                                        Console.WriteLine($"Status: {loan.Status}");
+
+                                        // Show paid off once the final payment clears the remaining principal
+                                        string status = loan.RemainingLoanBalance == 0m ? "Paid off" : loan.Status.ToString();
+                                        
+                                        Console.WriteLine($"Status: {status}");
                                         Console.WriteLine($"Loan amount: {loan.LoanAmount:N2} SEK");
                                         Console.WriteLine($"Remaining balance: {loan.RemainingLoanBalance:N2} SEK");
+                                        
+                                        // Show the next installment once the repayment schedule has started
+                                        if (loan.NextPaymentDate is DateTime dueDate)
+                                        {
+                                            decimal monthlyPayment = loanService.GetMonthlyPayment(loan.LoanId);
+                                            
+                                            // Shows the current late bill or the regular installment
+                                            if (loan.LateBillDeadLine is DateTime deadline)
+                                            {
+                                                decimal amountDue = monthlyPayment + loan.LateFees;
+                                                Console.WriteLine($"Late payment. Pay {amountDue:N2} SEK by {deadline:yy-MM-dd}.");
+                                                Console.WriteLine($"Late fees included: {loan.LateFees:N2} SEK");
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine($"Next payment due: {dueDate:yy-MM-dd}");
+                                                Console.WriteLine($"Next installment: {monthlyPayment:N2} SEK");
+                                            }
+                                        }
                                         Console.WriteLine($"Interest rate: {loan.InterestRate}%");
                                         Console.WriteLine($"Duration: {loan.Duration} months");
                                         Console.WriteLine($"Total interest: {loan.TotalInterest:N2} SEK");
@@ -300,16 +357,8 @@ namespace BankApp.Robin
                                     break;
                                 }
 
-                                Console.Write("Enter the repayment amount (SEK): ");
-
-                                if (!decimal.TryParse(Console.ReadLine(), out decimal paymentAmount))
-                                {
-                                    Console.WriteLine("Invalid repayment amount.");
-                                    break;
-                                }
-
-                                // Validates the repayment request
-                                RepayLoan(userId, loanId, paymentAmount);
+                                // Use the scheduled installment instead of asking for an amount
+                                PrepareLoanRepayment(userId, loanId);
                                 break;
 
                             case 3:
