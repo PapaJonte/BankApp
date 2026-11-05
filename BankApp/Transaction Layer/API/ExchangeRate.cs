@@ -70,12 +70,12 @@ public class ExchangeRate
     /// <returns>
     /// StatusCode representing result of the calculation
     /// </returns>
-    public StatusCode TryCalculateExchangeValue(Currency cur1, Currency cur2, decimal value, out decimal calculatedAmount)
+    public StatusCode TryCalculateExchangeValue(Currency cur_from, Currency cur_to, decimal value_from, out decimal calculatedAmount)
     {
         calculatedAmount = 0;
-        if (exchangeRateRegistry.TryGetExchangeRate(cur1, cur2, out decimal exchangeRate))
+        if (exchangeRateRegistry.TryGetExchangeRate(cur_from, cur_to, out decimal exchangeRate))
         {
-            calculatedAmount = ExchangeRateCalculator.CalculateWithExchangeRate(value, exchangeRate);
+            calculatedAmount = ExchangeRateCalculator.CalculateWithExchangeRate(value_from, exchangeRate);
             return StatusCode.Successful;
         }
         else
