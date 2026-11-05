@@ -80,7 +80,7 @@ namespace BankApp.GustafsClasses
             /*Creation of object of the BankAccount class to represent an account held by a user,
             that may both contain balance, and savingsAccounts.*/
             BankAccount userAccount = new BankAccount(userId, AccountNrGenerator(),
-                balance, interest, CheckCurrency() );
+                balance, interest, Currency.SEK);
 
             BankAccountList.Add(userAccount);
             BankAccountDictionary.Add(userId, BankAccountList);
@@ -89,6 +89,7 @@ namespace BankApp.GustafsClasses
         //Used for creating savings accounts. The savings accounts store the balance.
         public decimal CreateSavingsAccount(int userId)
         {
+            Enum.GetValues<Currency>();
             //Return data.
             decimal interest = 0.5m;
             if (BankAccountList.Count > 0)
@@ -113,7 +114,7 @@ namespace BankApp.GustafsClasses
                         if (Int32.TryParse(stringInput, out convertedInput))
                         {
                             SavingsAccount savingsAccount = new SavingsAccount(
-                            convertedInput, CheckCurrency(), interest, AccountNrGenerator() );
+                            convertedInput, Currency.SEK, interest, AccountNrGenerator() );
 
                             account.SavingAccounts.Add(savingsAccount);
                         }
