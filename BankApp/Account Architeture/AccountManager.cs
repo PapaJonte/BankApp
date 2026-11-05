@@ -55,16 +55,17 @@ namespace BankApp.GustafsClasses
             BankAccountDictionary.Add(userId, BankAccountList);
         }
         //Used for creating savings accounts. The savings accounts store the balance.
-        public void CreateSavingsAccount(int userId, int SavingsAccountNumber)
+        public decimal CreateSavingsAccount(int userId, int SavingsAccountNumber)
         {
+            //Return data.
+            decimal interest = 0.5m;
             if (BankAccountList.Count > 0)
             {
                 foreach (var account in BankAccountList)
                 {
                     if (account.GetUserId() == userId)
                     {
-                        //Make this into return data.
-                        decimal interest = 0.5m;
+                        
 
                         //Communication is needed before I adapt this one further.
                         Console.WriteLine(
@@ -90,6 +91,7 @@ namespace BankApp.GustafsClasses
                     }
                 }
             }
+            return interest;
         }
 
         /*Method for accessing the savingsaccounts.
@@ -187,7 +189,7 @@ namespace BankApp.GustafsClasses
             }
             return false;
         }
-
+        //Change this one into private and put it inside of methods that create accounts.
         public static int AccountNrGenerator()
         {
             Random random = new Random();
