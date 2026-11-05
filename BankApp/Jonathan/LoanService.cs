@@ -364,7 +364,7 @@ namespace BankApp.Jonathan
             }
         }
 
-        public bool RepayLoan(int loanId, decimal paymentAmount)
+        public bool RepayLoan(int loanId, decimal paymentAmount, DateTime submittedDate)
         {
             // Find the loan
             foreach (Loan loan in loans)
@@ -418,7 +418,15 @@ namespace BankApp.Jonathan
                     }
 
                     // Records the payment and updates the repayment schedule
-                    loan.RecordMonthlyPayment(interest, amortization);
+                    loan.RecordMonthlyPayment(interest, amortization, submittedDate);
+
+                    // Award 5 creditscore points for ever 3 consecutive on-time installments
+                    int streak = loan.ConsecutiveOnTimePayments;
+                    
+                    if (streak > 0 && streak % 3 == 0)
+                    {
+                        creditScoreService.IncreaseCreditScore(loan.UserId, 5);
+                    }
 
                     return true;
                 }

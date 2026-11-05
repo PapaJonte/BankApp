@@ -21,6 +21,7 @@ namespace BankApp.Jonathan
         public DateTime? PayoutDate { get; private set; }
         public DateTime? NextPaymentDate { get; private set; }
         public int PaymentsCompleted { get; private set; } = 0;
+        public int ConsecutiveOnTimePayments { get; private set; }
         public decimal InterestPaid { get; private set; } = 0m;
         public int LateBillsIssued { get; private set; }
 
@@ -117,7 +118,7 @@ namespace BankApp.Jonathan
             PayoutDate = creditedDate.Date;
         }
 
-        internal void RecordMonthlyPayment(decimal interestAmount, decimal amortizationAmount)
+        internal void RecordMonthlyPayment(decimal interestAmount, decimal amortizationAmount, DateTime submittedDate)
         {
             // Checks that the repayment schedule has started
             if (!NextPaymentDate.HasValue)
@@ -150,6 +151,9 @@ namespace BankApp.Jonathan
 
             // Increases the number of completed monthly payments
             PaymentsCompleted++;
+
+            // Compare against this installment's due date before advancing the schedule
+            ConsecutiveOnTimePayments = submittedDate.Date <= NextPaymentDate.Value.Date ? ConsecutiveOnTimePayments + 1 : 0;
 
             // The confirmed payment covers the installment and all its late fees
             LateBillsIssued = 0;
