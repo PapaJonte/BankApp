@@ -21,31 +21,7 @@ namespace BankApp.Jonathan
 
         public decimal GetInterestRate(int duration)
         {
-            // Failsafe if months are incorrect for our 1-12 year long loans
-            if (duration < 12 || duration > 144)
-            {
-                throw new ArgumentOutOfRangeException(nameof(duration), "Loan duration must be between 12 and 144 months.");
-            }
-
-            // Interest rates for different loan durations
-
-            if (duration <= 24) // 1-2 years
-                return 6.5m;
-
-            if (duration <= 48) // 3-4 years
-                return 7.0m;
-
-            if (duration <= 72) // 5-6 years
-                return 7.5m;
-
-            if (duration <= 96) // 7-8 years
-                return 8.2m;
-
-            if (duration <= 120) // 9-10 years
-                return 8.75m;
-
-            return 9.25m; // 11-12 years
-
+            return interestRuleService.GetBaseInterestRate(duration);
         }
 
         public decimal GetInterestRate(int duration, int creditScore)
@@ -76,8 +52,8 @@ namespace BankApp.Jonathan
                 throw new ArgumentOutOfRangeException(nameof(duration), "Loan duration must be between 12 and 144 months.");
             }
 
-            // Rounding it to 2 decimals for ören
-            return Math.Round(amount / duration, 2);
+            // Round down so the final payment can clear the remaining principal
+            return Math.Round(amount / duration, 2, MidpointRounding.ToZero);
         }
         
         public decimal CalculateMonthlyInterest(decimal remainingBalance, decimal annualInterestRate)

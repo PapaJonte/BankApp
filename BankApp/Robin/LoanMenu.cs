@@ -26,7 +26,17 @@ namespace BankApp.Robin
         public Loan? ApplyForLoan(int userId, decimal requestedAmount, int duration)
         {
             // Gets the customers combined total balance
-            decimal totalAccountBalance = accountManager.GetTotalBalance(userId);
+            decimal totalAccountBalance;
+
+            try
+            {
+                totalAccountBalance = accountManager.GetTotalBalance(userId);
+            }
+            catch (InvalidOperationException)
+            {
+                Console.WriteLine("Your total balance could not be calculated because an exchange rate is unavailable. Please try again later.");
+                return null;
+            }
 
             // Retrieve all bank accounts belonging to the customer
             List<BankAccount> customerAccounts = accountManager.BankAccountList
@@ -97,7 +107,16 @@ namespace BankApp.Robin
             }
 
             // Gets the customer's total balance from their bank accounts
-            decimal totalAccountBalance = accountManager.GetTotalBalance(loan.UserId);
+            decimal totalAccountBalance;
+            try
+            {
+                totalAccountBalance = accountManager.GetTotalBalance(loan.UserId);
+            }
+            catch (InvalidOperationException)
+            {
+                Console.WriteLine("The loan status could not be changed becase an exchange rate is unavailable.");
+                return false;
+            }
 
             // Attempts to update the loan status
             bool statusChanged = loanService.ChangeLoanStatus(loanId, newStatus, totalAccountBalance);

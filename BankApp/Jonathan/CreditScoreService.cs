@@ -62,7 +62,7 @@ namespace BankApp.Jonathan
             int currentCreditScore = GetCreditScore(userId);
 
             // Increases the score without exceeding 100
-            int newCreditScore = Math.Min(100, currentCreditScore + amount);
+            int newCreditScore = currentCreditScore + Math.Min(amount, 100 - currentCreditScore);
 
             UpdateCreditScore(userId, newCreditScore);
         }

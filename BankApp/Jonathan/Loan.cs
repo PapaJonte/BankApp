@@ -10,10 +10,10 @@ namespace BankApp.Jonathan
         public int LoanId { get; set; }
         public decimal LoanAmount { get; private set; }
         public decimal RemainingLoanBalance { get; private set; }
-        public decimal InterestRate { get; set; }
-        public int Duration { get; set; }
-        public decimal TotalInterest { get; set; }
-        public decimal TotalRepayment { get; set; }
+        public decimal InterestRate { get; }
+        public int Duration { get; }
+        public decimal TotalInterest { get; }
+        public decimal TotalRepayment { get; }
         public LoanStatus Status { get; private set; } = LoanStatus.Pending;
         public bool PayoutRequested { get; private set; } = false;
         
@@ -28,7 +28,7 @@ namespace BankApp.Jonathan
         public string DestinationAccountNumber { get; private set; } = string.Empty;
 
         // Creates a loan and sets its original and remaining balance
-        public Loan(decimal amount)
+        public Loan(decimal amount, int duration, decimal interestRate, decimal totalInterest)
         {
             // Checks if the loan amount is greater than zero
             if (amount <= 0)
@@ -39,6 +39,10 @@ namespace BankApp.Jonathan
             // Sets the original loan amount and remaining balance
             LoanAmount = amount;
             RemainingLoanBalance = amount;
+            Duration = duration;
+            InterestRate = interestRate;
+            TotalInterest = totalInterest;
+            TotalRepayment = amount + totalInterest;
         }
 
         // Assigns the destination account when the loan application is created
@@ -129,6 +133,11 @@ namespace BankApp.Jonathan
             }
 
             // Reduces the remaining loan balance by the amortization amount
+            if (PaymentsCompleted == Duration - 1)
+            {
+                amortizationAmount = RemainingLoanBalance;
+            }
+
             ReduceBalance(amortizationAmount);
 
             // Adds the paid interest to the total intrest paid
@@ -141,7 +150,7 @@ namespace BankApp.Jonathan
             ConsecutiveMissedPayments = 0;
 
             // Moves the next payment date forward by one month
-            if (PaymentsCompleted < Duration)
+            if (PaymentsCompleted < Duration && RemainingLoanBalance > 0)
             {
                 NextPaymentDate = NextPaymentDate.Value.AddMonths(1);
             }
