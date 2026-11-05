@@ -44,26 +44,30 @@ namespace BankApp.GustafsClasses
             }
         }
         //This method will create a bank account. Not to be confused with a savings account. Bank accounts store the savings accounts.
-        public void CreateAccount(int userId, int bankAccountNumber, decimal balance, decimal interest, Currency currency)
+        public decimal CreateAccount(int userId, decimal balance)
         {
+            decimal interest = 0.5m;
             /*Creation of object of the BankAccount class to represent an account held by a user,
             rather than individual spaces to have money in.*/
-            BankAccount userAccount = new BankAccount(userId, bankAccountNumber, balance, interest, currency);
+            BankAccount userAccount = new BankAccount(userId, AccountNrGenerator(),
+                balance, interest, CheckCurrency()) ;
 
             BankAccountList.Add(userAccount);
             BankAccountDictionary.Add(userId, BankAccountList);
+            return interest;
         }
         //Used for creating savings accounts. The savings accounts store the balance.
-        public void CreateSavingsAccount(int userId, int SavingsAccountNumber)
+        public decimal CreateSavingsAccount(int userId)
         {
+            //Return data.
+            decimal interest = 0.5m;
             if (BankAccountList.Count > 0)
             {
                 foreach (var account in BankAccountList)
                 {
                     if (account.GetUserId() == userId)
                     {
-                        //Interest for savings accounts.
-                        decimal interest = 0.5m;
+                        
 
                         //Communication is needed before I adapt this one further.
                         Console.WriteLine(
@@ -78,7 +82,7 @@ namespace BankApp.GustafsClasses
                         if (Int32.TryParse(stringInput, out convertedInput))
                         {
                             SavingsAccount savingsAccount = new SavingsAccount(
-                            convertedInput, CheckCurrency(), interest, SavingsAccountNumber);
+                            convertedInput, CheckCurrency(), interest, AccountNrGenerator() );
 
                             account.SavingAccounts.Add(savingsAccount);
                         }
@@ -89,6 +93,7 @@ namespace BankApp.GustafsClasses
                     }
                 }
             }
+            return interest;
         }
 
         /*Method for accessing the savingsaccounts.
@@ -185,6 +190,14 @@ namespace BankApp.GustafsClasses
                 }
             }
             return false;
+        }
+        //Generates random number for Account numbers of both savings accounts and bank accounts.
+        private int AccountNrGenerator()
+        {
+            Random random = new Random();
+            int accountNumber = random.Next(000000000, 999999999);
+
+            return accountNumber;
         }
     }
 }
