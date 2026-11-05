@@ -333,7 +333,7 @@ namespace BankApp.Robin
                             case 1:
 
                                 _accountManager.CreateAccount(_userService.GetLoggedInUser().UserId, 0m);
-
+                                _accountManager.GetAccounts(_authService.LoggedInUser.UserID);
                                 break;
 
                             case 2:
