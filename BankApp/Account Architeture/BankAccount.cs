@@ -56,7 +56,23 @@ namespace BankApp.GustafsClasses
                 balance = balance - transferSum;
             }
         }
+        //Method that notifies of threshold being met at transfer.
+        public int GetThresholdNotification(decimal transferSum, TransactionType transactionType)
+        {
+            int transferThreshold;
+            Enum.GetValues<TransactionType>();
 
+            if (transactionType == TransactionType.Deposit)
+            {
+                transferThreshold = 10000;
+                return transferThreshold;
+            }
+            else
+            {
+                transferThreshold = -10000;
+                return transferThreshold;
+            }
+        }
         //Method that returns account balance.
         public decimal GetBalance()
         {
