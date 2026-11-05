@@ -61,10 +61,13 @@ namespace BankApp.GustafsClasses
                 balance, Currency.SEK);
 
             BankAccountList.Add(userAccount);
-            if (BankAccountDictionary.Count == 0)
+            if (!BankAccountDictionary.TryGetValue(userId, out var customerAccounts))
             {
-                BankAccountDictionary.Add(userId, BankAccountList);
+                customerAccounts = new List<BankAccount>();
+                BankAccountDictionary.Add(userId, customerAccounts);
             }
+
+            customerAccounts.Add(userAccount);
         }
         //Used for creating savings accounts. The savings accounts store the balance.
         public decimal CreateSavingsAccount(int userId, decimal balance)
