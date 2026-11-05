@@ -21,14 +21,82 @@ namespace BankApp.Robin
             this.bankTransfer = bankTransfer;
         }
 
+        private void UpdateCreditScoreAdjustment()
+        {
+            // Show the existing brackets so the admin can choose which rule to update
+            Console.WriteLine("Credit-score brackets: 0-29, 30-49, 50-69, 70-89, 90-100");
+
+            Console.Write("Minimum score: ");
+            bool validMinimum = int.TryParse(Console.ReadLine(), out int minimum);
+
+            Console.Write("Maximum score: ");
+            bool validMaximum = int.TryParse(Console.ReadLine(), out int maximum);
+
+            // This adjustment is added to the base rate in percentage points
+            Console.Write("Interest adjustment in percentage points: ");
+            bool validAdjustment = decimal.TryParse(Console.ReadLine(), out decimal adjustment);
+
+            if(!validMinimum || !validMaximum || !validAdjustment || adjustment < 0)
+            {
+                Console.WriteLine("Enter a valid score bracket and a non-negative adjustment");
+                return;
+            }
+
+            try
+            {
+                // New applications use the updated rule, submitted loans keep their quoted rates
+                loanService.UpdateInterestRule(minimum, maximum, adjustment);
+                Console.WriteLine("Interest rule updated for new loan application");
+            }
+            catch (InvalidOperationException)
+            {
+                // Both bounds must be an existing bracket
+                Console.WriteLine("Enter one of the existing score brackets exactly.");
+            }
+        }
+
+        private void UpdateBaseRate()
+        {
+            // Show the supported brackets so the admin can enter both bounds
+            Console.WriteLine("Duration brackets in months: 12-24, 25-48, 49-72, 73-96, 97-120, 121-144");
+
+            Console.Write("Minimum duration: ");
+            bool validMinimum = int.TryParse(Console.ReadLine(), out int minimum);
+
+            Console.Write("Maximum duration: ");
+            bool validMaximum = int.TryParse(Console.ReadLine(), out int maximum);
+
+            // Enter the annual rate as a percentage, for example 7 for 7%
+            Console.Write("New annual base rate (%): ");
+            bool validRate = decimal.TryParse(Console.ReadLine(), out decimal rate);
+
+            // Validate the input before passing it to the service
+            if (!validMinimum || !validMaximum || !validRate || rate < 0)
+            {
+                Console.WriteLine("Enter a valid duration bracket and a non-negative rate.");
+                return;
+            }
+
+            // Both bounds must match the same existing bracket
+            if (!loanService.UpdateBaseInterestRate(minimum, maximum, rate))
+            {
+                Console.WriteLine("Enter one of the existing duration brackets exactly.");
+                return;
+            }
+
+            Console.WriteLine("Base rate updated for new loan applications.");
+        }
+
         // Displays the menu
         public void ShowAdminLoanMenu(int userId)
         {
             string[] options =
             {
                 "View pending loans",
-                "Approva a loan",
+                "Approve a loan",
                 "Reject a loan",
+                "Update credit-score interest adjustment",
+                "Update base interest rate",
                 "Return to admin menu"
             };
 
@@ -136,16 +204,26 @@ namespace BankApp.Robin
                                 }
 
                                 // Retrieve the customer's total account balance
-                                decimal totalAccountBalance = accountManager.GetTotalBalance(loan.UserId);
+                                decimal totalAccountBalance;
+
+                                try
+                                {
+                                    totalAccountBalance = accountManager.GetTotalBalance(loan.UserId);
+                                }
+                                catch (InvalidOperationException)
+                                {
+                                    Console.WriteLine("Approval could not continue because an exchange rate is unavailable. The loan is still pending");
+                                    break;
+                                }
 
                                 // Attempt to approve a loan
                                 bool approved = loanService.ChangeLoanStatus(loanId, LoanStatus.Approved, totalAccountBalance);
 
                                 if (approved)
                                 {
-                                    if (loan.PayoutRequested)
+                                    if (!loanService.RequestLoanPayout(loanId))
                                     {
-                                        Console.WriteLine("A payout has already been requested for this loan.");
+                                        Console.WriteLine("Loan approved, but payout is not eligible.");
                                         break;
                                     }
                                     // Create the account data required by the transaction system
@@ -202,6 +280,16 @@ namespace BankApp.Robin
                                 break;
 
                             case 3:
+                                // Update credit-score interest adjustment
+                                UpdateCreditScoreAdjustment();
+                                break;
+
+                            case 4:
+                                // Update base interest rate
+                                UpdateBaseRate();
+                                break;
+
+                            case 5:
                                 // Return to the admin menu
                                 return;
                         }

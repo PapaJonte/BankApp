@@ -21,9 +21,15 @@ public class BankTransfer(BankTransaction bankTransaction)
     /// </returns>
     public StatusCode TransferMoney(AccountData originAccount, AccountData targetAccount, decimal transferAmount, Currency transferCurrency)
     {
-        StatusCode transferCode = bankTransaction.TransferMoney(originAccount, targetAccount, transferAmount, transferCurrency);
+        StatusCode status = bankTransaction.TransferMoney(originAccount, targetAccount, transferAmount, transferCurrency);
 
-        return transferCode;
+        return status;
+    }
+
+    public StatusCode TransferLoan(AccountData targetAccount, decimal loanAmount, Currency loanCurrency)
+    {
+        StatusCode status = bankTransaction.RequestDeposit(targetAccount, loanAmount, loanCurrency);
+        return status;
     }
 
     /// <summary>
@@ -38,7 +44,7 @@ public class BankTransfer(BankTransaction bankTransaction)
     /// </returns>
     public StatusCode DepositMoney(AccountData account, decimal depositAmount)
     {
-        bankTransaction.RequestDeposit(account.UserID, account.AccountNumber, depositAmount);
+        StatusCode status = bankTransaction.RequestDeposit(account, depositAmount, account.Currency);
         return StatusCode.Successful;
     }
 
@@ -54,13 +60,13 @@ public class BankTransfer(BankTransaction bankTransaction)
     /// </returns>
     public StatusCode WithdrawyMoney(AccountData account, decimal withdrawAmount)
     {
-        StatusCode statusCode = bankTransaction.WithdrawalStatus(account.UserID, account.AccountNumber, withdrawAmount);
+        StatusCode status = bankTransaction.WithdrawalStatus(account.UserID, account.AccountNumber, withdrawAmount);
 
-        if (statusCode == StatusCode.Successful)
+        if (status == StatusCode.Successful)
         {
             bankTransaction.RequestWithdrawal(account.UserID, account.AccountNumber, withdrawAmount);
         }
 
-        return statusCode;
+        return status;
     }
 }

@@ -48,6 +48,12 @@ namespace BankApp.Jonathan
                 return null;
             }
 
+            // Each scheduled payment must repay at least one öre of principal
+            if (requestedAmount < duration / 100m)
+            {
+                return null;
+            }
+
             // Fetch the approved and pending loans
             decimal outstandingLoans = CalculateOutstandingLoans(userId);
             decimal pendingLoans = CalculatePendingLoans(userId);
@@ -79,21 +85,15 @@ namespace BankApp.Jonathan
             decimal totalRepayment = requestedAmount + totalInterest;
 
             // Creates a new loan
-            Loan newLoan = new Loan(requestedAmount);
+            Loan newLoan = new Loan(requestedAmount, duration, interestRate, totalInterest);
 
             // Customer and loan identification
             newLoan.UserId = userId;
             newLoan.LoanId = nextLoandId;
             nextLoandId++;
 
-            // Loan details
-            newLoan.Duration = duration;
+            // Sets an account for the loan deposit
             newLoan.SetDestinationAccount(destinationAccountNumber);
-
-            // Interest and repayment details
-            newLoan.InterestRate = interestRate;
-            newLoan.TotalInterest = totalInterest;
-            newLoan.TotalRepayment = totalRepayment;
 
             loans.Add(newLoan);
 
@@ -311,6 +311,33 @@ namespace BankApp.Jonathan
             return false;
         }
 
+        public bool RequestLoanPayout(int loanId)
+        {
+            Loan? loan = loans.FirstOrDefault(loanItem => loanItem.LoanId == loanId);
+
+            // Check if the loan exists
+            if (loan == null)
+            {
+                return false;
+            }
+
+            // Only approved loans can request a payout
+            if (loan.Status != LoanStatus.Approved)
+            {
+                return false;
+            }
+
+            // Prevent duplicate payout requests
+            if (loan.PayoutRequested)
+            {
+                return false;
+            }
+
+            loan.MarkPayoutRequested();
+
+            return true;
+        }
+
         public bool RepayLoan(int loanId, decimal paymentAmount)
         {
             // Find the loan
@@ -407,6 +434,12 @@ namespace BankApp.Jonathan
         public void UpdateInterestRule(int minimumCreditScore, int maximumCreditScore, decimal newAdjustment)
         {
             interestRuleService.UpdateInterestAdjustment(minimumCreditScore, maximumCreditScore, newAdjustment);
+        }
+
+        public bool UpdateBaseInterestRate(int minimumDuration, int maximumDuration, decimal newRate)
+        {
+            // Update the shared rate rules to price new loan applications
+            return interestRuleService.UpdateBaseInterestRate(minimumDuration, maximumDuration, newRate);
         }
 
         // Gets a loan using its unique loan ID
