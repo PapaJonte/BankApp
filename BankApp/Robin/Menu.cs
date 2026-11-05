@@ -439,7 +439,6 @@ namespace BankApp.Robin
 
                                     if (userLoggedIn == LoginResult.Success)
                                     {
-                                        _userService.LogUser(user);
                                         Console.WriteLine("\nLogin successful!");
                                         if (_authService.IsLoggedInUserAdmin())
                                         {
