@@ -61,7 +61,11 @@ namespace BankApp.GustafsClasses
                 balance, interest, Currency.SEK);
 
             BankAccountList.Add(userAccount);
-            BankAccountDictionary.Add(userId, BankAccountList);
+            if (BankAccountDictionary.Count == 0)
+            {
+                BankAccountDictionary.Add(userId, BankAccountList);
+            }
+            
             return interest;
         }
         //Used for creating savings accounts. The savings accounts store the balance.
