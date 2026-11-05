@@ -26,7 +26,7 @@ namespace BankApp
     {
         // All users are stored in memory in a dictionary, with the internal UserID as key.
         private readonly Dictionary<int, User> _users = new Dictionary<int, User>();
-        private LoggedInUser? _loggedInUser;
+        private LoggedInUser _loggedInUser;
         // Gives every user a unique internal ID, starting from 1. The ID is never reused, even if a user is deleted.
         private int _nextUserId = 1;
 
@@ -65,7 +65,7 @@ namespace BankApp
         {
             _loggedInUser = new LoggedInUser(userId);
         }
-        public LoggedInUser? GetLoggedInUser()
+        public LoggedInUser GetLoggedInUser()
         {
             return _loggedInUser;
         }
