@@ -51,8 +51,6 @@ public class LockedConsole : IConsole
         return true;
     }
 
-
-
     public IDisposable Lock()
     {
         Monitor.Enter(_gate);
