@@ -206,7 +206,10 @@ namespace BankApp.Robin
                 return;
             }
 
-            Console.WriteLine($"Selected account: {accountNumber}. Payments are unavailable right now.");
+            // TO DO: Queue paymentAmount from the selected regular account
+            // Keep this installment's amount fixed while the withdrawal is pending
+            // Record the repayment only after Alxe confirms the withdrawal succeeded
+            Console.WriteLine($"Selected account: {accountNumber}\nAmount due: {paymentAmount:N2} SEK\nPayments are unavailable right now.");
         }
 
 
