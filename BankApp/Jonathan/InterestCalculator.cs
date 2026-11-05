@@ -2,6 +2,9 @@
 
 namespace BankApp.Jonathan
 {
+    /// <summary>
+    /// Calculates loan quotes and installments using equal principal repayments
+    /// </summary>
     internal class InterestCalculator
     {
         //
@@ -19,6 +22,7 @@ namespace BankApp.Jonathan
         // INTEREST RATES
         //
 
+        // Annual interest rates
         public decimal GetInterestRate(int duration)
         {
             return interestRuleService.GetBaseInterestRate(duration);
@@ -30,7 +34,7 @@ namespace BankApp.Jonathan
             decimal baseInterestRate = GetInterestRate(duration);
             // Gets the additional interest based on customer's credit score
             decimal interestAdjustment = interestRuleService.GetInterestAdjustment(creditScore);
-            // Adds the interest adjustment to the base interest rate
+            // Adds the interest adjustment to the base interest rate in percentage points
             return baseInterestRate + interestAdjustment;
         }
 
@@ -39,9 +43,10 @@ namespace BankApp.Jonathan
         // MONTHLY CALCULATIONS
         //
 
+        // Monthly installment
         public decimal CalculateMonthlyAmortization(decimal amount, int duration)
         {
-            // Failsafes for amount and duration of loans
+            // Safeguard for amount and duration of loans
             if (amount <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(amount), "Loan amount must be greater than zero.");
@@ -58,7 +63,7 @@ namespace BankApp.Jonathan
         
         public decimal CalculateMonthlyInterest(decimal remainingBalance, decimal annualInterestRate)
         {
-            // Failsafes for negative outcomes
+            // Safeguard for negative outcomes
             if (remainingBalance < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(remainingBalance), "The loan's remaining balance cannot be negative.");
@@ -90,7 +95,7 @@ namespace BankApp.Jonathan
             // Calculates the normal monthly amortization
             decimal amortization = CalculateMonthlyAmortization(amount, duration);
 
-            // Makes sure the final payment clears the remaining loan balance
+            // Makes sure the final payment clears the remaining loan balance, the final installment repays any principal left by rounding
             if (currentMonth == duration)
             {
                 amortization = remainingBalance;
@@ -113,6 +118,7 @@ namespace BankApp.Jonathan
         // TOTAL LOAN CALCULATIONS
         //
 
+        // Full-term quote
         public decimal CalculateTotalInterest(decimal amount, int duration, decimal annualInterestRate)
         {
             // Starts with the full loan amount and no accumulated interest
@@ -120,7 +126,7 @@ namespace BankApp.Jonathan
             decimal totalInterest = 0m;
             decimal monthlyAmortization = CalculateMonthlyAmortization(amount, duration);
 
-            // Loops through every month of the loan
+            // Loops through every month of the loan, simulate the schedule and round each month's interest before summing
             for (int month = 1; month <= duration; month++)
             {
                 decimal monthlyInterest = CalculateMonthlyInterest(remainingBalance, annualInterestRate);

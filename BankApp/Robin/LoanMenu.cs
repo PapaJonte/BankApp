@@ -8,6 +8,9 @@ using BankApp.Transaction_Layer.Interface;
 
 namespace BankApp.Robin
 {
+    /// <summary>
+    /// Customer menu for applying, viewing loan details and preparing repayments
+    /// </summary>
     internal class LoanMenu
     {
         private readonly LoanService loanService;
@@ -94,6 +97,7 @@ namespace BankApp.Robin
             return loan;
         }
 
+        // Legacy status helper, the admin menu handles the active approval flow
         public bool ChangeLoanStatus(int loanId, LoanStatus newStatus)
         {
             // Gets the loan using its loand ID
@@ -133,16 +137,6 @@ namespace BankApp.Robin
                 string destinationAccountNumber = loan.DestinationAccountNumber;
                 decimal payoutAmount = loan.LoanAmount;
 
-                // TO DO: Validate that the destination is a regular account
-                // belonging to the customer before enabling payouts
-
-                // TO DO: Remove the test account restriction only after account ownership
-                // and account type validation is implemented
-
-                // Never enable payouts while using TEST-ACCOUNT-001
-
-                // TO DO: bankTransfer.DepositMoney(destinationAccountNumber, payoutAmount);
-
                 Console.WriteLine($"Loan #{loan.LoanId} approved " +
                     $"Payout of {payoutAmount} SEK prepared for {destinationAccountNumber}.");
             }
@@ -152,6 +146,7 @@ namespace BankApp.Robin
             return true;
         }
 
+        // Repayment amount and source account
         private void PrepareLoanRepayment(int userId, int loanId)
         {
             // Only show payment details for a loan owned by this customer

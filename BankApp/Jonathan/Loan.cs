@@ -4,26 +4,32 @@ using System.Text;
 
 namespace BankApp.Jonathan
 {
+    /// <summary>
+    /// Keeps the submitted quote, approval decision and repayments stat for one loan
+    /// </summary>
     internal class Loan
     {
+        // Borrower, loan identity and quoted terms
         public int UserId { get; set; }
         public int LoanId { get; set; }
         public decimal LoanAmount { get; private set; }
-        public decimal RemainingLoanBalance { get; private set; }
         public decimal InterestRate { get; }
         public int Duration { get; }
         public decimal TotalInterest { get; }
         public decimal TotalRepayment { get; }
+
+        // Approval and payout state
         public LoanStatus Status { get; private set; } = LoanStatus.Pending;
         public bool PayoutRequested { get; private set; } = false;
         
-        // Repayment tracking
+        // Repayment schedule and progress
         public DateTime? PayoutDate { get; private set; }
         public DateTime? NextPaymentDate { get; private set; }
+        public decimal RemainingLoanBalance { get; private set; }
         public int PaymentsCompleted { get; private set; } = 0;
-        public int ConsecutiveOnTimePayments { get; private set; }
         public decimal InterestPaid { get; private set; } = 0m;
         public int LateBillsIssued { get; private set; }
+        public int ConsecutiveOnTimePayments { get; private set; }
 
         // First missed payment adds a 75 SEK fee, the next adds 150 SEK each
         public decimal LateFees => LateBillsIssued == 0 ? 0m : 75m + (LateBillsIssued - 1) * 150m;
@@ -99,6 +105,7 @@ namespace BankApp.Jonathan
             Status = newStatus;
         }
 
+        // Repayment schedule
         internal void StartRepaymentSchedule(DateTime creditedDate)
         {
             // A repeated confirmation must preserve the original repayment schedule
@@ -169,6 +176,7 @@ namespace BankApp.Jonathan
             }
         }
 
+        // Payout request tracking
         internal void MarkPayoutRequested()
         {
             if (Status != LoanStatus.Approved)
@@ -184,6 +192,7 @@ namespace BankApp.Jonathan
             PayoutRequested = true;
         }
 
+        // Overdue installments
         internal int UpdateLateBills(DateTime today)
         {
             if (NextPaymentDate is not DateTime dueDate || today.Date <= dueDate.Date)

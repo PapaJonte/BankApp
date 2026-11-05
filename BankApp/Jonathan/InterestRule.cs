@@ -4,6 +4,9 @@ using System.Text;
 
 namespace BankApp.Jonathan
 {
+    /// <summary>
+    /// An inclusive credit-score range and its adjustable interest surcharge in percentage points
+    /// </summary>
     internal class InterestRule
     {
         // Stores the credit score and adjustment to interest

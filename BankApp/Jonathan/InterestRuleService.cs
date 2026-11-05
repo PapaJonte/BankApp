@@ -4,8 +4,12 @@ using System.Text;
 
 namespace BankApp.Jonathan
 {
+    /// <summary>
+    /// Stores the rate rules used to price new loan applications
+    /// </summary>
     internal class InterestRuleService
     {
+        // Credit-score brackets are inclusive, adjustments are in percentage points
         private List<InterestRule> interestRules = new List<InterestRule>()
         {
             new InterestRule(0, 29, 5.0m),
@@ -15,7 +19,7 @@ namespace BankApp.Jonathan
             new InterestRule(90, 100, 0.0m)
         };
 
-        // Stores the base interest rates for different loan durations
+        // Stores the base interest rates for different loan durations, base annual rates are percentages indexed by an inclusive term in months
         private readonly Dictionary<(int Min, int Max), decimal> baseInterestRates = new Dictionary<(int Min, int Max), decimal>()
         {
             { (12, 24), 6.5m },
@@ -26,6 +30,7 @@ namespace BankApp.Jonathan
             { (121, 144), 9.25m }
         };
 
+        // Credit-score adjustments
         public decimal GetInterestAdjustment(int creditScore)
         {
             if (creditScore < 0 || creditScore > 100)
@@ -33,7 +38,7 @@ namespace BankApp.Jonathan
                 throw new ArgumentOutOfRangeException(nameof(creditScore), "Credit score must be between 0 and 100.");
             }
 
-            // A perfect credit score always get the base interest rate
+            // A perfect credit score always get the base interest rate, even if the top bracket changes
             if (creditScore == 100)
             {
                 return 0m;
@@ -48,6 +53,41 @@ namespace BankApp.Jonathan
             }
 
             throw new InvalidOperationException("No matching interest rule was found.");
+        }
+
+        // Gets the base interest rate based on loan duration, base rate by loan term
+        public decimal GetBaseInterestRate(int duration)
+        {
+            foreach (var rate in baseInterestRates)
+            {
+                if (duration >= rate.Key.Min && duration <= rate.Key.Max)
+                {
+                    return rate.Value;
+                }
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(duration), "Loan duration must be between 12 and 144 months.");
+        }
+
+        // Updates the base interest rate for an existing duration range, both bounds must match an existing bracket to keep the supported terms intact
+        public bool UpdateBaseInterestRate(int minimumDuration, int maximumDuration, decimal newRate)
+        {
+            if (newRate < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(newRate), "Interest rate cannot be negative.");
+            }
+
+            var durationRange = (minimumDuration, maximumDuration);
+
+            // Checks if the duration range exists
+            if (!baseInterestRates.ContainsKey(durationRange))
+            {
+                return false;
+            }
+
+            // Updates the interest rate
+            baseInterestRates[durationRange] = newRate;
+            return true;
         }
 
         public void UpdateInterestAdjustment(int minimumCreditScore, int maximumCreditScore, decimal newAdjustment)
@@ -67,41 +107,6 @@ namespace BankApp.Jonathan
             }
 
             throw new InvalidOperationException("No matching interest rule was found.");
-        }
-
-        // Gets the base interest rate based on loan duration
-        public decimal GetBaseInterestRate(int duration)
-        {
-            foreach (var rate in baseInterestRates)
-            {
-                if (duration >= rate.Key.Min && duration <= rate.Key.Max)
-                {
-                    return rate.Value;
-                }
-            }
-
-            throw new ArgumentOutOfRangeException(nameof(duration), "Loan duration must be between 12 and 144 months.");
-        }
-
-        // Updates the base interest rate for an existing duration range
-        public bool UpdateBaseInterestRate(int minimumDuration, int maximumDuration, decimal newRate)
-        {
-            if (newRate < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(newRate), "Interest rate cannot be negative.");
-            }
-
-            var durationRange = (minimumDuration, maximumDuration);
-
-            // Checks if the duration range exists
-            if (!baseInterestRates.ContainsKey(durationRange))
-            {
-                return false;
-            }
-
-            // Updates the interest rate
-            baseInterestRates[durationRange] = newRate;
-            return true;
         }
     }
 }

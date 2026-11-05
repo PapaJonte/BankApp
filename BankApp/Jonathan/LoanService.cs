@@ -4,16 +4,16 @@ using System.Text;
 
 namespace BankApp.Jonathan
 {
+    /// <summary>
+    /// Coordinates loan eligibility, application decisions, and confirmed payments
+    /// </summary>
     internal class LoanService
     {
-        // decimal balance will eventually come from Gustaf
-        // It needs to combine all the of the customer's bank accounts
-        // The balance need to be converted to SEK if they're in a foreign currency
-
         //
         // CLASS FIELDS
         //
 
+        // Loan records and pricing dependencies
         private readonly List<Loan> loans = new List<Loan>();
         private readonly InterestRuleService interestRuleService;
         private readonly InterestCalculator calculator;
@@ -35,6 +35,7 @@ namespace BankApp.Jonathan
         // LOAN APPLICATIONS
         //
 
+        // Applications and validation
         public Loan? ApplyForLoan(int userId, decimal requestedAmount, int duration, decimal totalAccountBalance, string destinationAccountNumber)
         {
             if (string.IsNullOrWhiteSpace(destinationAccountNumber))
@@ -135,6 +136,7 @@ namespace BankApp.Jonathan
         // LOAN CALCULATIONS
         //
 
+        // Borrowing limit and existing commitments
         public decimal CalculateEligibleBalance(decimal totalAccountBalance, decimal outstandingLoans)
         {
             if (totalAccountBalance < 0)
@@ -227,6 +229,7 @@ namespace BankApp.Jonathan
         // LOAN MANAGEMENT
         //
 
+        // Loan lists and application decisions
         public List<Loan> GetCustomersLoan(int userId)
         {
             // Creates a list to store the customer's loans
@@ -309,6 +312,7 @@ namespace BankApp.Jonathan
             return false;
         }
 
+        // Payout requests and confirmation
         public bool RequestLoanPayout(int loanId)
         {
             Loan? loan = loans.FirstOrDefault(loanItem => loanItem.LoanId == loanId);
@@ -350,6 +354,7 @@ namespace BankApp.Jonathan
             return true;
         }
 
+        // Overdue installments
         public void UpdateLatePayments(int userId, DateTime today)
         {
             foreach (Loan loan in GetCustomersLoan(userId))
@@ -364,6 +369,7 @@ namespace BankApp.Jonathan
             }
         }
 
+        // Repayment recording and installment amounts
         public bool RepayLoan(int loanId, decimal paymentAmount, DateTime submittedDate)
         {
             // Find the loan
@@ -459,6 +465,7 @@ namespace BankApp.Jonathan
             return 0m;
         }
 
+        // Interest rules for future applications
         public void UpdateInterestRule(int minimumCreditScore, int maximumCreditScore, decimal newAdjustment)
         {
             interestRuleService.UpdateInterestAdjustment(minimumCreditScore, maximumCreditScore, newAdjustment);
