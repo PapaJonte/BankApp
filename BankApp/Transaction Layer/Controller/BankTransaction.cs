@@ -5,6 +5,7 @@ using BankApp.Transaction_Layer.DataModel;
 using BankApp.Transaction_Layer.Enum;
 using BankApp.Transaction_Layer.Interface;
 using BankApp.Transaction_Layer.Service;
+using Org.BouncyCastle.Asn1.X509;
 
 namespace BankApp.Transaction_Layer.Controller;
 
@@ -16,12 +17,28 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
     /// Stages a deposit transaction at the transaction module.
     /// </summary>
     /// <param name="">
-    /// string accountNumber, number of the account we deposit money to.
+    /// AccountData account data for target account
     /// decimal amount, value we add to the bank account.
+    /// Currency currency represents the currency amount is in, will be converted to target account currency
     /// </param>
-    public void RequestDeposit(int userID, int accountNumber, decimal amount)
+    public StatusCode RequestDeposit(AccountData targetAccount, decimal amount, Currency currency)
     {
-        stageTransaction.Stage_Single(userID, accountNumber, amount, TransactionType.Deposit);
+        StatusCode status = StatusCode.Successful;
+        if (targetAccount.Currency != currency)
+        {
+            status = exchangeRateModule.TryCalculateExchangeValue(currency, targetAccount.Currency, amount, out decimal convertedAmount);
+            if (status == StatusCode.Successful)
+            {
+                amount = convertedAmount;
+            }
+        }
+
+        if (status == StatusCode.Successful)
+        {
+            stageTransaction.Stage_Single(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit);
+        }
+
+        return status;
     }
 
     /// <summary>
