@@ -334,6 +334,7 @@ namespace BankApp.Robin
 
                             case 1:
                                 Console.Clear();
+
                                 _accountManager.CreateAccount(_userService.GetLoggedInUser().UserId, 0m);
 
                                 break;
@@ -441,6 +442,7 @@ namespace BankApp.Robin
 
                                     if (userLoggedIn == LoginResult.Success)
                                     {
+                                        _userService.LogUser(user);
                                         Console.WriteLine("\nLogin successful!");
                                         if (_authService.IsLoggedInUserAdmin())
                                         {
