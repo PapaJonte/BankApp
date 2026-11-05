@@ -52,21 +52,19 @@ namespace BankApp.GustafsClasses
             return accountNumber;
         }
         //This method will create a bank account. Not to be confused with a savings account. Bank accounts store the savings accounts.
-        public decimal CreateAccount(int userId, decimal balance)
+        public void CreateAccount(int userId, decimal balance)
         {
-            decimal interest = 0.5m;
+            
             /*Creation of object of the BankAccount class to represent an account held by a user,
             that may both contain balance, and savingsAccounts.*/
             BankAccount userAccount = new BankAccount(userId, AccountNrGenerator(),
-                balance, interest, Currency.SEK);
+                balance, Currency.SEK);
 
             BankAccountList.Add(userAccount);
             if (BankAccountDictionary.Count == 0)
             {
                 BankAccountDictionary.Add(userId, BankAccountList);
             }
-            
-            return interest;
         }
         //Used for creating savings accounts. The savings accounts store the balance.
         public decimal CreateSavingsAccount(int userId, decimal balance)
@@ -133,59 +131,30 @@ namespace BankApp.GustafsClasses
         //Puts balance of all savngs accounts of a user together into a total value after converting them to SEK.
         public decimal GetTotalBalance(int userId)
         {
-            decimal totalBalance = 0; //Where we put together all of the money into a total value.
-            decimal additionValue = 0;
-            ExchangeRate conversionTool = new ExchangeRate();
-            //Just to check if there is anything in the list.
-            if (BankAccountList.Count > 0)
+            decimal totalBalance = 0m;
+
+            foreach (BankAccount account in BankAccountList)
             {
-                foreach (var bAccount in BankAccountList)
+                if (account.GetUserId() != userId)
                 {
-                    //Here we choose Swedish crowns as the currency.
-                    Currency chosenValue = Currency.SEK;
+                    continue;
+                }
 
-                    if (bAccount.GetUserId() == userId)
-                    {
-                        if (bAccount.GetCurrency() != chosenValue)
-                        {
-                            //Don't be fooled, this is the same line of code.
-                            conversionTool.TryCalculateExchangeValue(
-                                bAccount.GetCurrency(),
-                                chosenValue, bAccount.GetBalance(),
-                                out additionValue);
+                totalBalance += ConvertBalanceToSek(account.GetBalance(), account.GetCurrency());
 
-                            totalBalance = totalBalance + additionValue;
-                        }
-                        else
-                        {
-                            totalBalance = totalBalance + bAccount.GetBalance();
-                        }
-                    }
-                    foreach (var sAccount in bAccount.SavingAccounts)
-                    {
-                        if (sAccount.GetCurrency() != chosenValue)
-                        {
-                            //Don't be fooled, this is the same line of code.
-                            conversionTool.TryCalculateExchangeValue(
-                                sAccount.GetCurrency(),
-                                chosenValue, sAccount.GetBalance(),
-                                out additionValue);
-
-                            totalBalance = totalBalance + additionValue;
-                        }
-                        else
-                        {
-                            totalBalance = totalBalance + bAccount.GetBalance();
-                        }
-                    }
-                } 
+                foreach (SavingsAccount savings in account.SavingAccounts)
+                {
+                    totalBalance += ConvertBalanceToSek(savings.GetBalance(), savings.GetCurrency());
+                }
             }
-            else
-            {
-                Console.WriteLine("Error! You have no accounts on the bank.");
-            }
-            
+
             return totalBalance;
+        }
+        public BankAccount? FindRegularAccount(int userId, int accountNumber)
+        {
+            return BankAccountList.Find(account =>
+                account.GetUserId() == userId
+                && account.GetBankAccountNumber() == accountNumber);
         }
         //Verifies ownership of Bank Account by bank account number and user ID. Will return a bool value depending on result.
         public bool AccountOwnershipVerification(int userId, int bankAccountNr)

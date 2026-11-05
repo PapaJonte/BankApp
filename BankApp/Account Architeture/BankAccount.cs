@@ -17,20 +17,18 @@ namespace BankApp.GustafsClasses
         private int bankAccountNumber;
         //Ammount in the account.
         private decimal balance; 
-        private decimal interest;
         //Currency of Account.
         private Currency currency; 
         
 
         /*Constructor making sure that we have applied an id to the account,
         to distinguish it from others.*/
-        public BankAccount(int userId, int bankAccountNumber, decimal balance, decimal interest, Currency currency)
+        public BankAccount(int userId, int bankAccountNumber, decimal balance, Currency currency)
         {
             this.userId = userId;
             this.bankAccountNumber = bankAccountNumber;
 
             this.balance = balance;
-            this.interest = interest;
             this.currency = currency;
         }
 
@@ -81,11 +79,6 @@ namespace BankApp.GustafsClasses
         public Currency GetCurrency()
         {
             return currency;
-        }
-        //Method that returns interest.
-        public decimal GetInterest()
-        {
-            return interest;
         }
     }
 }
