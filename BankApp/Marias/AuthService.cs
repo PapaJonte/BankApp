@@ -57,7 +57,9 @@ namespace BankApp
 
             user.ResetFailedLogins();
             LoggedInUser = user;
+            _userService.LogUser(user.UserID);
             return LoginResult.Success;
+
         }
 
         //Logs out the current user by clearing LoggedInUser.
