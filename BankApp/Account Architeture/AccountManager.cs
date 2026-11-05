@@ -195,9 +195,33 @@ namespace BankApp.GustafsClasses
         private int AccountNrGenerator()
         {
             Random random = new Random();
-            int accountNumber = random.Next(000000000, 999999999);
+            /*The while loop is a security measure that ensures that each account number for both savings,
+             * and bank accounts are unique by repeating when the number is identical to an already existing one in the bank.*/
+            while (true)
+            {
+                //Creating account number.
+                int accountNumber = random.Next(000000000, 999999999);
+                //Checking each bank account for identical integers.
+                foreach (var bAccount in BankAccountList)
+                {
+                    if (bAccount.GetBankAccountNumber() != accountNumber)
+                    {
 
-            return accountNumber;
+                        return accountNumber;
+                    }
+                    //Checking each savings account for identical integers.
+                    foreach (var sAccount in bAccount.SavingAccounts)
+                    {
+                        if (sAccount.GetSavingsAccountNumber() != accountNumber)
+                        {
+
+                            return accountNumber;
+                        }
+                    }
+                }
+            }
+            
+            
         }
     }
 }
