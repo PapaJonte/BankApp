@@ -47,7 +47,8 @@ namespace BankApp.GustafsClasses
         public void CreateAccount(int userId, int bankAccountNumber, decimal balance, decimal interest, Currency currency)
         {
             /*Creation of object of the BankAccount class to represent an account held by a user,
-            rather than individual spaces to have money in.*/
+            rather than individual spaces to have money in.
+            Will need to add the CheckCurrency method in here instead of currency.*/
             BankAccount userAccount = new BankAccount(userId, bankAccountNumber, balance, interest, currency);
 
             BankAccountList.Add(userAccount);
@@ -62,7 +63,7 @@ namespace BankApp.GustafsClasses
                 {
                     if (account.GetUserId() == userId)
                     {
-                        //Interest for savings accounts.
+                        //Make this into return data.
                         decimal interest = 0.5m;
 
                         //Communication is needed before I adapt this one further.
@@ -185,6 +186,14 @@ namespace BankApp.GustafsClasses
                 }
             }
             return false;
+        }
+
+        public static int AccountNrGenerator()
+        {
+            Random random = new Random();
+            int accountNumber = random.Next(000000000, 999999999);
+
+            return accountNumber;
         }
     }
 }
