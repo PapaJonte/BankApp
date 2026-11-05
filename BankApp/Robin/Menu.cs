@@ -9,7 +9,6 @@ namespace BankApp.Robin
 
         //private readonly Theme theme;
         private readonly LoanMenu _loanMenu;
-
         private readonly AdminLoanMenu _adminLoanMenu;
         private readonly UserService _userService;
         private readonly AuthService _authService;
@@ -67,9 +66,9 @@ namespace BankApp.Robin
             */
             CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
 
-            string userMessage = UserService.GetErrorMessage(userResult);
+            string userMessage = UserService.GetErrorMessage(result);
 
-            if (userResult == CreateUserResult.Success)
+            if (result == CreateUserResult.Success)
             {
                 Console.WriteLine(userMessage);
                 return true;
