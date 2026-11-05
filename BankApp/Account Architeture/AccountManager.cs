@@ -158,6 +158,24 @@ namespace BankApp.GustafsClasses
 
             return totalBalance;
         }
+        private decimal ConvertBalanceToSek(decimal balance, Currency currency)
+        {
+            if (currency == Currency.SEK || balance == 0m)
+            {
+                return balance;
+            }
+
+            StatusCode status = conversionTool.TryCalculateExchangeValue(
+                currency, Currency.SEK, balance, out decimal convertedBalance);
+
+            if (status != StatusCode.Successful)
+            {
+                throw new InvalidOperationException(
+                    $"No exchange rate is available from {currency} to SEK.");
+            }
+
+            return convertedBalance;
+        }
         public BankAccount? FindRegularAccount(int userId, int accountNumber)
         {
             return BankAccountList.Find(account =>
