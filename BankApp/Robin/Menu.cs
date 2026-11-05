@@ -9,7 +9,6 @@ namespace BankApp.Robin
 
         //private readonly Theme theme;
         private readonly LoanMenu _loanMenu;
-
         private readonly AdminLoanMenu _adminLoanMenu;
         private readonly UserService _userService;
         private readonly AuthService _authService;
@@ -66,10 +65,10 @@ namespace BankApp.Robin
             and reads the CreateUserResult enum to show the exact reason on failure instead of a generic true/false.
             */
             CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
-            
-            string userMessage = UserService.GetErrorMessage(userResult);
 
-            if (userResult == CreateUserResult.Success)
+            string userMessage = UserService.GetErrorMessage(result);
+
+            if (result == CreateUserResult.Success)
             {
                 Console.WriteLine(userMessage);
                 return true;
