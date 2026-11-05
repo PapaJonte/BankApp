@@ -17,12 +17,12 @@ namespace BankApp
         {
 
             Theme theme = new Theme();
-            UserService userService = new UserService();
+            AccountManager accountManager = new AccountManager();
+            UserService userService = new UserService(accountManager);
             AuthService authService = new AuthService(userService);
             CreditScoreService creditScoreService = new CreditScoreService();
             InterestRuleService interestRuleService = new InterestRuleService();
             LoanService loanService = new LoanService(interestRuleService, creditScoreService);
-            AccountManager accountManager = new AccountManager();
 
             #region Transactions
             AccountBridge accountBridge = new(accountManager);
