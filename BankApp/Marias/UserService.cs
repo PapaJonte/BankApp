@@ -43,11 +43,6 @@ namespace BankApp
             
             AddUser("00000000-0000", "ownerpassword123", "owner@gmail.com", "0729216167", UserRole.Owner);
             AddUser("11111111-1111", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
-
-#if DEBUG
-            AddUser("21111111-1111", "2", "a@gmail.com", "0729216167", UserRole.Customer);
-#endif
-
         }
 
         /*
