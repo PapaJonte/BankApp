@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
+using BankApp.GustafsClasses;
 
 namespace BankApp
 {
@@ -34,8 +35,12 @@ namespace BankApp
         /*
          Ther has to be an owner and admin from the beginning, or else no one can create new users (user story 2).
         */
-        public UserService()
+
+        private readonly AccountManager _accountManager;
+        public UserService(AccountManager accountManager)
         {
+            _accountManager = accountManager;
+            
             AddUser("00000000-0000", "ownerpassword123", "owner@gmail.com", "0729216167", UserRole.Owner);
             AddUser("11111111-1111", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
 
@@ -241,6 +246,13 @@ namespace BankApp
                 return CreateUserResult.InvalidPhone;
 
             createdUser = AddUser(username, password, email, phoneNumber, role);
+
+            if (role == UserRole.Customer)
+            {
+                //Automatically create a bank account for the new customer user with 0 SEK.
+                _accountManager.CreateAccount(createdUser.UserID, 0m);
+            }
+
             return CreateUserResult.Success;
         }
 
@@ -305,5 +317,10 @@ namespace BankApp
             user.ChangePassword(newPassword);
             return true;
         }
+
+
+
+
+
     }
 }
