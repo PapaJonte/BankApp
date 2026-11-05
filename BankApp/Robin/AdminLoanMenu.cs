@@ -221,24 +221,11 @@ namespace BankApp.Robin
 
                                 if (approved)
                                 {
-                                    if (!loanService.RequestLoanPayout(loanId))
-                                    {
-                                        Console.WriteLine("Loan approved, but payout is not eligible.");
-                                        break;
-                                    }
-                                    // Create the account data required by the transaction system
-                                    AccountData destinationAccount = new AccountData(loan.UserId, destinationAccountNumber, Currency.SEK);
-
-                                    // TO DO: Connect the loan payout once account currency and deposit processing have been verified
-                                    // bankTransfer.DepositMoney(destinationAccount, loan.LoanAmount);
-
-                                    // TO DO: Call loan.MarkPayoutRequested() only after the deposit request has been accepted by the transaction system
-
-                                    Console.WriteLine($"Loan #{loanId} approved.\n" +
-                                        $"Payout of {loan.LoanAmount:N2} SEK prepared for account {destinationAccount.AccountNumber}.");
+                                    // TO DO: Queue the payout to the selected regular account
+                                    // Mark the payout as reuqested only after Alex's method accepts it
+                                    // On confirmed deposit, call ConfirmLoanPayout with the actual credit date
+                                    Console.WriteLine($"Loan #{loanId} approved. Payout has not been queued.");
                                 }
-
-                                // TO DO: Connect the payout to the transaction system
                                 else
                                 {
                                     Console.WriteLine("Loan approval failed.");
