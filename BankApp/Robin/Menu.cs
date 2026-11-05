@@ -1,5 +1,7 @@
 ﻿using Spectre.Console;
 using BankApp.Pull_The_Sack.Interface;
+using BankApp.GustafsClasses;
+using BankApp.Transaction_Layer.Enum;
 namespace BankApp.Robin
 
 {
@@ -8,6 +10,8 @@ namespace BankApp.Robin
         // Creates private fields for UserService and AuthService
 
         //private readonly Theme theme;
+
+        private readonly AccountManager _accountManager;
         private readonly LoanMenu _loanMenu;
         private readonly AdminLoanMenu _adminLoanMenu;
         private readonly UserService _userService;
@@ -15,8 +19,9 @@ namespace BankApp.Robin
         // CONSTRUCTOR INJECTION: We require UserService to be passed in when Menu is created
 
         // Passes both fields into our constructor so we can use the methods from Maria's class.
-        public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu)
+        public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager)
         {
+            _accountManager = accountManager ?? throw new ArgumentNullException(nameof(accountManager));
             _adminLoanMenu = adminLoanMenu ?? throw new ArgumentNullException(nameof(adminLoanMenu));
             _loanMenu = loanMenu ?? throw new ArgumentNullException(nameof(loanMenu));
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
@@ -65,6 +70,7 @@ namespace BankApp.Robin
             and reads the CreateUserResult enum to show the exact reason on failure instead of a generic true/false.
             */
             CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
+            _accountManager.CreateAccount
 
             string userMessage = UserService.GetErrorMessage(result);
 
