@@ -67,13 +67,14 @@ namespace BankApp.GustafsClasses
                 {
                     if (account.GetUserId() == userId)
                     {
-                        
+                        /*I have made the assumption that the Console.WriteLine() statement is no longer necessary,
+                         * for communicating the interest value,
+                         since interest has now become the return value.*/
 
-                        //Communication is needed before I adapt this one further.
-                        Console.WriteLine(
+                        /*Console.WriteLine(
                             "You get " + interest + " in interest.");
                         Console.WriteLine(
-                            "Write how much money you want in the account.");
+                            "Write how much money you want in the account.");*/
 
                         string stringInput = Console.ReadLine();
                         int convertedInput;
@@ -110,7 +111,7 @@ namespace BankApp.GustafsClasses
                         foreach (var sAccount in bAccount.SavingAccounts)
                         {
                             //Displays balance and currency of account.
-                            Console.WriteLine(sAccount.GetBalance() + " " + sAccount.GetCurrency());
+                            Console.WriteLine(sAccount.GetBalance() + " " + sAccount.GetCurrency() );
                         }
                     }
                     else
