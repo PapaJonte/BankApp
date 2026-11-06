@@ -285,7 +285,7 @@ namespace BankApp.Robin
             }
         }
 
-        public BankAccount GetBankAccounts()
+        public List<BankAccount> GetBankAccounts()
         {
             List<BankAccount> myAccounts = new List<BankAccount>();
 
@@ -294,11 +294,11 @@ namespace BankApp.Robin
                 if (bankAccount.GetUserId() == _authService.LoggedInUser.UserID)
 
                 {
+                    bankAccount.GetBankAccountNumber();
                     myAccounts.Add(bankAccount);
                 }
             }
-            return ;
-
+            return myAccounts;
         }
 
         private void ShowTransferMenu()
@@ -347,18 +347,13 @@ namespace BankApp.Robin
                             case 0:
                                 Console.WriteLine($"\nWhich account would you like to deposit to?");
 
-                                List<BankAccount> myAccounts = new List<BankAccount>();
+                                int selectedIndex = 0;
 
-                                foreach (BankAccount bankAccount in _accountManager.BankAccountList)
-                                {
-
-                                    if (bankAccount.GetUserId() == _authService.LoggedInUser.UserID)
-
-                                    {
-                                        myAccounts.Add(bankAccount);
-                                    }
-                                    _bankTransfer.DepositMoney();
-                                }
+                               
+                                GetBankAccounts();
+                                
+                     
+                                _bankTransfer.DepositMoney();
                                 break;
 
                             case 1:
