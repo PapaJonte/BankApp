@@ -14,6 +14,7 @@ namespace BankApp.Robin
         //private readonly Theme theme;
 
         private readonly BankTransfer _bankTransfer;
+        private readonly ExchangeRate _exchangeRates;
         private readonly AccountManager _accountManager;
         private readonly LoanMenu _loanMenu;
         private readonly AdminLoanMenu _adminLoanMenu;
@@ -22,9 +23,11 @@ namespace BankApp.Robin
         // CONSTRUCTOR INJECTION: We require UserService to be passed in when Menu is created
 
         // Passes both fields into our constructor so we can use the methods from Maria's class.
-        public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager, BankTransfer bankTransfer)
+        public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager, 
+            BankTransfer bankTransfer, ExchangeRate exchangeRates)
         {
             _bankTransfer = bankTransfer ?? throw new ArgumentNullException(nameof(bankTransfer));
+            _exchangeRates = exchangeRates ?? throw new ArgumentNullException(nameof(exchangeRates));
             _accountManager = accountManager ?? throw new ArgumentNullException(nameof(accountManager));
             _adminLoanMenu = adminLoanMenu ?? throw new ArgumentNullException(nameof(adminLoanMenu));
             _loanMenu = loanMenu ?? throw new ArgumentNullException(nameof(loanMenu));
@@ -195,6 +198,38 @@ namespace BankApp.Robin
                 : "Wrong current password or the new one is too short.");
         }
 
+        private void UpdateExchangeRate()
+        {
+            Console.Clear();
+            Console.CursorVisible = true;
+
+            // Read the direction of the rate, for example EUR to SEK
+            Console.Write("From currency (e.g. EUR): ");
+            if (!Enum.TryParse(Console.ReadLine(), true, out Currency fromCurrency) || !Enum.IsDefined(fromCurrency))
+            {
+                Console.WriteLine("Invalid source currency.");
+                return;
+            }
+
+            Console.Write("To currency (e.g. SEK): ");
+            if (!Enum.TryParse(Console.ReadLine(), true, out Currency toCurrency) || !Enum.IsDefined(toCurrency) || fromCurrency == toCurrency)
+            {
+                Console.WriteLine("Choose a different, valid destination currency.");
+                return;
+            }
+
+            Console.Write($"How many {toCurrency} equal 1 {fromCurrency}?");
+            if (!decimal.TryParse(Console.ReadLine(), out decimal rate) || rate <= 0)
+            {
+                Console.WriteLine("Enter a positive exchange rate.");
+                return;
+            }
+
+            // Saving the same pair again replaces its previous rate
+            _exchangeRates.SetExchangeRate(fromCurrency, toCurrency, rate);
+            Console.WriteLine($"Rate saved. 1 {fromCurrency} = {rate} {toCurrency}");
+        }
+
         public void ShowAdminMenu(int userId)
         {
             Console.Clear();
@@ -285,7 +320,8 @@ namespace BankApp.Robin
 
                             case 3:
                                 // Exchange rates
-
+                                UpdateExchangeRate();
+                                Console.ReadKey(true);
                                 break;
 
                             case 4:
@@ -324,6 +360,68 @@ namespace BankApp.Robin
                 }
             }
             return myAccounts;
+        }
+
+        private void TransferBetweenAccounts()
+        {
+            Console.CursorVisible = true;
+
+            // Only show accounts the signed-in customer can send money from
+            List<BankAccount> accounts = GetBankAccounts();
+            
+            foreach (BankAccount account in accounts)
+            {
+                Console.WriteLine($"{account.GetBankAccountNumber()}: {account.GetBalance():N2} {account.GetCurrency()}");
+            }
+
+            Console.Write("Source account number: ");
+            
+            if (!int.TryParse(Console.ReadLine(), out int sourceNumber))
+            {
+                Console.WriteLine("Invalid source account number,");
+                return;
+            }
+
+            BankAccount? source = accounts.Find(account => account.GetBankAccountNumber() == sourceNumber);
+            
+            if (source == null)
+            {
+                Console.WriteLine("Select one of your own accounts.");
+                return;
+            }
+
+            // Find the recipient by account number without displaying their balance
+            Console.Write("Destination account number: ");
+            
+            if (!int.TryParse(Console.ReadLine(), out int destinationNumber) || destinationNumber == sourceNumber)
+            {
+                Console.WriteLine("Enter a different, valid destination account number.");
+                return;
+            }
+
+            BankAccount? destination = _accountManager.BankAccountList.Find(account => account.GetBankAccountNumber() == destinationNumber);
+
+            if (destination == null)
+            {
+                Console.WriteLine("Destination account was not found.");
+                return;
+            }
+
+            Currency sourceCurrency = source.GetCurrency();
+            Console.Write($"Amount to send ({sourceCurrency}): ");
+
+            if (!decimal.TryParse(Console.ReadLine(), out decimal amount) || amount <= 0m)
+            {
+                Console.WriteLine("Enter a positive amount.");
+                return;
+            }
+
+            // The transaction service converst the amount and queues the transfer
+            AccountData origin = new(source.GetUserId(), sourceNumber, sourceCurrency);
+            AccountData target = new(destination.GetUserId(), destinationNumber, destination.GetCurrency());
+            StatusCode status = _bankTransfer.TransferMoney(origin, target, amount, sourceCurrency);
+
+            Console.WriteLine(status == StatusCode.Successful ? "Transfer queued." : "Transfer could not be queued. Check your balance and the exchange rate.");
         }
 
         private void ShowTransferMenu()
@@ -429,14 +527,9 @@ namespace BankApp.Robin
                                 break;
 
                             case 2:
-                                foreach (BankAccount bankAccount in _accountManager.BankAccountList)
-                                {
-                                    Console.WriteLine($"\nAccount number : {bankAccount.GetBankAccountNumber()}" +
-                                        $"\nBalance : {bankAccount.GetBalance()} " +
-                                        $"\nCurrency : {bankAccount.GetCurrency()}");
-                                }
-
-                                // _bankTransfer.TransferMoney();
+                                // Transfer
+                                TransferBetweenAccounts();
+                                Console.ReadKey(true);
                                 break;
 
                         }
