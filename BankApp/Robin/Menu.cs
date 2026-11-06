@@ -448,6 +448,39 @@ namespace BankApp.Robin
                 }
             }
         }
+
+        //Method to read user input while masking it with asterisks for password entry.
+        private static string ReadMasked()
+        {
+            var input = new System.Text.StringBuilder();
+
+            while (true)
+            {
+                ConsoleKeyInfo key = Console.ReadKey(true);
+
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    return input.ToString();
+                }
+
+                if (key.Key == ConsoleKey.Backspace)
+                {
+                    if (input.Length > 0)
+                    {
+                        input.Length--;
+                        Console.Write("\b \b");   
+                    }
+                }
+                else if (!char.IsControl(key.KeyChar))
+                {
+                    input.Append(key.KeyChar);
+                    Console.Write('*');
+                }
+            }
+        }
+
+
         public void LoginMenu()
         {
             Console.Clear();
@@ -507,7 +540,7 @@ namespace BankApp.Robin
                                     Console.Write("\nPersonal identity number: ");
                                     string userName = Console.ReadLine() ?? "";
                                     Console.Write("\nPassword: ");
-                                    string userPassword = Console.ReadLine() ?? "";
+                                    string userPassword = ReadMasked();
                                     LoginResult userLoggedIn = _authService.Login(userName, userPassword);
 
                                     if (userLoggedIn == LoginResult.WrongCredentials)
