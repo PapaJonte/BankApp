@@ -198,6 +198,39 @@ namespace BankApp.Robin
                 : "Wrong current password or the new one is too short.");
         }
 
+        // User story 16: lets the logged-in user change their own email and phone number.
+        private void UpdateMyDetails()
+        {
+            Console.Clear();
+            Console.CursorVisible = true;
+
+            User? user = _authService.LoggedInUser;
+            if (user == null)
+            {
+                Console.WriteLine("No user logged in.");
+                return;
+            }
+
+            Console.WriteLine("===== UPDATE PERSONAL DETAILS =====");
+            Console.WriteLine("Leave a field empty to keep the current value.\n");
+
+            Console.Write($"Email ({user.Email}): ");
+            string newEmail = Console.ReadLine() ?? "";
+            if (string.IsNullOrWhiteSpace(newEmail))
+                newEmail = user.Email;
+
+            Console.Write($"Phone number ({user.PhoneNumber}): ");
+            string newPhone = Console.ReadLine() ?? "";
+            if (string.IsNullOrWhiteSpace(newPhone))
+                newPhone = user.PhoneNumber;
+
+            bool updated = _userService.UpdateUserInfo(user, newEmail, newPhone);
+
+            Console.WriteLine(updated
+                ? "\nYour details have been updated."
+                : "\nInvalid email or phone number. Nothing was changed.");
+        }
+
         private void UpdateExchangeRate()
         {
             Console.Clear();
@@ -296,7 +329,7 @@ namespace BankApp.Robin
                                 Console.Write("Type in identity number : ");
                                 string userNameUnlock = Console.ReadLine() ?? "";
 
-                                Console.Write("Set a new temporary password (min 6 characters): ");
+                                Console.Write("Set a new password (min 6 characters): ");
                                 string tempPassword = ReadMasked();
 
                                 bool userUnlocked = _userService.ResetPassword(_authService.LoggedInUser, userNameUnlock, tempPassword);
@@ -712,7 +745,7 @@ namespace BankApp.Robin
                     "Transfer money",
                     "Transaction history",
                     "Loans",
-                    "Change password",
+                    "Update personal details",
                     "Log out",
 
                 };
@@ -736,11 +769,11 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 7) % 7;
+                        selectedIndex = (selectedIndex - 1 + options.Length) % options.Length;
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 7;
+                        selectedIndex = (selectedIndex + 1) % options.Length;
                         break;
 
                     case ConsoleKey.Enter:
@@ -795,7 +828,7 @@ namespace BankApp.Robin
                                 break;
 
                             case 5:
-                                ChangeMyPassword();
+                                UpdateMyDetails();
                                 Console.ReadKey();
                                 break;
 
