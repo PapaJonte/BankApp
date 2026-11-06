@@ -14,6 +14,7 @@ namespace BankApp.Robin
         //private readonly Theme theme;
 
         private readonly BankTransfer _bankTransfer;
+        private readonly ExchangeRate _exchangeRates;
         private readonly AccountManager _accountManager;
         private readonly LoanMenu _loanMenu;
         private readonly AdminLoanMenu _adminLoanMenu;
@@ -22,9 +23,11 @@ namespace BankApp.Robin
         // CONSTRUCTOR INJECTION: We require UserService to be passed in when Menu is created
 
         // Passes both fields into our constructor so we can use the methods from Maria's class.
-        public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager, BankTransfer bankTransfer)
+        public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager, 
+            BankTransfer bankTransfer, ExchangeRate exchangeRates)
         {
             _bankTransfer = bankTransfer ?? throw new ArgumentNullException(nameof(bankTransfer));
+            _exchangeRates = exchangeRates ?? throw new ArgumentNullException(nameof(exchangeRates));
             _accountManager = accountManager ?? throw new ArgumentNullException(nameof(accountManager));
             _adminLoanMenu = adminLoanMenu ?? throw new ArgumentNullException(nameof(adminLoanMenu));
             _loanMenu = loanMenu ?? throw new ArgumentNullException(nameof(loanMenu));
@@ -195,6 +198,38 @@ namespace BankApp.Robin
                 : "Wrong current password or the new one is too short.");
         }
 
+        private void UpdateExchangeRate()
+        {
+            Console.Clear();
+            Console.CursorVisible = true;
+
+            // Read the direction of the rate, for example EUR to SEK
+            Console.Write("From currency (e.g. EUR): ");
+            if (!Enum.TryParse(Console.ReadLine(), true, out Currency fromCurrency) || !Enum.IsDefined(fromCurrency))
+            {
+                Console.WriteLine("Invalid source currency.");
+                return;
+            }
+
+            Console.Write("To currency (e.g. SEK): ");
+            if (!Enum.TryParse(Console.ReadLine(), true, out Currency toCurrency) || !Enum.IsDefined(toCurrency) || fromCurrency == toCurrency)
+            {
+                Console.WriteLine("Choose a different, valid destination currency.");
+                return;
+            }
+
+            Console.Write($"How many {toCurrency} equal 1 {fromCurrency}?");
+            if (!decimal.TryParse(Console.ReadLine(), out decimal rate) || rate <= 0)
+            {
+                Console.WriteLine("Enter a positive exchange rate.");
+                return;
+            }
+
+            // Saving the same pair again replaces its previous rate
+            _exchangeRates.SetExchangeRate(fromCurrency, toCurrency, rate);
+            Console.WriteLine($"Rate saved. 1 {fromCurrency} = {rate} {toCurrency}");
+        }
+
         public void ShowAdminMenu(int userId)
         {
             Console.Clear();
@@ -285,7 +320,8 @@ namespace BankApp.Robin
 
                             case 3:
                                 // Exchange rates
-
+                                UpdateExchangeRate();
+                                Console.ReadKey(true);
                                 break;
 
                             case 4:
@@ -326,9 +362,227 @@ namespace BankApp.Robin
             return myAccounts;
         }
 
+        private void TransferBetweenAccounts()
+        {
+            Console.CursorVisible = true;
+
+            // Only show accounts the signed-in customer can send money from
+            List<BankAccount> accounts = GetBankAccounts();
+            
+            foreach (BankAccount account in accounts)
+            {
+                Console.WriteLine($"{account.GetBankAccountNumber()}: {account.GetBalance():N2} {account.GetCurrency()}");
+            }
+
+            Console.Write("Source account number: ");
+            
+            if (!int.TryParse(Console.ReadLine(), out int sourceNumber))
+            {
+                Console.WriteLine("Invalid source account number,");
+                return;
+            }
+
+            BankAccount? source = accounts.Find(account => account.GetBankAccountNumber() == sourceNumber);
+            
+            if (source == null)
+            {
+                Console.WriteLine("Select one of your own accounts.");
+                return;
+            }
+
+            // Find the recipient by account number without displaying their balance
+            Console.Write("Destination account number: ");
+            
+            if (!int.TryParse(Console.ReadLine(), out int destinationNumber) || destinationNumber == sourceNumber)
+            {
+                Console.WriteLine("Enter a different, valid destination account number.");
+                return;
+            }
+
+            BankAccount? destination = _accountManager.BankAccountList.Find(account => account.GetBankAccountNumber() == destinationNumber);
+
+            if (destination == null)
+            {
+                Console.WriteLine("Destination account was not found.");
+                return;
+            }
+
+            Currency sourceCurrency = source.GetCurrency();
+            Console.Write($"Amount to send ({sourceCurrency}): ");
+
+            if (!decimal.TryParse(Console.ReadLine(), out decimal amount) || amount <= 0m)
+            {
+                Console.WriteLine("Enter a positive amount.");
+                return;
+            }
+
+            // The transaction service converst the amount and queues the transfer
+            AccountData origin = new(source.GetUserId(), sourceNumber, sourceCurrency);
+            AccountData target = new(destination.GetUserId(), destinationNumber, destination.GetCurrency());
+            StatusCode status = _bankTransfer.TransferMoney(origin, target, amount, sourceCurrency);
+
+            Console.WriteLine(status == StatusCode.Successful ? "Transfer queued." : "Transfer could not be queued. Check your balance and the exchange rate.");
+        }
+
+        private void OpenAccount()
+        {
+            string[] options = { "Open regular bank account", "Open savings account" };
+
+            int selectedIndex = 0;
+
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("===== OPEN ACCOUNT =====");
+                Console.WriteLine("Press Esc to go back.\n");
+
+                for (int i = 0; i < options.Length; i++)
+                {
+                    if (i == selectedIndex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"> {options[i]}");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.WriteLine(options[i]);
+                    }
+                }
+
+                switch (Console.ReadKey(true).Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        selectedIndex = (selectedIndex - 1 + options.Length) % options.Length;
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        selectedIndex = (selectedIndex + 1) % options.Length;
+                        break;
+
+                    case ConsoleKey.Enter:
+
+                        switch (selectedIndex)
+                        {
+                            case 0:
+                                // Regular bank account
+                                OpenRegularAccount();
+                                Console.ReadKey(true);
+                                break;
+
+                            case 1:
+                                // Savings account
+                                OpenSavingsAccount();
+                                Console.ReadKey(true);
+                                break;
+                        }
+                        break;
+
+                    case ConsoleKey.Escape:
+                        return;
+                }
+            }
+        }
+
+        private void OpenRegularAccount()
+        {
+            Console.CursorVisible = true;
+
+            // Open a regular account for the signed-in customer in their chosen currency
+            Currency currency = AccountManager.CheckCurrency();
+            _accountManager.CreateAccount(_authService.LoggedInUser!.UserID, 0m, currency);
+
+            Console.WriteLine($"Regular bank account opened in {currency}");
+        }
+
+        private void OpenSavingsAccount()
+        {
+            Console.CursorVisible = true;
+
+            // Show the customer's regular account so they can choose where to open savings
+            foreach (BankAccount account in GetBankAccounts())
+            {
+                Console.WriteLine($"{account.GetBankAccountNumber()} ({account.GetCurrency()})");
+            }
+
+            Console.Write("Regular account number: ");
+
+            if (!int.TryParse(Console.ReadLine(), out int accountNumber))
+            {
+                Console.WriteLine("Invalid account number.");
+                return;
+            }
+
+            int userId = _authService.LoggedInUser!.UserID;
+            Currency currency = AccountManager.CheckCurrency();
+            SavingsAccount? savingsAccount = _accountManager.CreateSavingsAccount(userId, accountNumber, currency);
+
+            if (savingsAccount == null)
+            {
+                Console.WriteLine("Select one of your own regular accounts.");
+                return;
+            }
+
+            Console.WriteLine($"Savings account {savingsAccount.GetSavingsAccountNumber()} opened in {currency}");
+        }
+
+        private void DepositToAccount()
+        {
+            Console.CursorVisible = true;
+
+            // List only the customer's accounts. A null rate means it is a regular account.
+            var destinations = new Dictionary<int, (Currency Currency, decimal? AnnualRate)>();
+
+            foreach (BankAccount account in GetBankAccounts())
+            {
+                int number = account.GetBankAccountNumber();
+                destinations.Add(number, (account.GetCurrency(), null));
+                Console.WriteLine($"{number} — Regular ({account.GetCurrency()})");
+
+                foreach (SavingsAccount savings in account.SavingAccounts)
+                {
+                    int savingsNumber = savings.GetSavingsAccountNumber();
+                    destinations.Add(savingsNumber, (savings.GetCurrency(), savings.GetInterest()));
+                    Console.WriteLine($"{savingsNumber} — Savings ({savings.GetCurrency()})");
+                }
+            }
+
+            Console.Write("Destination account number: ");
+            if (!int.TryParse(Console.ReadLine(), out int accountNumber) || !destinations.TryGetValue(accountNumber, out var destination))
+            {
+                Console.WriteLine("Select one of your listed accounts.");
+                return;
+            }
+
+            Console.Write($"Amount to deposit ({destination.Currency}): ");
+            if (!decimal.TryParse(Console.ReadLine(), out decimal amount) || amount <= 0m)
+            {
+                Console.WriteLine("Enter a positive amount.");
+                return;
+            }
+
+            // Queue the deposit in the currency of the selected account.
+            AccountData target = new(_authService.LoggedInUser!.UserID, accountNumber, destination.Currency);
+
+            if (_bankTransfer.DepositMoney(target, amount) != StatusCode.Successful)
+            {
+                Console.WriteLine("The deposit could not be queued.");
+                return;
+            }
+
+            Console.WriteLine("Deposit queued.");
+
+            // Estimate one year of interest on this deposit at the account's current rate.
+            if (destination.AnnualRate is decimal annualRate)
+            {
+                decimal estimatedInterest = amount * annualRate / 100m;
+                Console.WriteLine($"Estimated interest after one year at {annualRate}%: {estimatedInterest:N2} {destination.Currency}.");
+            }
+        }
+
         private void ShowTransferMenu()
         {
-            string[] options = { "Deposit", "Withdraw", "Transfer" };
+            string[] options = { "Deposit", "Withdraw", "Transfer", "Open account" };
 
             int selectedIndex = 0;
 
@@ -363,22 +617,14 @@ namespace BankApp.Robin
                         break;
 
                     case ConsoleKey.Enter:
-                        Console.WriteLine($"\n{options[selectedIndex]} is not available yet.");
-                        Console.ReadKey(true);
 
 
                         switch (selectedIndex)
                         {
                             case 0:
-                                Console.WriteLine($"\nWhich account would you like to deposit to?");
-
-                                int selectedIndex = 0;
-
-                               
-                                GetBankAccounts();
-                                
-                     
-                                _bankTransfer.DepositMoney();
+                                // Deposit
+                                DepositToAccount();
+                                Console.ReadKey(true);
                                 break;
 
                             case 1:
@@ -429,16 +675,15 @@ namespace BankApp.Robin
                                 break;
 
                             case 2:
-                                foreach (BankAccount bankAccount in _accountManager.BankAccountList)
-                                {
-                                    Console.WriteLine($"\nAccount number : {bankAccount.GetBankAccountNumber()}" +
-                                        $"\nBalance : {bankAccount.GetBalance()} " +
-                                        $"\nCurrency : {bankAccount.GetCurrency()}");
-                                }
-
-                                // _bankTransfer.TransferMoney();
+                                // Transfer
+                                TransferBetweenAccounts();
+                                Console.ReadKey(true);
                                 break;
 
+                            case 3:
+                                // Open account
+                                OpenAccount();
+                                break;
                         }
                         break;
 
