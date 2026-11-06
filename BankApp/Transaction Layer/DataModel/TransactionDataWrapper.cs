@@ -33,10 +33,10 @@ public readonly struct TransactionDataWrapper(TransactionDataObject[] dataObject
     /// <returns>
     /// bool flag if object is found.
     /// </returns>
-    public readonly bool TryGetWithdrawalObject(out TransactionDataObject dataObject)
+    public readonly bool TryGetWithdrawalObject(out TransactionDataObject? dataObject)
     {
         bool hasWithdrawal = false;
-        dataObject = default;
+        dataObject = null;
 
         foreach (var d in _dataObjects)
         {
@@ -59,10 +59,10 @@ public readonly struct TransactionDataWrapper(TransactionDataObject[] dataObject
     /// <returns>
     /// bool flag for finding object or not.
     /// </returns>
-    public readonly bool TryGetDepositObject(out TransactionDataObject dataObject)
+    public readonly bool TryGetDepositObject(out TransactionDataObject? dataObject)
     {
         bool hasDeposit = false;
-        dataObject = default;
+        dataObject = null;
 
         foreach (var d in _dataObjects)
         {
