@@ -243,7 +243,8 @@ def _layout(nodes, hgap, vgap):
     return (x - hgap, y - vgap)
 
 
-def render_class_diagram(path, nodes, edges, title=None, hgap=54, vgap=58, margin=24):
+def render_class_diagram(path, nodes, edges, title=None, hgap=54, vgap=58, margin=24,
+                         overline='BANKAPP · THE GOLDEN SACK'):
     f_title = _font('title', 13)
     f_stereo = _font('small', 10.5)
     f_body = _font('body', 11.5)
@@ -251,15 +252,21 @@ def render_class_diagram(path, nodes, edges, title=None, hgap=54, vgap=58, margi
     for n in nodes:
         n.measure(f_title, f_stereo, f_body)
     tw, th = _layout(nodes, hgap, vgap)
-    title_h = 30 if title else 0
+    title_h = 46 if title else 0
     W = margin * 2 + tw
     H = margin * 2 + title_h + th
     img = Image.new('RGB', (int(W * S), int(H * S)), WHITE)
     dr = ImageDraw.Draw(img)
     if title:
-        dr.text((margin * S, (margin - 18) * S), title, font=_font('title', 14), fill=INK)
+        dr.text((margin * S, (margin - 24) * S), overline, font=_font('small', 9.5),
+                fill=(152, 158, 172))
+        dr.text((margin * S, (margin - 11) * S), title, font=_font('title', 14), fill=INK)
     oy = margin + title_h
     by_name = {n.name: n for n in nodes}
+    for n in nodes:  # subtle drop shadows under every box
+        dr.rectangle([(margin + n.x) * S + 3 * S, (oy + n.y) * S + 3 * S,
+                      (margin + n.x + n.w) * S + 3 * S, (oy + n.y + n.h) * S + 3 * S],
+                     fill=(224, 227, 233))
     for n in nodes:
         n.draw(dr, margin, oy, f_title, f_stereo, f_body)
     for e in edges:
@@ -422,7 +429,8 @@ def _draw_seq_items(items, dr, seq, y, f_label, f_small, width):
     return y
 
 
-def render_sequence(path, participants, items, title=None, margin=26):
+def render_sequence(path, participants, items, title=None, margin=26,
+                    overline='BANKAPP · THE GOLDEN SACK'):
     """participants: list of (id, name, stereo). Items: tuples, see module docstring."""
     f_label = _font('label', 11)
     f_small = _font('small', 10.5)
@@ -442,7 +450,7 @@ def render_sequence(path, participants, items, title=None, margin=26):
         xs[pid] = x + pw[pid] / 2
         x += pw[pid] + gap
     seq = _Seq(order, xs)
-    title_h = 30 if title else 0
+    title_h = 46 if title else 0
     head_h = 34
     seq_h = sum(_item_height(it) for it in items)
     H = margin + title_h + head_h + seq_h + 36
@@ -450,12 +458,16 @@ def render_sequence(path, participants, items, title=None, margin=26):
     img = Image.new('RGB', (int(W * S), int(H * S)), WHITE)
     dr = ImageDraw.Draw(img)
     if title:
-        dr.text((margin * S, (margin - 18) * S), title, font=_font('title', 14), fill=INK)
+        dr.text((margin * S, (margin - 26) * S), overline, font=_font('small', 9.5),
+                fill=(152, 158, 172))
+        dr.text((margin * S, (margin - 13) * S), title, font=_font('title', 14), fill=INK)
     top = margin + title_h
     for pid, name, stereo in participants:
         x0 = (xs[pid] - pw[pid] / 2) * S
         x1 = (xs[pid] + pw[pid] / 2) * S
         y1 = (top + head_h) * S
+        dr.rounded_rectangle([x0 + 3 * S, top * S + 3 * S, x1 + 3 * S, y1 + 3 * S],
+                             radius=6 * S, fill=(224, 227, 233))
         pal = PALETTE['actor' if stereo == 'actor' else 'class']
         dr.rounded_rectangle([x0, top * S, x1, y1], radius=6 * S,
                              fill=pal['head'], outline=LINE, width=2)

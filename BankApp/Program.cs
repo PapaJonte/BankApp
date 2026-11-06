@@ -29,7 +29,7 @@ namespace BankApp
             LoanService loanService = new LoanService(interestRuleService, creditScoreService);
             
             #region Transactions
-            AccountBridge accountBridge = new(accountManager);
+            AccountBridge accountBridge = new(accountManager, loanService);
             
             #region Transaction Module
             TransactionScheduler transactionScheduler = new();
@@ -42,7 +42,7 @@ namespace BankApp
             IViewTransactionStatisticBridge viewTransactionStatisticBridge = new TransactionStatisticBridge(bankTransferStatistic);
             #endregion
 
-            LoanMenu loanMenu = new LoanMenu(loanService, accountManager, viewTransactionStatisticBridge);
+            LoanMenu loanMenu = new LoanMenu(loanService, accountManager, viewTransactionStatisticBridge, bankTransferModule, exchangeRateModule);
             AdminLoanMenu adminLoanMenu = new AdminLoanMenu(loanService, accountManager, bankTransferModule);
 
             #region Transfer Module

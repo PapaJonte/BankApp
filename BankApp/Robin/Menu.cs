@@ -173,6 +173,28 @@ namespace BankApp.Robin
                 }
             }
         }
+
+        private void ChangeMyPassword()
+        {
+            Console.Clear();
+            Console.Write("Current password: ");
+            string oldPassword = ReadMasked();
+            Console.Write("New password (min 6 characters): ");
+            string newPassword = ReadMasked();
+            Console.Write("Repeat new password: ");
+            string repeat = ReadMasked();
+
+            if (newPassword != repeat)
+            {
+                Console.WriteLine("The passwords do not match.");
+                return;
+            }
+
+            Console.WriteLine(_userService.ChangePassword(_authService.LoggedInUser, oldPassword, newPassword)
+                ? "Password changed."
+                : "Wrong current password or the new one is too short.");
+        }
+
         public void ShowAdminMenu(int userId)
         {
             Console.Clear();
@@ -236,18 +258,21 @@ namespace BankApp.Robin
                             case 1:
                                 // Unlock user
                                 Console.Clear();
-                                Console.WriteLine("Type in identity number : ");
+                                Console.Write("Type in identity number : ");
                                 string userNameUnlock = Console.ReadLine() ?? "";
 
-                                bool userUnlocked = _authService.UnlockUser(userNameUnlock);
+                                Console.Write("Set a new temporary password (min 6 characters): ");
+                                string tempPassword = ReadMasked();
+
+                                bool userUnlocked = _userService.ResetPassword(_authService.LoggedInUser, userNameUnlock, tempPassword);
 
                                 if (userUnlocked)
                                 {
-                                    Console.Write($"You unlocked user : {userNameUnlock}");
+                                    Console.WriteLine($"You unlocked user : {userNameUnlock}. They can now log in with the new password.");
                                 }
                                 else
                                 {
-                                    Console.WriteLine("User not found!");
+                                    Console.WriteLine("Could not unlock (user not found, no permission or password too short).");
                                 }
                                 Console.ReadKey();
                                 break;
@@ -447,6 +472,7 @@ namespace BankApp.Robin
                     "Transfer money",
                     "Transaction history",
                     "Loans",
+                    "Change password",
                     "Log out",
 
                 };
@@ -470,11 +496,11 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 6) % 6;
+                        selectedIndex = (selectedIndex - 1 + 7) % 7;
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 6;
+                        selectedIndex = (selectedIndex + 1) % 7;
                         break;
 
                     case ConsoleKey.Enter:
@@ -525,6 +551,11 @@ namespace BankApp.Robin
                                 break;
 
                             case 5:
+                                ChangeMyPassword();
+                                Console.ReadKey();
+                                break;
+
+                            case 6:
                                 _authService.Logout();
                                 userMenu = false;
                                 break;
@@ -539,6 +570,39 @@ namespace BankApp.Robin
                 }
             }
         }
+
+        //Method to read user input while masking it with asterisks for password entry.
+        private static string ReadMasked()
+        {
+            var input = new System.Text.StringBuilder();
+
+            while (true)
+            {
+                ConsoleKeyInfo key = Console.ReadKey(true);
+
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    return input.ToString();
+                }
+
+                if (key.Key == ConsoleKey.Backspace)
+                {
+                    if (input.Length > 0)
+                    {
+                        input.Length--;
+                        Console.Write("\b \b");   
+                    }
+                }
+                else if (!char.IsControl(key.KeyChar))
+                {
+                    input.Append(key.KeyChar);
+                    Console.Write('*');
+                }
+            }
+        }
+
+
         public void LoginMenu()
         {
             Console.Clear();
@@ -598,7 +662,7 @@ namespace BankApp.Robin
                                     Console.Write("\nPersonal identity number: ");
                                     string userName = Console.ReadLine() ?? "";
                                     Console.Write("\nPassword: ");
-                                    string userPassword = Console.ReadLine() ?? "";
+                                    string userPassword = ReadMasked();
                                     LoginResult userLoggedIn = _authService.Login(userName, userPassword);
 
                                     if (userLoggedIn == LoginResult.WrongCredentials)

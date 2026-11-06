@@ -97,7 +97,7 @@ namespace BankApp.Robin
             string[] options =
             {
                 "View pending loans",
-                "Approve a loan",
+                "Approve a loan or retry payout",
                 "Reject a loan",
                 "Update credit-score interest adjustment",
                 "Update base interest rate",
@@ -176,7 +176,7 @@ namespace BankApp.Robin
 
                             case 1:
                                 // Approve loans
-                                Console.WriteLine("Enter the loan ID to approve:");
+                                Console.WriteLine("Enter the loan ID: ");
 
                                 if (!int.TryParse(Console.ReadLine(), out int loanId))
                                 {
@@ -184,56 +184,69 @@ namespace BankApp.Robin
                                     break;
                                 }
 
-                                // Find the loan among pending applications
-                                Loan? loan = loanService.GetPendingLoans().Find(loanItem => loanItem.LoanId == loanId);
+                                // Include approved loans os the admin can retry if queuing failed
+                                Loan? loan = loanService.GetLoanById(loanId);
 
-                                if (loan == null)
+                                if (loan == null || loan.Status == LoanStatus.Rejected)
                                 {
-                                    Console.WriteLine("Pending loan not found.");
+                                    Console.WriteLine("No pending or approved loan found.");
                                     break;
                                 }
 
-                                // Convert the stored destination account number to an integer
-                                if (!int.TryParse(loan.DestinationAccountNumber, out int destinationAccountNumber))
+                                if (loan.PayoutRequested || loan.PayoutDate.HasValue)
+                                {
+                                    Console.WriteLine("The payout has already been requested.");
+                                    break;
+                                }
+
+                                // Use the borrower's actual regular account and its currency
+                                if (!int.TryParse(loan.DestinationAccountNumber, out int accountNumber))
                                 {
                                     Console.WriteLine("Invalid destination account number.");
                                     break;
                                 }
 
-                                // Verify that the destination account belongs to the customer
-                                if (!accountManager.AccountOwnershipVerification(loan.UserId, destinationAccountNumber))
+                                BankAccount? destination = accountManager.FindRegularAccount(loan.UserId, accountNumber);
+
+                                if (destination == null)
                                 {
                                     Console.WriteLine("The destination account could not be verified.");
                                     break;
                                 }
 
-                                // Retrieve the customer's total account balance
-                                decimal totalAccountBalance;
+                                // Recheck the borrowing limit before approving a pending application
+                                if (loan.Status == LoanStatus.Pending)
+                                {
+                                    decimal totalBalance;
+                                    try
+                                    {
+                                        totalBalance = accountManager.GetTotalBalance(loan.UserId);
+                                    }
+                                    catch (InvalidOperationException)
+                                    {
+                                        Console.WriteLine("An exchange rate is missing. The loan is still pending.");
+                                        break;
+                                    }
 
-                                try
-                                {
-                                    totalAccountBalance = accountManager.GetTotalBalance(loan.UserId);
+                                    if (!loanService.ChangeLoanStatus(loanId, LoanStatus.Approved, totalBalance))
+                                    {
+                                        Console.WriteLine("Loan approval failed.");
+                                        break;
+                                    }
                                 }
-                                catch (InvalidOperationException)
+
+                                AccountData target = new(loan.UserId, accountNumber, destination.GetCurrency());
+                                StatusCode status = bankTransfer.TransferLoan(target, loan.LoanAmount, Currency.SEK, loanId);
+
+                                if (status != StatusCode.Successful)
                                 {
-                                    Console.WriteLine("Approval could not continue because an exchange rate is unavailable. The loan is still pending");
+                                    Console.WriteLine($"Loan #{loanId} is approved, but the payout could not be queued. You can retry.");
                                     break;
                                 }
 
-                                // Attempt to approve a loan
-                                bool approved = loanService.ChangeLoanStatus(loanId, LoanStatus.Approved, totalAccountBalance);
-
-                                if (approved)
-                                {
-                                    // TO DO: Queue the payout to the selected regular account
-                                    // Mark the payout as reuqested only after Alex's method accepts it
-                                    // On confirmed deposit, call ConfirmLoanPayout with the actual credit date
-                                    Console.WriteLine($"Loan #{loanId} approved. Payout has not been queued.");
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Loan approval failed.");
-                                }
+                                // Record the request only after the transaction queue accepts it
+                                loanService.RequestLoanPayout(loanId);
+                                Console.WriteLine($"Loan #{loanId} is approved. Payout queued.");
 
                                 break;
 

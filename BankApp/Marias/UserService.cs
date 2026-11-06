@@ -264,14 +264,14 @@ namespace BankApp
         {
             return result switch
             {
-                CreateUserResult.Success => "Användaren skapades!",
-                CreateUserResult.NotAllowed => "Du har inte behörighet att skapa den här typen av konto.",
-                CreateUserResult.InvalidPersonalNumber => "Personnumret måste bestå av exakt 12 siffror (t.ex. 199001011234).",
-                CreateUserResult.UsernameTaken => "Det här personnumret är redan registrerat.",
-                CreateUserResult.InvalidPassword => $"Lösenordet måste vara minst {MinPasswordLength} tecken.",
-                CreateUserResult.InvalidEmail => "Ogiltig e-postadress - måste innehålla @ och en punkt efter @ (t.ex. namn@exempel.com).",
-                CreateUserResult.InvalidPhone => "Ogiltigt telefonnummer - ange 7-15 siffror.",
-                _ => "Okänt fel."
+                CreateUserResult.Success => "User Created Successfully",
+                CreateUserResult.NotAllowed => "You are not authorized to create this type of account.",
+                CreateUserResult.InvalidPersonalNumber => "Your personal number has to be 12 numbers total (example: 199001011234).",
+                CreateUserResult.UsernameTaken => "This username is already taken.",
+                CreateUserResult.InvalidPassword => $"Password has to be at least {MinPasswordLength} numbers long.",
+                CreateUserResult.InvalidEmail => "Email has to contain a @ and a dot after @ (example: name@exempel.com).",
+                CreateUserResult.InvalidPhone => "Invalid phone number, please enter 7-15 digits.",
+                _ => "Unknown error."
             };
         }
 
@@ -315,7 +315,27 @@ namespace BankApp
             user.ChangePassword(newPassword);
             return true;
         }
+        // Sets a new password for a user, without needing the old password. Used by admins to reset passwords.
+        // Admin can reset passwords for Customers, Owner can reset passwords for Admins.
+        public bool ResetPassword(User? caller, string username, string newPassword)
+        {
+            if (caller == null || caller.Role == UserRole.Customer)
+                return false;
 
+            if (!IsValidPassword(newPassword))
+                return false;
+
+            User? target = GetUserByUsername(username);
+            if (target == null || target.Role == UserRole.Owner)
+                return false;
+
+            if (target.Role == UserRole.Admin && caller.Role != UserRole.Owner)
+                return false;
+
+            target.ChangePassword(newPassword);
+            target.Unlock();
+            return true;
+        }
 
 
 
