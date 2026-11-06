@@ -27,7 +27,7 @@ public class PayoutEvaluator(PayoutTable table) : IPayoutEvaluator
                         .OrderByDescending(s => s.Count())
                         .First();
 
-        if (bestCount.Count() > 1)
+        if (bestCount.Count() > 2)
         {
             payoutMultiplier = bestCount.Count() / 3m * table.GetPayoutValue(bestCount.Key);
         }

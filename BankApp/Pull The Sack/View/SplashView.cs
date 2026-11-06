@@ -16,7 +16,7 @@ public class SplashView(SplashViewConfig config) : IView
     public bool HasBeenServed { get; set; } = false;
     public GameState GameState { get; set; }
     public ViewState ViewState { get; set; } = ViewState.Idle;
-
+    private string continueText = "";
 
     private int currentFrame = 0;
 
@@ -35,11 +35,15 @@ public class SplashView(SplashViewConfig config) : IView
         if (currentFrame < 4)
         {
             ViewState = ViewState.Animating;
+            continueText = "";
         }
         else
         {
             ViewState = ViewState.Complete;
+            continueText = config.Continue;
         }
+        console.WriteCentered("");
+        console.WriteCentered(continueText);
 
     }
 

@@ -648,97 +648,222 @@ InterestRuleService "1" *-- "5" InterestRule : bands
 # 06 — Menus & presentation (Robin's module)
 # =====================================================================
 ui_nodes = [
-    cls('UserService', 'UserService', 'component', col=0, row=0,
-        notes=['«Marias» external']),
-    cls('Menu', kind='class', col=1, row=0,
-        attrs=['- _loanMenu : LoanMenu',
-               '- _userService : UserService',
-               '- _authService : AuthService'],
-        ops=['+ LoginMenu()',
+    cls('UserService', 'UserService', 'component', col=1, row=-1,
+        notes=['«Marias» external',
+               'GetAllUsers(), CreateUser(...),',
+               'static GetErrorMessage(result)']),
+    cls('AuthService', 'AuthService', 'component', col=3, row=-1,
+        notes=['«Marias» external',
+               'Login(), Logout(), UnlockUser(),',
+               'IsLoggedInUserAdmin(),',
+               'LoggedInUser : User?']),
+    cls('Menu', kind='class', col=2, row=0,
+        attrs=['- _userService : UserService',
+               '- _authService : AuthService',
+               '- _loanMenu : LoanMenu',
+               '- _adminLoanMenu : AdminLoanMenu',
+               '- _accountManager : AccountManager',
+               '- _bankTransfer : BankTransfer (unused)'],
+        ops=['+ ctor(UserService, AuthService, LoanMenu,',
+             '    AdminLoanMenu, AccountManager,',
+             '    BankTransfer)',
+             '+ LoginMenu()',
              '+ CreateUser() : bool',
              '+ ShowCreatedUsers()',
+             '+ ShowLoggedInUser()',
              '+ ShowAdminMenu(userId)',
              '+ ShowUserMenu()',
-             '+ ShowOwnerMenu()'],
-        notes=['arrow-key menus, Console.Clear redraw']),
-    cls('LoanMenu', kind='class', col=2, row=0,
+             '+ ShowOwnerMenu()',
+             '- ShowTransferMenu()',
+             '- ReadMasked() : string  {static}'],
+        notes=['arrow-key menus; logo via',
+               'GoldenSack.WriteLogo();',
+               'LoginResult routes role menu;',
+               'ShowOwnerMenu never called;',
+               'all _bankTransfer calls are',
+               'commented out']),
+    cls('ExchangeRate', 'ExchangeRate', 'component', col=0, row=1,
+        notes=['«Transaction_Layer.API» external',
+               'TryCalculateExchangeValue(from,',
+               '    to, value, out amount)']),
+    cls('LoanMenu', kind='class', col=1, row=1,
         attrs=['- loanService : LoanService',
-               '- accountManager : AccountManager'],
-        ops=['+ ShowLoanMenu(userId)',
+               '- accountManager : AccountManager',
+               '- bankTransferStatistics :',
+               '    IViewTransactionStatisticBridge',
+               '- bankTransfer : BankTransfer',
+               '- exchangeRates : ExchangeRate'],
+        ops=['+ ctor(LoanService, AccountManager,',
+             '    IViewTransactionStatisticBridge,',
+             '    BankTransfer, ExchangeRate)',
+             '+ ShowLoanMenu(userId)',
              '+ ApplyForLoan(userId, amount,',
              '    duration) : Loan?',
-             '+ ChangeLoanStatus(loanId,',
-             '    newStatus) : bool'],
-        notes=['apply for loan / view my loans']),
-    cls('LoanService', 'LoanService', 'component', col=3, row=0,
-        notes=['«Jonathan» external']),
-    cls('AuthService', 'AuthService', 'component', col=0, row=1,
-        notes=['«Marias» external']),
-    cls('Theme', kind='class', col=1, row=2,
+             '- PrepareLoanRepayment(userId, loanId)'],
+        notes=['repayment: SEK → account currency',
+               'via ExchangeRate, BankTransfer.',
+               'WithdrawMoney, then RepayLoan;',
+               'bankTransferStatistics injected',
+               'but never used']),
+    cls('AdminLoanMenu', kind='class', col=3, row=1,
+        attrs=['- loanService : LoanService',
+               '- accountManager : AccountManager',
+               '- bankTransfer : BankTransfer'],
+        ops=['+ ctor(LoanService, AccountManager,',
+             '    BankTransfer)',
+             '+ ShowAdminLoanMenu(userId)',
+             '- UpdateCreditScoreAdjustment()',
+             '- UpdateBaseRate()'],
+        notes=['approve → re-check 5x limit →',
+               'BankTransfer.TransferLoan payout',
+               'then RequestLoanPayout; reject;',
+               'update interest rule / base rate']),
+    cls('LoanService', 'LoanService', 'component', col=1, row=2,
+        notes=['«Jonathan» external',
+               'ApplyForLoan, RepayLoan,',
+               'UpdateLatePayments, GetPendingLoans,',
+               'GetLoanById, ChangeLoanStatus,',
+               'RequestLoanPayout, GetCustomersLoan,',
+               'UpdateInterestRule,',
+               'UpdateBaseInterestRate']),
+    cls('BankTransfer', 'BankTransfer', 'component', col=2, row=2,
+        notes=['«Transaction_Layer.API» external',
+               'WithdrawMoney(source, amount),',
+               'TransferLoan(target, amount,',
+               '    Currency, loanId) : StatusCode']),
+    cls('AccountManager', 'AccountManager', 'component', col=3, row=2,
+        notes=['«GustafsClasses» external',
+               'BankAccountList, CreateAccount(...),',
+               'GetTotalBalance(userId),',
+               'FindRegularAccount(userId, no),',
+               'static CheckCurrency() : Currency']),
+    cls('Theme', kind='class', col=0, row=2,
         attrs=['- style : Style'],
         ops=['+ Markup(input)'],
-        notes=['Spectre.Console blue/white',
-               'bold style; not wired in']),
-    cls('EmailService', kind='class', col=2, row=2,
+        notes=['Spectre blue/white bold;',
+               'created in Program.Main but',
+               'never used — unwired']),
+    cls('EmailService', kind='class', col=0, row=3,
         ops=['+ SendEmail(recipient, subject, body)'],
-        notes=['MailKit SMTP/IMAP sender,',
-               'not wired to anything yet']),
-    cls('AccountManager', 'AccountManager', 'component', col=3, row=1,
-        notes=['«Gustaf» external']),
+        notes=['«global namespace»',
+               'MailKit/MimeKit SMTP+IMAP;',
+               'placeholder credentials;',
+               'never referenced — dead code']),
 ]
 ui_edges = [
     Edge('Menu', 'LoanMenu', 'assoc', 'opens'),
+    Edge('Menu', 'AdminLoanMenu', 'assoc', 'opens'),
     Edge('Menu', 'UserService', 'uses', '«uses»'),
     Edge('Menu', 'AuthService', 'uses', '«uses»'),
+    Edge('LoanMenu', 'ExchangeRate', 'uses', 'converts'),
     Edge('LoanMenu', 'LoanService', 'uses', '«uses»'),
-    Edge('LoanMenu', 'AccountManager', 'uses', '«uses»'),
+    Edge('LoanMenu', 'BankTransfer', 'uses', '«uses»'),
+    Edge('AdminLoanMenu', 'BankTransfer', 'uses', '«uses»'),
+    Edge('AdminLoanMenu', 'AccountManager', 'uses', '«uses»'),
 ]
 add('06-menus-ui', 'Menus & presentation — BankApp.Robin', 'class',
     (ui_nodes, ui_edges), '''
 classDiagram
 direction LR
 class Menu {
-  -_loanMenu : LoanMenu
   -_userService : UserService
   -_authService : AuthService
+  -_loanMenu : LoanMenu
+  -_adminLoanMenu : AdminLoanMenu
+  -_accountManager : AccountManager
+  -_bankTransfer : BankTransfer
+  +ctor(UserService, AuthService, LoanMenu, AdminLoanMenu, AccountManager, BankTransfer)
   +LoginMenu()
   +CreateUser() bool
   +ShowCreatedUsers()
+  +ShowLoggedInUser()
   +ShowAdminMenu(userId)
   +ShowUserMenu()
   +ShowOwnerMenu()
+  -ShowTransferMenu()
+  -ReadMasked() string$
 }
 class LoanMenu {
   -loanService : LoanService
   -accountManager : AccountManager
+  -bankTransferStatistics : IViewTransactionStatisticBridge
+  -bankTransfer : BankTransfer
+  -exchangeRates : ExchangeRate
+  +ctor(LoanService, AccountManager, IViewTransactionStatisticBridge, BankTransfer, ExchangeRate)
   +ShowLoanMenu(userId)
   +ApplyForLoan(userId, amount, duration) Loan?
-  +ChangeLoanStatus(loanId, newStatus) bool
+  -PrepareLoanRepayment(userId, loanId)
+}
+class AdminLoanMenu {
+  -loanService : LoanService
+  -accountManager : AccountManager
+  -bankTransfer : BankTransfer
+  +ctor(LoanService, AccountManager, BankTransfer)
+  +ShowAdminLoanMenu(userId)
+  -UpdateCreditScoreAdjustment()
+  -UpdateBaseRate()
 }
 class Theme {
   -style : Style
   +Markup(input)
 }
 class EmailService {
+  <<global namespace>>
   +SendEmail(recipient, subject, body)
 }
 class UserService {
   <<external Marias>>
+  +GetAllUsers()
+  +CreateUser(...) CreateUserResult
+  +GetErrorMessage(result)$
 }
 class AuthService {
   <<external Marias>>
+  +Login(username, password) LoginResult
+  +Logout()
+  +UnlockUser(username) bool
+  +IsLoggedInUserAdmin() bool
+}
+class ExchangeRate {
+  <<external Transaction_Layer.API>>
+  +TryCalculateExchangeValue(from, to, value, out amount) StatusCode
 }
 class LoanService {
   <<external Jonathan>>
+  +ApplyForLoan(...) Loan?
+  +RepayLoan(loanId, amount, date) bool
+  +UpdateLatePayments(userId, date)
+  +GetPendingLoans() List~Loan~
+  +GetLoanById(loanId) Loan
+  +ChangeLoanStatus(loanId, status, balance) bool
+  +RequestLoanPayout(loanId)
+  +UpdateInterestRule(min, max, adj)
+  +UpdateBaseInterestRate(min, max, rate) bool
 }
 class AccountManager {
-  <<external Gustaf>>
+  <<external GustafsClasses>>
+  +BankAccountList
+  +CreateAccount(userId, amount, currency)
+  +GetTotalBalance(userId) decimal
+  +FindRegularAccount(userId, accountNumber) BankAccount
+  +CheckCurrency() Currency$
+}
+class BankTransfer {
+  <<external Transaction_Layer.API>>
+  +WithdrawMoney(source, amount) StatusCode
+  +TransferLoan(target, amount, currency, loanId) StatusCode
 }
 Menu --> LoanMenu : opens
+Menu --> AdminLoanMenu : opens
 Menu ..> UserService : uses
 Menu ..> AuthService : uses
+LoanMenu --> ExchangeRate : converts installments
 LoanMenu ..> LoanService : uses
 LoanMenu ..> AccountManager : uses
+LoanMenu ..> BankTransfer : uses
+AdminLoanMenu ..> LoanService : uses
+AdminLoanMenu ..> AccountManager : uses
+AdminLoanMenu ..> BankTransfer : uses
 ''')
 
 # =====================================================================
