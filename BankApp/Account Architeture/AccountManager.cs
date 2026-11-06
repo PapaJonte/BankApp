@@ -90,19 +90,22 @@ namespace BankApp.GustafsClasses
         //Used for creating savings accounts. The savings accounts store the balance.
         public SavingsAccount? CreateSavingsAccount(int userId, int bankAccountNumber, Currency currency)
         {
+            //Variables for adding values to the object's constructor.
             decimal balance = 0m;
             decimal interest = 0.5m;
+            //Attempting to find object of BankAccount class.
             BankAccount? parentAccount = FindRegularAccount(userId, bankAccountNumber);
-
+            //Returning nothing if there is nothing to be found.
             if (parentAccount == null)
             {
                 return null;
             }
-
+            //Creating an object of SavingsAccount class, as is the point of this method.
             SavingsAccount savingsAccount = new SavingsAccount(
                     balance, currency, interest, AccountNrGenerator() );
 
-            parentAccount.SavingAccounts.Add(savingsAccount);
+            parentAccount.SavingAccounts.Add(savingsAccount); //Adding account to list to save for later.
+            //Saving the list for later.
             parentAccount.SavingsAccountDictionary[userId] = parentAccount.SavingAccounts;
             return savingsAccount;
         }
