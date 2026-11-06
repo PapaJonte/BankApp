@@ -77,7 +77,7 @@ namespace BankApp.GustafsClasses
         //Used for creating savings accounts. The savings accounts store the balance.
         public decimal CreateSavingsAccount(int userId, decimal balance, Currency currency)
         {
-            Enum.GetValues<Currency>();
+            Enum.GetValues<Currency>(); 
             //Return data.
             decimal interest = 0.5m;
             if (BankAccountList.Count > 0)
