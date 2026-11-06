@@ -87,8 +87,7 @@ public class Orchestrator
         // --- Controller + run ---
         SlotMachineController controller =
             new(machine, updater, bank, userInput, registry);
-        controller.PullTheSack();
-
+            
         return controller;
     }
 }

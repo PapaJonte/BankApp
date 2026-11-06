@@ -328,15 +328,15 @@ namespace BankApp.Robin
                         switch (selectedIndex)
                         {
                             case 0:
-                                _bankTransfer.DepositMoney();
+                               // _bankTransfer.DepositMoney();
                                 break;
 
                             case 1:
-                                _bankTransfer.WithdrawMoney();
+                                //_bankTransfer.WithdrawMoney();
                                 break;
 
                             case 2:
-                                _bankTransfer.TransferMoney();
+                               // _bankTransfer.TransferMoney();
                                 break;
 
                         }

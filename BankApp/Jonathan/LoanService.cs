@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BankApp.Pull_The_Sack.API;
 
 namespace BankApp.Jonathan
 {
@@ -18,7 +19,8 @@ namespace BankApp.Jonathan
         private readonly InterestRuleService interestRuleService;
         private readonly InterestCalculator calculator;
         private readonly CreditScoreService creditScoreService;
-        
+        private GamblingFacade gambling;
+
         private int nextLoandId = 1;
 
         public LoanService(InterestRuleService interestRuleService, CreditScoreService creditScoreService)
@@ -28,6 +30,7 @@ namespace BankApp.Jonathan
             this.creditScoreService = creditScoreService ?? throw new ArgumentNullException(nameof(creditScoreService));
 
             calculator = new InterestCalculator(interestRuleService);
+            gambling = new();
         }
 
 
@@ -88,9 +91,36 @@ namespace BankApp.Jonathan
             // Calculates the total amount the customer will repay, including interest.
             decimal totalRepayment = requestedAmount + totalInterest;
 
-            // Creates a new loan
-            Loan newLoan = new Loan(requestedAmount, duration, interestRate, totalInterest);
+            Loan newLoan;
 
+            //  gamble on the loan
+            Console.WriteLine();
+            Console.WriteLine("=====================================================");
+            Console.WriteLine("  FEELING LUCKY? GAMBLE ON YOUR LOAN TODAY!");
+            Console.WriteLine("  Sponsored by LiveForGambling.com");
+            Console.WriteLine("  -- Where every debt is just one spin away --");
+            Console.WriteLine("=====================================================");
+            Console.WriteLine($"Your current total repayment: {totalRepayment:N2} SEK");
+            Console.Write("Do you want to gamble on your loan? (y/n): ");
+
+            string? gambleChoice = Console.ReadLine();
+
+    
+            if (!string.IsNullOrWhiteSpace(gambleChoice) &&
+                gambleChoice.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
+            {
+
+                requestedAmount = gambling.GambleOnLoan(totalRepayment).GetLoanAmount();
+                newLoan = new Loan(requestedAmount, duration, interestRate, totalInterest, totalRepayment);
+            }
+            else
+            {
+                Console.WriteLine("Got to risk it to get the biscuit! Keeping your loan as it is.");
+                newLoan = new Loan(requestedAmount, duration, interestRate, totalInterest);
+            }
+
+            // Creates a new loan
+            Console.Clear();
             // Customer and loan identification
             newLoan.UserId = userId;
             newLoan.LoanId = nextLoandId;
@@ -344,12 +374,12 @@ namespace BankApp.Jonathan
         {
             // Only a confirmed deposit for an approved loan starts repayment
             Loan? loan = GetLoanById(loanId);
-            
+
             if (loan == null || loan.Status != LoanStatus.Approved)
             {
                 return false;
             }
-                
+
             loan.StartRepaymentSchedule(creditedDate);
             return true;
         }
@@ -361,7 +391,7 @@ namespace BankApp.Jonathan
             {
                 // Repeated checks only charge bills that have become due since the last check
                 int newDeductions = loan.UpdateLateBills(today);
-                
+
                 if (newDeductions > 0)
                 {
                     creditScoreService.DecreaseCreditScore(userId, newDeductions * 10);
@@ -428,7 +458,7 @@ namespace BankApp.Jonathan
 
                     // Award 5 creditscore points for ever 3 consecutive on-time installments
                     int streak = loan.ConsecutiveOnTimePayments;
-                    
+
                     if (streak > 0 && streak % 3 == 0)
                     {
                         creditScoreService.IncreaseCreditScore(loan.UserId, 5);

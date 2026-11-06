@@ -125,7 +125,7 @@ public class SlotMachineController(
                 {
                     if (view.ViewState == ViewState.Complete)
                     {
-                        bank.SetLoanAmount(423424);
+                        bank.SetLoanAmount(gameState.Balance * gameState.SpinResult!.PayoutMultiplier);
                         machine.EndGame();
                     }
                 }
@@ -133,6 +133,7 @@ public class SlotMachineController(
 
             case GamePhase.Exiting:
                 RemoveViewFromUpdater(ViewType.ResultView);
+                Console.Clear();
                 break;
         }
     }
