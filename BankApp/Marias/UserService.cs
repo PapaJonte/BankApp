@@ -315,7 +315,27 @@ namespace BankApp
             user.ChangePassword(newPassword);
             return true;
         }
+        // Sets a new password for a user, without needing the old password. Used by admins to reset passwords.
+        // Admin can reset passwords for Customers, Owner can reset passwords for Admins.
+        public bool ResetPassword(User? caller, string username, string newPassword)
+        {
+            if (caller == null || caller.Role == UserRole.Customer)
+                return false;
 
+            if (!IsValidPassword(newPassword))
+                return false;
+
+            User? target = GetUserByUsername(username);
+            if (target == null || target.Role == UserRole.Owner)
+                return false;
+
+            if (target.Role == UserRole.Admin && caller.Role != UserRole.Owner)
+                return false;
+
+            target.ChangePassword(newPassword);
+            target.Unlock();
+            return true;
+        }
 
 
 
