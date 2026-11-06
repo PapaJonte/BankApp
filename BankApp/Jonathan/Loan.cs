@@ -21,7 +21,7 @@ namespace BankApp.Jonathan
         // Approval and payout state
         public LoanStatus Status { get; private set; } = LoanStatus.Pending;
         public bool PayoutRequested { get; private set; } = false;
-        
+
         // Repayment schedule and progress
         public DateTime? PayoutDate { get; private set; }
         public DateTime? NextPaymentDate { get; private set; }
@@ -55,6 +55,23 @@ namespace BankApp.Jonathan
             InterestRate = interestRate;
             TotalInterest = totalInterest;
             TotalRepayment = amount + totalInterest;
+        }
+
+        public Loan(decimal amount, int duration, decimal interestRate, decimal totalInterest, decimal totalRepayment)
+        {
+            // Checks if the loan amount is greater than zero
+            if (amount <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(amount), "The loan amount must be greater than zero.");
+            }
+
+            // Sets the original loan amount and remaining balance
+            LoanAmount = amount;
+            RemainingLoanBalance = amount;
+            Duration = duration;
+            InterestRate = interestRate;
+            TotalInterest = totalInterest;
+            TotalRepayment = totalRepayment;
         }
 
         // Assigns the destination account when the loan application is created
