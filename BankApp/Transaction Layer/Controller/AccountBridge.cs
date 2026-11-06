@@ -26,27 +26,48 @@ internal class AccountBridge(AccountManager accountManager) : IAccountBridge
 
     public void Deposit(int userID, int accountNumber, decimal amount)
     {
-        if(TryGetBankAccounts(userID, accountNumber, out (BankAccount, SavingsAccount)? accs))
+        if (TryGetSavingsAccount(userID, accountNumber, out var savingsAccount))
         {
-            if (accs?.Item1.GetThresholdNotification(amount, TransactionType.Deposit) >= amount)
+            if (TryGetBankAccount(userID, accountNumber, out var bankAccount))
+            {
+                if (bankAccount!.GetThresholdNotification(amount, TransactionType.Deposit) <= amount)
+                {
+                    //call notification service when impl
+                }
+                savingsAccount!.TransferBalance(amount, true);
+            }
+        }
+        else if (TryGetBankAccount(userID, accountNumber, out var bankAccount))
+        {
+            if (bankAccount!.GetThresholdNotification(amount, TransactionType.Deposit) <= amount)
             {
                 //call notification service when impl
             }
-            accs?.Item2.TransferBalance(amount, true);
+            bankAccount.TransferBalance(amount, true);
         }
     }
 
     public void Withdraw(int userID, int accountNumber, decimal amount)
     {
-        if (TryGetBankAccounts(userID, accountNumber, out (BankAccount, SavingsAccount)? accs))
+        if (TryGetSavingsAccount(userID, accountNumber, out var savingsAccount))
         {
-            if (accs?.Item1.GetThresholdNotification(amount, TransactionType.Withdrawal) >= amount)
+            if (TryGetBankAccount(userID, accountNumber, out var bankAccount))
+            {
+                if (bankAccount!.GetThresholdNotification(amount, TransactionType.Withdrawal) <= amount)
+                {
+                    //call notification service when impl
+                }
+                savingsAccount!.TransferBalance(amount, false);
+            }
+        }
+        else if (TryGetBankAccount(userID, accountNumber, out var bankAccount))
+        {
+            if (bankAccount!.GetThresholdNotification(amount, TransactionType.Withdrawal) <= amount)
             {
                 //call notification service when impl
             }
-            accs?.Item2.TransferBalance(amount, false);
+            bankAccount.TransferBalance(amount, false);
         }
-
     }
 
     private bool TryGetBankAccount(int userID, int accountNumber, out BankAccount? bankAccount)
@@ -100,45 +121,5 @@ internal class AccountBridge(AccountManager accountManager) : IAccountBridge
         }
     }
 
-    private bool TryGetBankAccounts(int userID, int accountNumber, out (BankAccount, SavingsAccount)? bankTouple)
-    {
-        bankTouple = null;
-        BankAccount? bankAccount = null;
-        SavingsAccount? savingsAccount;
-        var bankAccounts = accountManager.BankAccountDictionary[userID];
-
-        if (bankAccounts == null)
-        {
-            return false;
-        }
-
-        foreach (var b in bankAccounts)
-        {
-            foreach (var s in b.SavingAccounts)
-            {
-                if (s.GetSavingsAccountNumber() == accountNumber)
-                {
-                    bankAccount = b;
-                    break;
-                }
-            }
-        }
-
-        if (bankAccount == null)
-        {
-            return false;
-        }
-
-        savingsAccount = bankAccount.SavingAccounts.FirstOrDefault(x => x.GetSavingsAccountNumber() == accountNumber);
-
-        if (savingsAccount == null)
-        {
-            return false;
-        }
-
-        bankTouple = new(bankAccount, savingsAccount);
-
-        return true;
-    }
 
 }
