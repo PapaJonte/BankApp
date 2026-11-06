@@ -88,29 +88,26 @@ namespace BankApp.GustafsClasses
             customerAccounts.Add(userAccount);
         }
         //Used for creating savings accounts. The savings accounts store the balance.
-        public decimal CreateSavingsAccount(int userId, decimal balance, Currency currency)
+        public SavingsAccount? CreateSavingsAccount(int userId, int bankAccountNumber, Currency currency)
         {
-            Enum.GetValues<Currency>(); 
-            //Return data.
+            //Variables for adding values to the object's constructor.
+            decimal balance = 0m;
             decimal interest = 0.5m;
-            if (BankAccountList.Count > 0)
+            //Attempting to find object of BankAccount class.
+            BankAccount? parentAccount = FindRegularAccount(userId, bankAccountNumber);
+            //Returning nothing if there is nothing to be found.
+            if (parentAccount == null)
             {
-                foreach (var account in BankAccountList)
-                {
-                    if (account.GetUserId() == userId)
-                    {
-                        SavingsAccount savingsAccount = new SavingsAccount(
-                            balance, currency, interest, AccountNrGenerator());
-
-                        account.SavingAccounts.Add(savingsAccount);
-                        if (account.SavingsAccountDictionary.Count == 0)
-                        {
-                            account.SavingsAccountDictionary.Add(userId, account.SavingAccounts);
-                        }
-                    }
-                }
+                return null;
             }
-            return interest;
+            //Creating an object of SavingsAccount class, as is the point of this method.
+            SavingsAccount savingsAccount = new SavingsAccount(
+                    balance, currency, interest, AccountNrGenerator() );
+
+            parentAccount.SavingAccounts.Add(savingsAccount); //Adding account to list to save for later.
+            //Saving the list for later.
+            parentAccount.SavingsAccountDictionary[userId] = parentAccount.SavingAccounts;
+            return savingsAccount;
         }
 
         /*Method for accessing the savingsaccounts.
