@@ -280,6 +280,54 @@ namespace BankApp.Robin
                 }
             }
         }
+
+        private void ShowTransferMenu()
+        {
+            string[] options = { "Deposit", "Withdraw", "Transfer" };
+
+            int selectedIndex = 0;
+
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("===== TRANSACTIONS =====");
+                Console.WriteLine("Press Esc to go back.\n");
+
+                for (int i = 0; i < options.Length; i++)
+                {
+                    if (i == selectedIndex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"> {options[i]}");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.WriteLine(options[i]);
+                    }
+                }
+
+                switch (Console.ReadKey(true).Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        selectedIndex = (selectedIndex - 1 + options.Length) % options.Length;
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        selectedIndex = (selectedIndex + 1) % options.Length;
+                        break;
+
+                    case ConsoleKey.Enter:
+                        Console.WriteLine($"\n{options[selectedIndex]} is not available yet.");
+                        Console.ReadKey(true);
+                        break;
+
+                    case ConsoleKey.Escape:
+                        return;
+                }
+            }
+        }
+
         public void ShowUserMenu()
         {
             Console.Clear();
@@ -296,9 +344,11 @@ namespace BankApp.Robin
                 {
                     "View accounts",
                     "Create bank account",
+                    "Transfer money",
                     "Transaction history",
                     "Loans",
                     "Log out",
+                    
                 };
 
                 for (int i = 0; i < options.Length; i++)
@@ -320,11 +370,11 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 5) % 5;
+                        selectedIndex = (selectedIndex - 1 + 6) % 6;
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 5;
+                        selectedIndex = (selectedIndex + 1) % 6;
                         break;
 
                     case ConsoleKey.Enter:
@@ -351,16 +401,24 @@ namespace BankApp.Robin
                                 break;
 
                             case 2:
-                                Console.WriteLine("Transaction history");
+                                ShowTransferMenu();
+
+                                //Deposit 
+                                //Withdraw
+                                //Transfer
                                 break;
 
                             case 3:
+                                Console.WriteLine("Transaction history");
+                                break;
+
+                            case 4:
                                 Console.WriteLine("Loans");
                                 _loanMenu.ShowLoanMenu(_authService.LoggedInUser.UserID);
 
                                 break;
 
-                            case 4:
+                            case 5:
                                 _authService.Logout();
                                 userMenu = false;
                                 break;
