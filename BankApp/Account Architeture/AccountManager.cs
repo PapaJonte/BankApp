@@ -26,6 +26,17 @@ namespace BankApp.GustafsClasses
          * Don't call upon this method!*/
         public static Currency CheckCurrency()
         {
+
+            int index = 0;
+            foreach (var e in System.Enum.GetValues<Currency>())
+            {
+                ++index;
+                Console.Write($"{e}, ");
+
+                if (index % 10 == 0)
+                    Console.WriteLine("");
+            }
+            Console.WriteLine("");
             //while loop around to make sure the user gives a correct value as currency.
             while ( true)
             {
