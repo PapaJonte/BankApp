@@ -107,19 +107,28 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
         decimal withdrawalAmount = 0m, depositAmount = 0m;
         StatusCode statusCode;
 
-        if (originAccount.Currency == transferCurrency && targetAccount.Currency == transferCurrency) //calculate how much we will deposit
+        if (originAccount.Currency == transferCurrency && targetAccount.Currency == transferCurrency)
         {
+            // Both accounts use the same currency, so the amounts are equal
             withdrawalAmount = transferAmount;
-            statusCode = exchangeRateModule.TryCalculateExchangeValue(transferCurrency, targetAccount.Currency, transferAmount, out depositAmount);
-            withdrawalAmount = transferAmount;
-        }
-        else if (originAccount.Currency == transferCurrency) //calculate how much we will withdraw
-        {
-            statusCode = exchangeRateModule.TryCalculateExchangeValue(targetAccount.Currency, originAccount.Currency, transferAmount, out withdrawalAmount);
             depositAmount = transferAmount;
+            statusCode = StatusCode.Successful;
         }
-        else//if transfer currency is outside both of accounts it is invalid.
+        else if (originAccount.Currency == transferCurrency)
         {
+            // The customer entered the amount to send. Calculate what the recipient gets
+            withdrawalAmount = transferAmount;
+            statusCode = exchangeRateModule.TryCalculateExchangeValue(originAccount.Currency, targetAccount.Currency, transferAmount, out depositAmount);
+        }
+        else if (targetAccount.Currency == transferCurrency)
+        {
+            // The customer entered the amount the recipient should get. Calculate what to debit
+            depositAmount = transferAmount;
+            statusCode = exchangeRateModule.TryCalculateExchangeValue(targetAccount.Currency, originAccount.Currency, transferAmount, out withdrawalAmount);
+        }
+        else
+        {
+            // The entered currency must match one of the accounts
             statusCode = StatusCode.Invalid;
         }
 
