@@ -323,6 +323,23 @@ namespace BankApp.Robin
                     case ConsoleKey.Enter:
                         Console.WriteLine($"\n{options[selectedIndex]} is not available yet.");
                         Console.ReadKey(true);
+                        
+
+                        switch (selectedIndex)
+                        {
+                            case 0:
+                                _bankTransfer.DepositMoney();
+                                break;
+
+                            case 1:
+                                _bankTransfer.WithdrawMoney();
+                                break;
+
+                            case 2:
+                                _bankTransfer.TransferMoney();
+                                break;
+
+                        }
                         break;
 
                     case ConsoleKey.Escape:
@@ -405,12 +422,6 @@ namespace BankApp.Robin
 
                             case 2:
                                 ShowTransferMenu();
-                                _bankTransfer.DepositMoney();
-                                _bankTransfer.WithdrawMoney();
-                                _bankTransfer.TransferMoney();
-                                //Deposit 
-                                //Withdraw
-                                //Transfer
                                 break;
 
                             case 3:
