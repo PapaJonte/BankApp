@@ -333,7 +333,7 @@ namespace BankApp.Robin
                                 foreach (BankAccount bankAccount in _accountManager.BankAccountList)
                                 {
                                     if (bankAccount.GetUserId() == _authService.LoggedInUser.UserID)
-                                    
+
                                         Console.WriteLine($"\nAccount number : {bankAccount.GetBankAccountNumber()}" +
                                             $"\nBalance : {bankAccount.GetBalance()} " +
                                             $"\nCurrency : {bankAccount.GetCurrency()}");
