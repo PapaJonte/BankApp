@@ -750,17 +750,21 @@ namespace BankApp.Robin
                                 Console.Clear();
                                 Console.WriteLine("===== ACCOUNTS =====");
                                 ShowLoggedInUser();
-                                //_accountManager.GetAccounts(_authService.LoggedInUser.UserID);
-
-                                foreach (BankAccount bankAccount in _accountManager.BankAccountList)
+                                
+                                // GetBankAccounts returns only the signed-in customer's regular accounts
+                                foreach (BankAccount bankAccount in GetBankAccounts())
                                 {
-                                    if (bankAccount.GetUserId() == _authService.LoggedInUser.UserID)
+                                    Console.WriteLine($"\nRegular account: {bankAccount.GetBankAccountNumber()}");
+                                    Console.WriteLine($"Balance: {bankAccount.GetBalance():N2} {bankAccount.GetCurrency()}");
+
+                                    // Show each savings account under the regular account it belongs to
+                                    foreach (SavingsAccount savingsAccount in bankAccount.SavingAccounts)
                                     {
-                                        Console.WriteLine($"\nAccount number : {bankAccount.GetBankAccountNumber()}" +
-                                            $"\nBalance : {bankAccount.GetBalance()} " +
-                                            $"\nCurrency : {bankAccount.GetCurrency()}");
+                                        Console.WriteLine($" Savings account: {savingsAccount.GetSavingsAccountNumber()}");
+                                        Console.WriteLine($" Balance: {savingsAccount.GetBalance():N2} {savingsAccount.GetCurrency()}");
                                     }
                                 }
+
                                 Console.ReadKey();
                                 break;
 
