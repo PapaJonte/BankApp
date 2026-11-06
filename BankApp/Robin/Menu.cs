@@ -323,12 +323,12 @@ namespace BankApp.Robin
                     case ConsoleKey.Enter:
                         Console.WriteLine($"\n{options[selectedIndex]} is not available yet.");
                         Console.ReadKey(true);
-                        
+
 
                         switch (selectedIndex)
                         {
                             case 0:
-                               // _bankTransfer.DepositMoney();
+                                // _bankTransfer.DepositMoney();
                                 break;
 
                             case 1:
@@ -336,7 +336,7 @@ namespace BankApp.Robin
                                 break;
 
                             case 2:
-                               // _bankTransfer.TransferMoney();
+                                // _bankTransfer.TransferMoney();
                                 break;
 
                         }
@@ -368,7 +368,7 @@ namespace BankApp.Robin
                     "Transaction history",
                     "Loans",
                     "Log out",
-                    
+
                 };
 
                 for (int i = 0; i < options.Length; i++)
@@ -406,11 +406,14 @@ namespace BankApp.Robin
                                 ShowLoggedInUser();
                                 //_accountManager.GetAccounts(_authService.LoggedInUser.UserID);
 
-                                foreach(BankAccount bankAccount in _accountManager.BankAccountList)
+                                foreach (BankAccount bankAccount in _accountManager.BankAccountList)
                                 {
-                                    Console.WriteLine($"\nAccount number : {bankAccount.GetBankAccountNumber()}" +
-                                        $"\nBalance : {bankAccount.GetBalance()} " +
-                                        $"\nCurrency : {bankAccount.GetCurrency()}");
+                                    if (bankAccount.GetUserId() == _authService.LoggedInUser.UserID)
+                                    {
+                                        Console.WriteLine($"\nAccount number : {bankAccount.GetBankAccountNumber()}" +
+                                            $"\nBalance : {bankAccount.GetBalance()} " +
+                                            $"\nCurrency : {bankAccount.GetCurrency()}");
+                                    }
                                 }
                                 Console.ReadKey();
                                 break;
