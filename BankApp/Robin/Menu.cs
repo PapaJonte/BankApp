@@ -82,7 +82,6 @@ namespace BankApp.Robin
                  * In order to recieve access to the Currency Enum you may have to add "Enum.GetValues<Currency>()" somewhere above in this class.
                  
                  If you want the user to make the choice of Currency then you may insert the method "CheckCurrency()" as an input.*/
-                _accountManager.CreateAccount(createdUser.UserID, 0m, Currency.SEK);
                 Console.WriteLine(userMessage);
                 return true;
             }
@@ -334,6 +333,7 @@ namespace BankApp.Robin
                             case 0:
                                 Console.WriteLine("Accounts");
                                 ShowLoggedInUser();
+                                _accountManager.GetAccounts(_authService.LoggedInUser.UserID);
                                 Console.ReadKey();
                                 break;
 
@@ -345,8 +345,9 @@ namespace BankApp.Robin
                  * In order to recieve access to the Currency Enum you may have to add "Enum.GetValues<Currency>()" somewhere above in this class.
                  
                  If you want the user to make the choice of Currency then you may insert the method "CheckCurrency()" as an input.*/
-                                _accountManager.CreateAccount(_authService.LoggedInUser.UserID, 0m, Currency.SEK);
-                                _accountManager.GetAccounts(_authService.LoggedInUser.UserID);
+                                Console.CursorVisible = true;
+                                Currency currency = AccountManager.CheckCurrency();
+                                _accountManager.CreateAccount(_authService.LoggedInUser.UserID, 0m, currency);
                                 break;
 
                             case 2:
