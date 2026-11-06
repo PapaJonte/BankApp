@@ -88,29 +88,23 @@ namespace BankApp.GustafsClasses
             customerAccounts.Add(userAccount);
         }
         //Used for creating savings accounts. The savings accounts store the balance.
-        public decimal CreateSavingsAccount(int userId, decimal balance, Currency currency)
+        public SavingsAccount? CreateSavingsAccount(int userId, int bankAccountNumber, Currency currency)
         {
-            Enum.GetValues<Currency>(); 
-            //Return data.
+            decimal balance = 0m;
             decimal interest = 0.5m;
-            if (BankAccountList.Count > 0)
-            {
-                foreach (var account in BankAccountList)
-                {
-                    if (account.GetUserId() == userId)
-                    {
-                        SavingsAccount savingsAccount = new SavingsAccount(
-                            balance, currency, interest, AccountNrGenerator());
+            BankAccount? parentAccount = FindRegularAccount(userId, bankAccountNumber);
 
-                        account.SavingAccounts.Add(savingsAccount);
-                        if (account.SavingsAccountDictionary.Count == 0)
-                        {
-                            account.SavingsAccountDictionary.Add(userId, account.SavingAccounts);
-                        }
-                    }
-                }
+            if (parentAccount == null)
+            {
+                return null;
             }
-            return interest;
+
+            SavingsAccount savingsAccount = new SavingsAccount(
+                    balance, currency, interest, AccountNrGenerator() );
+
+            parentAccount.SavingAccounts.Add(savingsAccount);
+            parentAccount.SavingsAccountDictionary[userId] = parentAccount.SavingAccounts;
+            return savingsAccount;
         }
 
         /*Method for accessing the savingsaccounts.
