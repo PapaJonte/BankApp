@@ -75,7 +75,7 @@ internal class AccountBridge(AccountManager accountManager, LoanService loanServ
     public void UpdateLoanService(TransactionDataLoanObject? loanObject)
     {
         if (loanObject == null) return;
-        //call loanService here
+        loanService.ConfirmLoanPayout(loanObject.LoanID, loanObject.TransactionDate);
     }
 
     private bool TryGetBankAccount(int userID, int accountNumber, out BankAccount? bankAccount)
