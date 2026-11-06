@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using BankApp.Transaction_Layer.Interface;
+using BankApp.Transaction_Layer.DataModel;
+using BankApp.Transaction_Layer.Enum;
 
 namespace BankApp.Robin
 {
@@ -16,13 +18,17 @@ namespace BankApp.Robin
         private readonly LoanService loanService;
         private readonly AccountManager accountManager;
         private readonly IViewTransactionStatisticBridge bankTransferStatistics;
+        private readonly BankTransfer bankTransfer;
+        private readonly ExchangeRate exchangeRates;
 
         // Constructor
-        public LoanMenu(LoanService loanService, AccountManager accountManager, IViewTransactionStatisticBridge bankTransferStatistics)
+        public LoanMenu(LoanService loanService, AccountManager accountManager, IViewTransactionStatisticBridge bankTransferStatistics, BankTransfer bankTransfer, ExchangeRate exchangeRates)
         {
             this.loanService = loanService;
             this.accountManager = accountManager;
             this.bankTransferStatistics = bankTransferStatistics;
+            this.bankTransfer = bankTransfer;
+            this.exchangeRates = exchangeRates;
         }
 
         // Handles loan applications
@@ -146,16 +152,54 @@ namespace BankApp.Robin
 
             Console.WriteLine("Enter the account number to pay from: ");
             
-            if(!int.TryParse(Console.ReadLine(), out int accountNumber) || !accounts.Any(account => account.GetBankAccountNumber() == accountNumber))
+            if (!int.TryParse(Console.ReadLine(), out int accountNumber))
             {
-                Console.WriteLine("Select one of the listed accounts,");
+                Console.WriteLine("Enter a valid accout number.");
                 return;
             }
 
-            // TO DO: Queue paymentAmount from the selected regular account
-            // Keep this installment's amount fixed while the withdrawal is pending
-            // Record the repayment only after Alxe confirms the withdrawal succeeded
-            Console.WriteLine($"Selected account: {accountNumber}\nAmount due: {paymentAmount:N2} SEK\nPayments are unavailable right now.");
+            // Select the account from the signed-in customer's list
+            BankAccount? source = accounts.Find(account => account.GetBankAccountNumber() == accountNumber);
+            if (source = null)
+            {
+                Console.WriteLine("Select one of the listed accounts.");
+                return;
+            }
+
+            // The loan is billed in SEK, but WithdrawMoney expects the account's currency
+            Currency accountCurrency = source.GetCurrency();
+            decimal debitAmount = paymentAmount;
+
+            if (accountCurrency != Currency.SEK && exchangeRates.TryCalculateExchangeValue(Currency.SEK, accountCurrency, paymentAmount, out debitAmount)
+                != StatusCode.Successful)
+            {
+                Console.WriteLine("The payment could not be converted to the account currency.");
+                return;
+            }
+
+            if (debitAmount <= 0m)
+            {
+                Console.WriteLine("There is no valid payment amount to withdraw.");
+                return;
+            }
+
+            AccountData sourceAccount = new(userId, accountNumber, accountCurrency);
+            DateTime submittedDate = DateTime.Today;
+
+            if (bankTransfer.WithdrawMoney(sourceAccount, debitAmount) != StatusCode.Successful)
+            {
+                Console.WriteLine("The withdrawal failed. The installment is still due.");
+                return;
+            }
+
+            // Record the original SEK amount after the direct withdrawal succeeds
+            if(!loanService.RepayLoan(loanId, paymentAmount, submittedDate))
+            {
+                Console.WriteLine("The withdrawal succeeded, but the loan payment could not be recorded. Contact an administrator before retrying.");
+                return;
+            }
+
+            Console.WriteLine($"Payment of {paymentAmount:N2} SEK recorded.");
         }
 
 
