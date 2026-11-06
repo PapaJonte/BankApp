@@ -57,7 +57,6 @@ namespace BankApp
 
             user.ResetFailedLogins();
             LoggedInUser = user;
-            _userService.LogUser(user.UserID);
             return LoginResult.Success;
 
         }
