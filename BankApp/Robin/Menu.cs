@@ -2,6 +2,7 @@
 using BankApp.Pull_The_Sack.Interface;
 using BankApp.GustafsClasses;
 using BankApp.Transaction_Layer.Enum;
+using BankApp.Transaction_Layer.API;
 namespace BankApp.Robin
 
 {
@@ -11,6 +12,7 @@ namespace BankApp.Robin
 
         //private readonly Theme theme;
 
+        private readonly BankTransfer _bankTransfer;
         private readonly AccountManager _accountManager;
         private readonly LoanMenu _loanMenu;
         private readonly AdminLoanMenu _adminLoanMenu;
@@ -19,8 +21,9 @@ namespace BankApp.Robin
         // CONSTRUCTOR INJECTION: We require UserService to be passed in when Menu is created
 
         // Passes both fields into our constructor so we can use the methods from Maria's class.
-        public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager)
+        public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager, BankTransfer bankTransfer)
         {
+            _bankTransfer = bankTransfer ?? throw new ArgumentNullException(nameof(bankTransfer));
             _accountManager = accountManager ?? throw new ArgumentNullException(nameof(accountManager));
             _adminLoanMenu = adminLoanMenu ?? throw new ArgumentNullException(nameof(adminLoanMenu));
             _loanMenu = loanMenu ?? throw new ArgumentNullException(nameof(loanMenu));
@@ -402,7 +405,9 @@ namespace BankApp.Robin
 
                             case 2:
                                 ShowTransferMenu();
-
+                                _bankTransfer.DepositMoney();
+                                _bankTransfer.WithdrawMoney();
+                                _bankTransfer.TransferMoney();
                                 //Deposit 
                                 //Withdraw
                                 //Transfer
@@ -415,7 +420,6 @@ namespace BankApp.Robin
                             case 4:
                                 Console.WriteLine("Loans");
                                 _loanMenu.ShowLoanMenu(_authService.LoggedInUser.UserID);
-
                                 break;
 
                             case 5:
