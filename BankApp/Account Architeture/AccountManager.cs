@@ -57,13 +57,13 @@ namespace BankApp.GustafsClasses
             return accountNumber;
         }
         //This method will create a bank account. Not to be confused with a savings account. Bank accounts store the savings accounts.
-        public void CreateAccount(int userId, decimal balance)
+        public void CreateAccount(int userId, decimal balance, Currency currency)
         {
             
             /*Creation of object of the BankAccount class to represent an account held by a user,
             that may both contain balance, and savingsAccounts.*/
             BankAccount userAccount = new BankAccount(userId, AccountNrGenerator(),
-                balance, Currency.SEK);
+                balance, currency);
 
             BankAccountList.Add(userAccount);
             if (!BankAccountDictionary.TryGetValue(userId, out var customerAccounts))
