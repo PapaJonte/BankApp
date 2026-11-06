@@ -21,7 +21,7 @@ public record SplashViewConfig : ViewConfig
         Frame4,
     ]);
 
-    public string SplashGraphics => Head;
+    public string Continue = "Press space to play the game.";
 
     private const string Banner =
         @"   ____        _ _     _____ _            ____             _    " + "\n" +

@@ -25,6 +25,9 @@ public class GameView : IView
     private int blinkCount = 0;
     private int targetBlinkCounts = 4;
     private ConsoleColor[] blinkColor;
+    private string gamePrompt;
+
+
 
     /// <summary>
     /// Constructor, sets the blink colors iterated between once the reels have landed on their symbols.
@@ -66,11 +69,13 @@ public class GameView : IView
             {
                 ViewState = ViewState.Animating;
                 BlockWidth = reels.Count * config.ReelWidth + (reels.Count - 1) * config.ReelGap; //thank you deepseek
+                gamePrompt = config.PullTheSackPrompt;
             }
 
             if (GameState.GamePhase == GamePhase.Resolving && !resolved)
             {
                 Resolve();
+                gamePrompt = "";
             }
 
             #region Draw top graphics
@@ -99,6 +104,8 @@ public class GameView : IView
                 console.WriteCentered("Press space to continue");
                 ViewState = ViewState.Complete;
             }
+
+            console.WriteCentered(gamePrompt);
 
             //gameview register callbacks with reels for when they are done
             //calls reels to start blink functionality

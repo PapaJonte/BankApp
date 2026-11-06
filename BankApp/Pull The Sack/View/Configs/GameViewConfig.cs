@@ -35,7 +35,9 @@ public record GameViewConfig : ViewConfig
     public string CompleteText_Lost = "Congratulations! You lost money you didn't have!";
     public string CompleteText_Won = "Congratulations! You won money, use them on your next gamble at LiveForGambling.com!";
     public string CompleteText_SackPot = "Congratulations! You hit the Sackpot! Use your Sackpot at LiveForGamble.Com!";
-    
+
+    public string PullTheSackPrompt = "Press space to Pull the Sack!";
+
     /// <summary>Number of reels displayed on the payline.</summary>
     public int ReelCols { get; init; } = 3;
     public int ReelRows { get; init; } = 3;
