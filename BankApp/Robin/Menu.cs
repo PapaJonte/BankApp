@@ -401,9 +401,17 @@ namespace BankApp.Robin
                         switch (selectedIndex)
                         {
                             case 0:
-                                Console.WriteLine("Accounts");
+                                Console.Clear();
+                                Console.WriteLine("===== ACCOUNTS =====");
                                 ShowLoggedInUser();
-                                _accountManager.GetAccounts(_authService.LoggedInUser.UserID);
+                                //_accountManager.GetAccounts(_authService.LoggedInUser.UserID);
+
+                                foreach(BankAccount bankAccount in _accountManager.BankAccountList)
+                                {
+                                    Console.WriteLine($"\nAccount number : {bankAccount.GetBankAccountNumber()}" +
+                                        $"\nBalance : {bankAccount.GetBalance()} " +
+                                        $"\nCurrency : {bankAccount.GetCurrency()}");
+                                }
                                 Console.ReadKey();
                                 break;
 
