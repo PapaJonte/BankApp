@@ -1,22 +1,65 @@
 # BankApp
 
-SavingsAccount
+---Accounts---
+
+--SavingsAccount--
 Not to be confused with BankAccount!
 SavingsAccount as a class serves the purpose primarily of storing the balance of accounts. Because this class is intended to have many almost completely identical variations in it's objects there is a constructor provided for assigning values to it's properties.
 
 The properties include "Balance", "Interest", and "SavingsAccountNumber". Savings account number exists for the purpose of identifying such accounts later when transactions must be made, for there is supposed to be a multitude of savings accounts. Meanwhile Balance, and Interest serve a more obvious purpose.
 
-The majority of methods are dedicated to returning the various different properties of the class. An exception to this rule is one method dedicated to reducing or increasing balance, for transaction purposes.
+TransferBalance:
+Unlike other methods of the class this one does not exist for the purpose of returning private value of the class. TransferBalance() either raises or lowers balance of an account depending on the input values. The bool value in the parameter determines whether it is a deposit that shall be made, or a withdrawal. The other input value simply determines how much the transfer sum happens to be. This method does not actually transfer values however, for there are other methods inside of the Transaction Layer folder that manages that job.
 
-BankAccount
-Not to be confused with SavingsAccount!
-The BankAccount serves to contain SavingsAccounts, and sort them by user ID. Hence why it has both a list dedicated to storing objects of the SavingsAccount class, and a dictionary for storing the list.
-The userId variable that represents the ID of the user, and the bank account number may be both be returned with a method the same way as values in the SavingsAccount class.
+GetBalance, GetCurrency, GetSavingsAccountNumber:
+These methods all return a value, and are named after the variable in their name.
 
-AccountManager
-This class has various different methods for handling the two other Account classes. For example it may create objects of both the SavingsAccount class, and the BankAccount class by different methods for each type of class.
-Other than that there happens to be a method for calculating the total balance of all accounts of a user, there is a method for printing out the balance and currency of account of a user, and there is one private method for choosing currency for created accounts.
-Otherwise all methods are public, for selection of currency is only required for internal processes.
+--BankAccount--
+Not to be confused with SavingsAccount, though that may pherhaps easily be done, for BankAccount has many properties, variables, and methods that are either identical, or somewhat similar. For instance BankAccount, just like SavingsAccount has balance, currency, a number variable to identify the specific object that is somewhat similar to what SavingsAccount has, and additionally methods to return these values.
+The BankAccount serves partly to contain SavingsAccounts. Hence why it has both a list dedicated to storing objects of the SavingsAccount class, and a dictionary for storing the list.
+Additionally it's more closely associated with the user ID in order to establish ownership. The userId variable that represents the ID of the user, and the bank account number may both be returned with a method the same way as values in the SavingsAccount class.
+
+GetThresholdNotification:
+This method returns the threshold number once a transaction happens to be above the maximum threshold for deposits, and withdrawals. The method assists transaction based systems by providing this information.
+
+TransferBalance:
+Same as in SavingsAccount above.
+
+GetInterest, GetUserId:
+Returns interest and user ID, just like the names imply. Very similar to other Methods that follow the naming convention of having "Get" in the name.
+
+GetBalance, GetCurrency, GetBankAccountNumber:
+Same as in SavingsAccount above.
+
+--AccountManager--
+This class has various different methods for handling the two other Account classes. Here is a rundown of the included methods for manipulating the accounts:
+
+CheckCurrency:
+This method allows the account user on the bank to give an input to choose currency for an account.
+
+AccountNumberGenerator:
+This method generates a unique number to identify individual accounts that are created.
+
+CreateAccount:
+Not to be confused with CreateSavingsAccount. This method creates an object of the BankAccount class.
+
+CreateSavingsAccount:
+Not to be confused with the CreateAccount class. This method creates an object of the SavingsAccount class.
+
+GetAccounts:
+This method prints out balance and currency of the various accounts, both Bank accounts and savings accounts, of a user into the Console. 
+
+ConvertBalanceToSek
+This method converts currencies to SEK. This serves the GetTotalBalance method below.
+
+GetTotalBalance
+This method calculates the total balance of the various accounts, both savings accounts and bank accounts, that are owned by the same user. This method is necessary for assisting with judging maximum limits for loans outside of this class, and folder.
+
+FindRegularAccount
+This method finds a specific object of the Bank Account class.
+
+AccountOwnershipVerification
+This method serves to verify if a user truly owns an account.
 
 ---TRANSACTION LAYER---
 
