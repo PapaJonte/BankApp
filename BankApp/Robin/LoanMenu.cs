@@ -160,7 +160,7 @@ namespace BankApp.Robin
 
             // Select the account from the signed-in customer's list
             BankAccount? source = accounts.Find(account => account.GetBankAccountNumber() == accountNumber);
-            if (source = null)
+            if (source == null)
             {
                 Console.WriteLine("Select one of the listed accounts.");
                 return;
