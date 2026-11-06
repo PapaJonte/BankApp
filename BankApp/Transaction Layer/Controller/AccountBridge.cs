@@ -30,14 +30,7 @@ internal class AccountBridge(AccountManager accountManager, LoanService loanServ
     {
         if (TryGetSavingsAccount(userID, accountNumber, out var savingsAccount))
         {
-            if (TryGetBankAccount(userID, accountNumber, out var bankAccount))
-            {
-                if (bankAccount!.GetThresholdNotification(amount, TransactionType.Deposit) <= amount)
-                {
-                    //call notification service when impl
-                }
-                savingsAccount!.TransferBalance(amount, true);
-            }
+            savingsAccount!.TransferBalance(amount, true);
         }
         else if (TryGetBankAccount(userID, accountNumber, out var bankAccount))
         {
@@ -53,14 +46,7 @@ internal class AccountBridge(AccountManager accountManager, LoanService loanServ
     {
         if (TryGetSavingsAccount(userID, accountNumber, out var savingsAccount))
         {
-            if (TryGetBankAccount(userID, accountNumber, out var bankAccount))
-            {
-                if (bankAccount!.GetThresholdNotification(amount, TransactionType.Withdrawal) <= amount)
-                {
-                    //call notification service when impl
-                }
-                savingsAccount!.TransferBalance(amount, false);
-            }
+            savingsAccount!.TransferBalance(amount, false);
         }
         else if (TryGetBankAccount(userID, accountNumber, out var bankAccount))
         {
@@ -98,23 +84,22 @@ internal class AccountBridge(AccountManager accountManager, LoanService loanServ
     {
         savingsAccount = null;
 
-        var bankAccounts = accountManager.BankAccountDictionary[userID];
-
-        if (bankAccounts == null)
+        if (!accountManager.BankAccountDictionary.TryGetValue(userID, out var bankAccounts))
         {
             return false;
         }
 
-        var savingsAccounts = bankAccounts?.FirstOrDefault(x => x.GetUserId() == userID).SavingAccounts;
-
-        if (savingsAccounts == null)
+        foreach (BankAccount bankAccount in bankAccounts)
         {
-            return false;
+            savingsAccount = bankAccount.SavingAccounts.Find(account => account.GetSavingsAccountNumber() == accountNumber);
+
+            if (savingsAccount != null)
+            {
+                return true;
+            }
         }
 
-        savingsAccount = savingsAccounts.FirstOrDefault(x => x.GetSavingsAccountNumber() == accountNumber);
-
-        return savingsAccount != null;
+        return false;
     }
 
 
