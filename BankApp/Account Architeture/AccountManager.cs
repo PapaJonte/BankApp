@@ -65,6 +65,8 @@ namespace BankApp.GustafsClasses
             BankAccount userAccount = new BankAccount(userId, AccountNrGenerator(),
                 balance, currency);
 
+
+
             BankAccountList.Add(userAccount);
             if (!BankAccountDictionary.TryGetValue(userId, out var customerAccounts))
             {
