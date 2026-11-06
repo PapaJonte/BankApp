@@ -83,12 +83,7 @@ internal class AccountBridge(AccountManager accountManager) : IAccountBridge
 
         bankAccount = bankAccounts.Find(x => x.GetBankAccountNumber() == accountNumber);
 
-        if (bankAccount == null)
-        {
-            return false;
-        }
-
-        return true;
+        return bankAccount != null;
     }
 
     private bool TryGetSavingsAccount(int userID, int accountNumber, out SavingsAccount? savingsAccount)
@@ -111,14 +106,7 @@ internal class AccountBridge(AccountManager accountManager) : IAccountBridge
 
         savingsAccount = savingsAccounts.FirstOrDefault(x => x.GetSavingsAccountNumber() == accountNumber);
 
-        if (savingsAccount == null)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return savingsAccount != null;
     }
 
 
