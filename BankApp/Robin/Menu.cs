@@ -1,8 +1,9 @@
-﻿using Spectre.Console;
+﻿using BankApp.GustafsClasses;
 using BankApp.Pull_The_Sack.Interface;
-using BankApp.GustafsClasses;
-using BankApp.Transaction_Layer.Enum;
 using BankApp.Transaction_Layer.API;
+using BankApp.Transaction_Layer.DataModel;
+using BankApp.Transaction_Layer.Enum;
+using Spectre.Console;
 namespace BankApp.Robin
 
 {
@@ -284,6 +285,22 @@ namespace BankApp.Robin
             }
         }
 
+        public BankAccount GetBankAccounts()
+        {
+            List<BankAccount> myAccounts = new List<BankAccount>();
+
+            foreach (BankAccount bankAccount in _accountManager.BankAccountList)
+            {
+                if (bankAccount.GetUserId() == _authService.LoggedInUser.UserID)
+
+                {
+                    myAccounts.Add(bankAccount);
+                }
+            }
+            return ;
+
+        }
+
         private void ShowTransferMenu()
         {
             string[] options = { "Deposit", "Withdraw", "Transfer" };
@@ -330,30 +347,73 @@ namespace BankApp.Robin
                             case 0:
                                 Console.WriteLine($"\nWhich account would you like to deposit to?");
 
+                                List<BankAccount> myAccounts = new List<BankAccount>();
+
                                 foreach (BankAccount bankAccount in _accountManager.BankAccountList)
                                 {
-                                    if (bankAccount.GetUserId() == _authService.LoggedInUser.UserID)
-                                    
-                                        Console.WriteLine($"\nAccount number : {bankAccount.GetBankAccountNumber()}" +
-                                            $"\nBalance : {bankAccount.GetBalance()} " +
-                                            $"\nCurrency : {bankAccount.GetCurrency()}");
-                                }
 
-                                //_bankTransfer.DepositMoney();
+                                    if (bankAccount.GetUserId() == _authService.LoggedInUser.UserID)
+
+                                    {
+                                        myAccounts.Add(bankAccount);
+                                    }
+                                    _bankTransfer.DepositMoney();
+                                }
                                 break;
 
                             case 1:
-                                //_bankTransfer.WithdrawMoney();
+                                User? customer = _authService.LoggedInUser;
+
+                                if (customer == null)
+                                {
+                                    return;
+                                }
+
+                                var accounts = _accountManager.BankAccountList.Where(account => account.GetUserId() == customer.UserID).ToList();
+
+                                foreach (BankAccount account in accounts)
+                                {
+                                    Console.WriteLine($"{account.GetBankAccountNumber()}: {account.GetBalance():N2} {account.GetCurrency()}");
+                                }
+
+                                Console.Write("Enter the account number: ");
+                                if (!int.TryParse(Console.ReadLine(), out int accountNumber))
+                                {
+                                    Console.WriteLine("Invalid account number.");
+                                    break;
+                                }
+
+                                BankAccount? source = accounts.Find(account => account.GetBankAccountNumber() == accountNumber);
+
+                                if (source == null)
+                                {
+                                    Console.WriteLine("Select one of your listed accounts.");
+                                    break;
+                                }
+
+                                Currency currency = source.GetCurrency();
+                                Console.Write($"Enter the withdrawal amount ({currency})");
+
+                                if (!decimal.TryParse(Console.ReadLine(), out decimal amount) || amount <= 0m)
+                                {
+                                    Console.WriteLine("Enter a positive amount.");
+                                    break;
+                                }
+
+                                AccountData accountData = new(customer.UserID, accountNumber, currency);
+                                StatusCode status = _bankTransfer.WithdrawMoney(accountData, amount);
+
+                                Console.WriteLine(status == StatusCode.Successful ? $"Withdrew {amount:N2} {currency}."
+                                    : "The withdrawal failed. Check that the account has enough funds.");
+
                                 break;
 
                             case 2:
                                 foreach (BankAccount bankAccount in _accountManager.BankAccountList)
                                 {
-                                    if (bankAccount.GetUserId() == _authService.LoggedInUser.UserID)
-
-                                        Console.WriteLine($"\nAccount number : {bankAccount.GetBankAccountNumber()}" +
-                                            $"\nBalance : {bankAccount.GetBalance()} " +
-                                            $"\nCurrency : {bankAccount.GetCurrency()}");
+                                    Console.WriteLine($"\nAccount number : {bankAccount.GetBankAccountNumber()}" +
+                                        $"\nBalance : {bankAccount.GetBalance()} " +
+                                        $"\nCurrency : {bankAccount.GetCurrency()}");
                                 }
 
                                 // _bankTransfer.TransferMoney();
