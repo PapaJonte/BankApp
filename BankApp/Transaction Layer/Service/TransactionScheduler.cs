@@ -20,7 +20,7 @@ public class TransactionScheduler
     public void StartSchedule(Action OnScheduleListener)
     {
         OnSchedule += OnScheduleListener;
-        _ = TransactionSchedule(scheduleDurationInMinutes * 1000, ct.Token);
+        _ = TransactionSchedule(scheduleDurationInMinutes * 60000, ct.Token);
     }
 
     /// <summary>
