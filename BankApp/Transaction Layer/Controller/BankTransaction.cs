@@ -107,12 +107,13 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
         decimal withdrawalAmount = 0m, depositAmount = 0m;
         StatusCode statusCode;
 
-        if (originAccount.Currency == transferCurrency) //calculate how much we will deposit
+        if (originAccount.Currency == transferCurrency && targetAccount.Currency == transferCurrency) //calculate how much we will deposit
         {
+            withdrawalAmount = transferAmount;
             statusCode = exchangeRateModule.TryCalculateExchangeValue(transferCurrency, targetAccount.Currency, transferAmount, out depositAmount);
             withdrawalAmount = transferAmount;
         }
-        else if (targetAccount.Currency == transferCurrency) //calculate how much we will withdraw
+        else if (originAccount.Currency == transferCurrency) //calculate how much we will withdraw
         {
             statusCode = exchangeRateModule.TryCalculateExchangeValue(targetAccount.Currency, originAccount.Currency, transferAmount, out withdrawalAmount);
             depositAmount = transferAmount;
