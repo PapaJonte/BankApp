@@ -44,7 +44,7 @@ public class StageTransaction
         StatusCode status = StatusCode.Successful;
 
         TransactionDataObject tdo = new(userID, accountNumber, amount, transactionType, DateTime.Now.Date);
-        if (!stage)
+        if (stage)
         {
             TransactionDataWrapper wrapper = transactionType == TransactionType.Deposit ? TransactionDataWrapper.ForDeposit(tdo) : TransactionDataWrapper.ForWithdrawal(tdo);
             transactionRegistry.RegisterStagedTransaction(wrapper);
@@ -145,12 +145,14 @@ public class StageTransaction
     private void WithDraw(TransactionDataObject withdrawalObject)
     {
         accountBridge.Withdraw(withdrawalObject.userID, withdrawalObject.AccountNumber, withdrawalObject.Amount);
+        withdrawalObject = withdrawalObject with { TransactionDate = DateTime.Now.Date };
         transactionRegistry.RegisterSuccessfulTransaction(withdrawalObject);
     }
 
     private void Deposit(TransactionDataObject depositObject)
     {
         accountBridge.Deposit(depositObject.userID, depositObject.AccountNumber, depositObject.Amount);
+        depositObject = depositObject with { TransactionDate = DateTime.Now.Date };
         transactionRegistry.RegisterSuccessfulTransaction(depositObject);
     }
 
