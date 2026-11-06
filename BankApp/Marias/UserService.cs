@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using BankApp.GustafsClasses;
+using BankApp.Marias;
+using BankApp.Transaction_Layer.Enum;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
-using BankApp.GustafsClasses;
-using BankApp.Marias;
 
 namespace BankApp
 {
@@ -260,7 +261,7 @@ namespace BankApp
             if (role == UserRole.Customer)
             {
                 //Automatically create a bank account for the new customer user with 0 SEK.
-                _accountManager.CreateAccount(createdUser.UserID, 0m);
+                _accountManager.CreateAccount(createdUser.UserID, 0m, Currency.SEK);
             }
 
             return CreateUserResult.Success;
