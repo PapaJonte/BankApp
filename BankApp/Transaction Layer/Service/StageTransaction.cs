@@ -39,27 +39,26 @@ public class StageTransaction
     /// decimal amount, value the transaction requests to move.
     /// TransactionType transactionType, the type of transaction being staged (deposit or withdrawal).
     /// </param>
-    public StatusCode Stage_Single(int userID, int accountNumber, decimal amount, TransactionType transactionType, bool stage)
+    public StatusCode Stage_SingleTransaction(TransactionDataObject transactionObject, bool stage)
     {
         StatusCode status = StatusCode.Successful;
 
-        TransactionDataObject tdo = new(userID, accountNumber, amount, transactionType, DateTime.Now.Date);
         if (stage)
         {
-            TransactionDataWrapper wrapper = transactionType == TransactionType.Deposit ? TransactionDataWrapper.ForDeposit(tdo) : TransactionDataWrapper.ForWithdrawal(tdo);
+            TransactionDataWrapper wrapper = transactionObject.TransactionType == TransactionType.Deposit ? TransactionDataWrapper.ForDeposit(transactionObject) : TransactionDataWrapper.ForWithdrawal(transactionObject);
             transactionRegistry.RegisterStagedTransaction(wrapper);
         }
         else
         {
-            if (transactionType == TransactionType.Deposit)
+            if (transactionObject.TransactionType == TransactionType.Deposit)
             {
-                Deposit(tdo);
+                Deposit(transactionObject);
             }
-            else if (transactionType == TransactionType.Withdrawal)
+            else if (transactionObject.TransactionType == TransactionType.Withdrawal)
             {
-                if (accountBridge.CanWithdraw(tdo.userID, tdo.AccountNumber, tdo.Amount))
+                if (accountBridge.CanWithdraw(transactionObject.userID, transactionObject.AccountNumber, transactionObject.Amount))
                 {
-                    WithDraw(tdo);
+                    WithDraw(transactionObject);
                 }
                 else
                 {
@@ -113,11 +112,12 @@ public class StageTransaction
         {
             if (s.IsTransfer)
             {
-                if (s.TryGetWithdrawalObject(out TransactionDataObject withdrawalObj))
+                if (s.TryGetWithdrawalObject(out TransactionDataObject? withdrawalObj))
                 {
+                    if (withdrawalObj == null) continue;
                     if (accountBridge.CanWithdraw(withdrawalObj.userID, withdrawalObj.AccountNumber, withdrawalObj.Amount))
                     {
-                        if (s.TryGetDepositObject(out TransactionDataObject depositObject))
+                        if (s.TryGetDepositObject(out TransactionDataObject? depositObject))
                         {
                             WithDraw(withdrawalObj);
                             Deposit(depositObject);
@@ -127,12 +127,13 @@ public class StageTransaction
             }
             else
             {
-                if (s.TryGetDepositObject(out TransactionDataObject depositObject))
+                if (s.TryGetDepositObject(out TransactionDataObject? depositObject))
                 {
                     Deposit(depositObject);
                 }
-                else if (s.TryGetWithdrawalObject(out TransactionDataObject withdrawalObject))
+                else if (s.TryGetWithdrawalObject(out TransactionDataObject? withdrawalObject))
                 {
+                    if (withdrawalObject == null) continue;
                     if (accountBridge.CanWithdraw(withdrawalObject.userID, withdrawalObject.AccountNumber, withdrawalObject.Amount))
                     {
                         WithDraw(withdrawalObject);
@@ -142,18 +143,24 @@ public class StageTransaction
         }
     }
 
-    private void WithDraw(TransactionDataObject withdrawalObject)
+    private void WithDraw(TransactionDataObject? withdrawalObject)
     {
+        if (withdrawalObject == null) throw new NullReferenceException("Withdrawal object is null!");
         accountBridge.Withdraw(withdrawalObject.userID, withdrawalObject.AccountNumber, withdrawalObject.Amount);
         withdrawalObject = withdrawalObject with { TransactionDate = DateTime.Now.Date };
         transactionRegistry.RegisterSuccessfulTransaction(withdrawalObject);
     }
 
-    private void Deposit(TransactionDataObject depositObject)
+    private void Deposit(TransactionDataObject? depositObject)
     {
+        if (depositObject == null) throw new NullReferenceException("Deposit object is null!");
         accountBridge.Deposit(depositObject.userID, depositObject.AccountNumber, depositObject.Amount);
         depositObject = depositObject with { TransactionDate = DateTime.Now.Date };
         transactionRegistry.RegisterSuccessfulTransaction(depositObject);
+        if(depositObject is TransactionDataLoanObject)
+        {
+            accountBridge.UpdateLoanService(depositObject as TransactionDataLoanObject);
+        }
     }
 
     #endregion

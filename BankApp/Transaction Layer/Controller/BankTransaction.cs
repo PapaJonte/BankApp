@@ -36,7 +36,28 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
 
         if (status == StatusCode.Successful)
         {
-            status = stageTransaction.Stage_Single(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit, true);
+            TransactionDataObject transactionObject = new(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit, DateTime.Now.Date); 
+            status = stageTransaction.Stage_SingleTransaction(transactionObject, true);
+        }
+
+        return status;
+    }
+
+    public StatusCode RequestLoanDeposit(AccountData targetAccount, decimal amount, Currency currency, int loanID)
+    {
+        StatusCode status = StatusCode.Successful;
+        if (targetAccount.Currency != currency)
+        {
+            status = exchangeRateModule.TryCalculateExchangeValue(currency, targetAccount.Currency, amount, out decimal convertedAmount);
+            if (status == StatusCode.Successful)
+            {
+                amount = convertedAmount;
+            }
+        }
+        if (status == StatusCode.Successful)
+        {
+            TransactionDataLoanObject transactionObject = new(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit, DateTime.Now.Date, loanID);
+            status = stageTransaction.Stage_SingleTransaction(transactionObject, true);
         }
 
         return status;
@@ -52,7 +73,8 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
     /// </param>
     public StatusCode RequestWithdrawal(int userID, int accountNumber, decimal amount)
     {
-        StatusCode status = stageTransaction.Stage_Single(userID, accountNumber, amount, TransactionType.Withdrawal, false);
+        TransactionDataObject withdrawObject = new(userID, accountNumber, amount,TransactionType.Withdrawal,DateTime.Now.Date);
+        StatusCode status = stageTransaction.Stage_SingleTransaction(withdrawObject, false);
         return status;
     }
 

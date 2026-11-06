@@ -3,5 +3,6 @@ namespace BankApp.Transaction_Layer.Enum;
 public enum TransactionType
 {
     Deposit,
-    Withdrawal
+    Withdrawal,
+
 }

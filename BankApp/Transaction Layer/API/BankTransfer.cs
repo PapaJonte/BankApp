@@ -26,9 +26,9 @@ public class BankTransfer(BankTransaction bankTransaction)
         return status;
     }
 
-    public StatusCode TransferLoan(AccountData targetAccount, decimal loanAmount, Currency loanCurrency)
+    public StatusCode TransferLoan(AccountData targetAccount, decimal loanAmount, Currency loanCurrency, int loanID)
     {
-        StatusCode status = bankTransaction.RequestDeposit(targetAccount, loanAmount, loanCurrency);
+        StatusCode status = bankTransaction.RequestLoanDeposit(targetAccount, loanAmount, loanCurrency, loanID);
         return status;
     }
 

@@ -1,6 +1,8 @@
 
 using System.Xml.Linq;
 using BankApp.GustafsClasses;
+using BankApp.Jonathan;
+using BankApp.Transaction_Layer.DataModel;
 using BankApp.Transaction_Layer.Enum;
 using BankApp.Transaction_Layer.Interface;
 using Org.BouncyCastle.Asn1.Cms;
@@ -8,7 +10,7 @@ using Org.BouncyCastle.Crypto.Modes;
 
 namespace BankApp.Transaction_Layer.Controller;
 
-internal class AccountBridge(AccountManager accountManager) : IAccountBridge
+internal class AccountBridge(AccountManager accountManager, LoanService loanService) : IAccountBridge
 {
 
     public bool CanWithdraw(int userID, int accountNumber, decimal amount)
@@ -68,6 +70,12 @@ internal class AccountBridge(AccountManager accountManager) : IAccountBridge
             }
             bankAccount.TransferBalance(amount, false);
         }
+    }
+
+    public void UpdateLoanService(TransactionDataLoanObject? loanObject)
+    {
+        if (loanObject == null) return;
+        //call loanService here
     }
 
     private bool TryGetBankAccount(int userID, int accountNumber, out BankAccount? bankAccount)
