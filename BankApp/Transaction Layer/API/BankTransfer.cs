@@ -44,8 +44,7 @@ public class BankTransfer(BankTransaction bankTransaction)
     /// </returns>
     public StatusCode DepositMoney(AccountData account, decimal depositAmount)
     {
-        StatusCode status = bankTransaction.RequestDeposit(account, depositAmount, account.Currency);
-        return StatusCode.Successful;
+        return bankTransaction.RequestDeposit(account, depositAmount, account.Currency);
     }
 
     /// <summary>

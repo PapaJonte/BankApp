@@ -424,9 +424,165 @@ namespace BankApp.Robin
             Console.WriteLine(status == StatusCode.Successful ? "Transfer queued." : "Transfer could not be queued. Check your balance and the exchange rate.");
         }
 
+        private void OpenAccount()
+        {
+            string[] options = { "Open regular bank account", "Open savings account" };
+
+            int selectedIndex = 0;
+
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("===== OPEN ACCOUNT =====");
+                Console.WriteLine("Press Esc to go back.\n");
+
+                for (int i = 0; i < options.Length; i++)
+                {
+                    if (i == selectedIndex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"> {options[i]}");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.WriteLine(options[i]);
+                    }
+                }
+
+                switch (Console.ReadKey(true).Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        selectedIndex = (selectedIndex - 1 + options.Length) % options.Length;
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        selectedIndex = (selectedIndex + 1) % options.Length;
+                        break;
+
+                    case ConsoleKey.Enter:
+
+                        switch (selectedIndex)
+                        {
+                            case 0:
+                                // Regular bank account
+                                OpenRegularAccount();
+                                Console.ReadKey(true);
+                                break;
+
+                            case 1:
+                                // Savings account
+                                OpenSavingsAccount();
+                                Console.ReadKey(true);
+                                break;
+                        }
+                        break;
+
+                    case ConsoleKey.Escape:
+                        return;
+                }
+            }
+        }
+
+        private void OpenRegularAccount()
+        {
+            Console.CursorVisible = true;
+
+            // Open a regular account for the signed-in customer in their chosen currency
+            Currency currency = AccountManager.CheckCurrency();
+            _accountManager.CreateAccount(_authService.LoggedInUser!.UserID, 0m, currency);
+
+            Console.WriteLine($"Regular bank account opened in {currency}");
+        }
+
+        private void OpenSavingsAccount()
+        {
+            Console.CursorVisible = true;
+
+            // Show the customer's regular account so they can choose where to open savings
+            foreach (BankAccount account in GetBankAccounts())
+            {
+                Console.WriteLine($"{account.GetBankAccountNumber()} ({account.GetCurrency()})");
+            }
+
+            Console.Write("Regular account number: ");
+
+            if (!int.TryParse(Console.ReadLine(), out int accountNumber))
+            {
+                Console.WriteLine("Invalid account number.");
+                return;
+            }
+
+            int userId = _authService.LoggedInUser!.UserID;
+            Currency currency = AccountManager.CheckCurrency();
+            SavingsAccount? savingsAccount = _accountManager.CreateSavingsAccount(userId, accountNumber, currency);
+
+            if (savingsAccount == null)
+            {
+                Console.WriteLine("Select one of your own regular accounts.");
+                return;
+            }
+
+            Console.WriteLine($"Savings account {savingsAccount.GetSavingsAccountNumber()} opened in {currency}");
+        }
+
+        private void DepositToAccount()
+        {
+            Console.CursorVisible = true;
+
+            // List only the customer's accounts. A null rate means it is a regular account.
+            var destinations = new Dictionary<int, (Currency Currency, decimal? AnnualRate)>();
+
+            foreach (BankAccount account in GetBankAccounts())
+            {
+                int number = account.GetBankAccountNumber();
+                destinations.Add(number, (account.GetCurrency(), null));
+                Console.WriteLine($"{number} — Regular ({account.GetCurrency()})");
+
+                foreach (SavingsAccount savings in account.SavingAccounts)
+                {
+                    int savingsNumber = savings.GetSavingsAccountNumber();
+                    destinations.Add(savingsNumber, (savings.GetCurrency(), savings.GetInterest()));
+                    Console.WriteLine($"{savingsNumber} — Savings ({savings.GetCurrency()})");
+                }
+            }
+
+            Console.Write("Destination account number: ");
+            if (!int.TryParse(Console.ReadLine(), out int accountNumber) || !destinations.TryGetValue(accountNumber, out var destination))
+            {
+                Console.WriteLine("Select one of your listed accounts.");
+                return;
+            }
+
+            Console.Write($"Amount to deposit ({destination.Currency}): ");
+            if (!decimal.TryParse(Console.ReadLine(), out decimal amount) || amount <= 0m)
+            {
+                Console.WriteLine("Enter a positive amount.");
+                return;
+            }
+
+            // Queue the deposit in the currency of the selected account.
+            AccountData target = new(_authService.LoggedInUser!.UserID, accountNumber, destination.Currency);
+
+            if (_bankTransfer.DepositMoney(target, amount) != StatusCode.Successful)
+            {
+                Console.WriteLine("The deposit could not be queued.");
+                return;
+            }
+
+            Console.WriteLine("Deposit queued.");
+
+            // Estimate one year of interest on this deposit at the account's current rate.
+            if (destination.AnnualRate is decimal annualRate)
+            {
+                decimal estimatedInterest = amount * annualRate / 100m;
+                Console.WriteLine($"Estimated interest after one year at {annualRate}%: {estimatedInterest:N2} {destination.Currency}.");
+            }
+        }
+
         private void ShowTransferMenu()
         {
-            string[] options = { "Deposit", "Withdraw", "Transfer" };
+            string[] options = { "Deposit", "Withdraw", "Transfer", "Open account" };
 
             int selectedIndex = 0;
 
@@ -461,22 +617,14 @@ namespace BankApp.Robin
                         break;
 
                     case ConsoleKey.Enter:
-                        Console.WriteLine($"\n{options[selectedIndex]} is not available yet.");
-                        Console.ReadKey(true);
 
 
                         switch (selectedIndex)
                         {
                             case 0:
-                                Console.WriteLine($"\nWhich account would you like to deposit to?");
-
-                                int selectedIndex = 0;
-
-                               
-                                GetBankAccounts();
-                                
-                     
-                                _bankTransfer.DepositMoney();
+                                // Deposit
+                                DepositToAccount();
+                                Console.ReadKey(true);
                                 break;
 
                             case 1:
@@ -532,6 +680,10 @@ namespace BankApp.Robin
                                 Console.ReadKey(true);
                                 break;
 
+                            case 3:
+                                // Open account
+                                OpenAccount();
+                                break;
                         }
                         break;
 
