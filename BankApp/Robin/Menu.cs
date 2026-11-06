@@ -328,7 +328,18 @@ namespace BankApp.Robin
                         switch (selectedIndex)
                         {
                             case 0:
-                                // _bankTransfer.DepositMoney();
+                                Console.WriteLine($"\nWhich account would you like to deposit to?");
+
+                                foreach (BankAccount bankAccount in _accountManager.BankAccountList)
+                                {
+                                    if (bankAccount.GetUserId() == _authService.LoggedInUser.UserID)
+                                    
+                                        Console.WriteLine($"\nAccount number : {bankAccount.GetBankAccountNumber()}" +
+                                            $"\nBalance : {bankAccount.GetBalance()} " +
+                                            $"\nCurrency : {bankAccount.GetCurrency()}");
+                                }
+
+                                //_bankTransfer.DepositMoney();
                                 break;
 
                             case 1:
@@ -336,6 +347,15 @@ namespace BankApp.Robin
                                 break;
 
                             case 2:
+                                foreach (BankAccount bankAccount in _accountManager.BankAccountList)
+                                {
+                                    if (bankAccount.GetUserId() == _authService.LoggedInUser.UserID)
+
+                                        Console.WriteLine($"\nAccount number : {bankAccount.GetBankAccountNumber()}" +
+                                            $"\nBalance : {bankAccount.GetBalance()} " +
+                                            $"\nCurrency : {bankAccount.GetCurrency()}");
+                                }
+
                                 // _bankTransfer.TransferMoney();
                                 break;
 
