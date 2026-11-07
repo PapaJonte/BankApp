@@ -19,16 +19,26 @@ public class StageTransaction
         InitScheduler();
     }
 
-
+    /// <summary>
+    /// Returns all transactions in history for user
+    /// </summary>
+    /// <param name="userID"></param>
+    /// <returns></returns>
     public List<TransactionDataObject> GetTransactionHistoryOnUserID(int userID)
     {
         return transactionRegistry.GetAllTransactionsOnUserID(userID);
     }
-
+    //Returns all transactions in history for account.
     public List<TransactionDataObject> GetTransactionHistoryOnAccountID(int accountID)
     {
         return transactionRegistry.GetAllTransactionsOnAccountNumber(accountID);
     }
+
+    /// <summary>
+    /// return all completed transactions from registry
+    /// </summary>
+    /// <returns></returns>
+    public List<TransactionDataObject> GetAllCompletedTransactions() => transactionRegistry.GetAllCompletedTransactions();
 
     /// <summary>
     /// Responsible for staging requested transaction of money. Only single transactions.
@@ -143,6 +153,11 @@ public class StageTransaction
         }
     }
 
+    /// <summary>
+    /// Calls bridge to withdraw money from account and register transaction.
+    /// </summary>
+    /// <param name="withdrawalObject"></param>
+    /// <exception cref="NullReferenceException"></exception>
     private void WithDraw(TransactionDataObject? withdrawalObject)
     {
         if (withdrawalObject == null) throw new NullReferenceException("Withdrawal object is null!");
@@ -150,7 +165,13 @@ public class StageTransaction
         withdrawalObject = withdrawalObject with { TransactionDate = DateTime.Now.Date };
         transactionRegistry.RegisterSuccessfulTransaction(withdrawalObject);
     }
-
+    
+    /// <summary>
+    /// Calls bridge to deposit money from account and register transaction. If deposition is loan
+    /// call to update loan service.
+    /// </summary>
+    /// <param name="depositObject"></param>
+    /// <exception cref="NullReferenceException"></exception>
     private void Deposit(TransactionDataObject? depositObject)
     {
         if (depositObject == null) throw new NullReferenceException("Deposit object is null!");
