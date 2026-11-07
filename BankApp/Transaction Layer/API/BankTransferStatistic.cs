@@ -2,11 +2,13 @@ using System;
 using BankApp.Transaction_Layer.DataModel.Transaction_Statistical_Objects;
 using BankApp.Transaction_Layer.Enum;
 using BankApp.Transaction_Layer.Service;
+using Spectre.Console;
 
 namespace BankApp.Transaction_Layer.API;
 
 public class BankTransferStatistic(TransactionStatisticFilter transactionStatisticFilter)
 {
+    #region user stats
     /// <summary>
     /// Fetches and returns statistics over account popularity by total volume. Volume meaning sum of monetary asset.
     /// </summary>
@@ -60,9 +62,36 @@ public class BankTransferStatistic(TransactionStatisticFilter transactionStatist
 
         Dictionary<int, List<TransactionDate>> transactionDates = [];
 
-        TotalTransactionsDateOrder dateOrder = new(userID, orderedTransactionDict) {StatusCode = status};
+        TotalTransactionsDateOrder dateOrder = new(userID, orderedTransactionDict) { StatusCode = status };
 
         return dateOrder;
-    } 
+    }
+    #endregion
 
+    #region admin stats
+    /// <summary>
+    /// Get total transaction value add it to wrapper object and return
+    /// </summary>
+    /// <returns></returns>
+    public TotalTransactions GetTotalBankTransactions()
+    {
+        StatusCode status = transactionStatisticFilter.TryGetFullTransactionAmount(out decimal total);
+
+        TotalTransactions totalTransactions = new(total) { StatusCode = status };
+        return totalTransactions;
+    }
+
+    /// <summary>
+    /// get ordered list of most popular accounts based on transactions and add it to wrapper object and returns.
+    /// </summary>
+    /// <returns></returns>
+    public MostPopularAccounts GetMostPopularAccounts()
+    {
+        StatusCode status = transactionStatisticFilter.TryGetPopularAccounts(out IReadOnlyList<TotalCount>? orderedAccountList);
+
+        MostPopularAccounts mostPopularAccounts = new(orderedAccountList) { StatusCode = status };
+
+        return mostPopularAccounts;
+    }
+    #endregion
 }

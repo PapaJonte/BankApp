@@ -37,7 +37,11 @@ public class TransactionRegistry
     {
         transactionHistory.Add(transactionObject);
     }
-
+    /// <summary>
+    /// return all completed transactions as new list.
+    /// </summary>
+    /// <returns></returns>
+    public List<TransactionDataObject> GetAllCompletedTransactions() => [.. transactionHistory];
     public List<TransactionDataObject> GetAllTransactionsOnUserID(int userID)
     {
         return [.. transactionHistory.Where(x => x.userID == userID)];
