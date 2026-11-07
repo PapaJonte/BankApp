@@ -7,6 +7,7 @@ namespace BankApp.Transaction_Layer.API;
 
 public class BankTransferStatistic(TransactionStatisticFilter transactionStatisticFilter)
 {
+    #region user stats
     public AccountPopularityVolume AccountPopularityTotalVolume(int userID)
     {
         StatusCode status = transactionStatisticFilter.TryOrderByTotalVolume(userID, out IReadOnlyList<TotalVolume> orderedAccountList);
@@ -29,20 +30,32 @@ public class BankTransferStatistic(TransactionStatisticFilter transactionStatist
     {
         StatusCode status = transactionStatisticFilter.TryGetFullTransactionAmount(userID, out decimal totalAmount);
 
-        TotalTransactionAmount totalTransactionAmount = new(userID, totalAmount){ StatusCode = status};
+        TotalTransactionAmount totalTransactionAmount = new(userID, totalAmount) { StatusCode = status };
 
         return totalTransactionAmount;
     }
-    
+
     public TotalTransactionsDateOrder TransactionsByDate(int userID)
     {
         StatusCode status = transactionStatisticFilter.TryGetTransactionsByDate(userID, out IReadOnlyDictionary<int, List<TransactionDate>> orderedTransactionDict);
 
         Dictionary<int, List<TransactionDate>> transactionDates = [];
 
-        TotalTransactionsDateOrder dateOrder = new(userID, orderedTransactionDict) {StatusCode = status};
+        TotalTransactionsDateOrder dateOrder = new(userID, orderedTransactionDict) { StatusCode = status };
 
         return dateOrder;
-    } 
+    }
+    #endregion
 
+    #region admin stats
+
+    public TotalTransactions GetTotalBankTransactions()
+    {
+
+    }
+    public MostPopularAccounts GetMostPopularAccounts()
+    {
+        
+    }
+    #endregion
 }
