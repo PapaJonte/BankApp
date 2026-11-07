@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "BankApp": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "BANK_MAIL_ADDRESS": "goldensack.security@gmail.com",
+        "BANK_MAIL_PASSWORD": "ztuf qafl dmzp ryjc"
+      }
+    }
+  }
+}
