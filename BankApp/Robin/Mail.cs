@@ -1,40 +1,40 @@
 ﻿using MailKit.Net.Smtp;
+using MailKit.Security;
 using MimeKit;
-using MailKit.Net.Imap;
+
 public class EmailService
 {
-    public void SendEmail(string recipientAddress, string subject, string body)
+    public bool SendEmail(string recipientAddress, string subject, string body)
     {
-        var message = new MimeMessage();
-        message.From.Add(new MailboxAddress("Your Name", "your@email.com"));
-        message.To.Add(new MailboxAddress("", recipientAddress));
-        message.Subject = subject;
+        // Credentials come from environment variables, so nothing secret ends up in Git
+        string? senderAddress = Environment.GetEnvironmentVariable("BANK_MAIL_ADDRESS");
+        string? appPassword = Environment.GetEnvironmentVariable("BANK_MAIL_PASSWORD");
 
-        // Set the email body as plain text
-        message.Body = new TextPart("plain")
+        if (string.IsNullOrWhiteSpace(senderAddress) || string.IsNullOrWhiteSpace(appPassword))
         {
-            Text = body
-        };
-
-        // Connecting and authenticating to Gmail's IMAP server
-        using (var imapClient = new ImapClient())
-        {
-            imapClient.Connect("imap.gmail.com", 993, true);
-            imapClient.Authenticate("yourgmail@gmail.com", "yourpassword");
-            // Access and manage your inbox here
-            imapClient.Disconnect(true);
+            Console.WriteLine("Mail is not configured (missing environment variables).");
+            return false;
         }
 
-        using (var client = new SmtpClient())
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress("GoldenSack Bank", senderAddress));
+        message.To.Add(MailboxAddress.Parse(recipientAddress));
+        message.Subject = subject;
+        message.Body = new TextPart("plain") { Text = body };
+
+        try
         {
-            // Connect to the SMTP server
-            client.Connect("smtp.server.com", 587, false);
-            // Authenticate using your email credentials
-            client.Authenticate("your@email.com", "yourpassword");
-            // Send the email
+            using var client = new SmtpClient();
+            client.Connect("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+            client.Authenticate(senderAddress, appPassword);
             client.Send(message);
-            // Disconnect from the server
             client.Disconnect(true);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Could not send mail: {ex.Message}");
+            return false;
         }
     }
 }

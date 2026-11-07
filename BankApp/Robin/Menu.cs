@@ -13,6 +13,7 @@ namespace BankApp.Robin
 
         //private readonly Theme theme;
 
+        private readonly EmailService _emailService = new EmailService();
         private readonly BankTransfer _bankTransfer;
         private readonly ExchangeRate _exchangeRates;
         private readonly AccountManager _accountManager;
@@ -23,7 +24,7 @@ namespace BankApp.Robin
         // CONSTRUCTOR INJECTION: We require UserService to be passed in when Menu is created
 
         // Passes both fields into our constructor so we can use the methods from Maria's class.
-        public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager, 
+        public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager,
             BankTransfer bankTransfer, ExchangeRate exchangeRates)
         {
             _bankTransfer = bankTransfer ?? throw new ArgumentNullException(nameof(bankTransfer));
@@ -401,14 +402,14 @@ namespace BankApp.Robin
 
             // Only show accounts the signed-in customer can send money from
             List<BankAccount> accounts = GetBankAccounts();
-            
+
             foreach (BankAccount account in accounts)
             {
                 Console.WriteLine($"{account.GetBankAccountNumber()}: {account.GetBalance():N2} {account.GetCurrency()}");
             }
 
             Console.Write("Source account number: ");
-            
+
             if (!int.TryParse(Console.ReadLine(), out int sourceNumber))
             {
                 Console.WriteLine("Invalid source account number,");
@@ -416,7 +417,7 @@ namespace BankApp.Robin
             }
 
             BankAccount? source = accounts.Find(account => account.GetBankAccountNumber() == sourceNumber);
-            
+
             if (source == null)
             {
                 Console.WriteLine("Select one of your own accounts.");
@@ -425,7 +426,7 @@ namespace BankApp.Robin
 
             // Find the recipient by account number without displaying their balance
             Console.Write("Destination account number: ");
-            
+
             if (!int.TryParse(Console.ReadLine(), out int destinationNumber) || destinationNumber == sourceNumber)
             {
                 Console.WriteLine("Enter a different, valid destination account number.");
@@ -783,7 +784,7 @@ namespace BankApp.Robin
                                 Console.Clear();
                                 Console.WriteLine("===== ACCOUNTS =====");
                                 ShowLoggedInUser();
-                                
+
                                 // GetBankAccounts returns only the signed-in customer's regular accounts
                                 foreach (BankAccount bankAccount in GetBankAccounts())
                                 {
@@ -868,7 +869,7 @@ namespace BankApp.Robin
                     if (input.Length > 0)
                     {
                         input.Length--;
-                        Console.Write("\b \b");   
+                        Console.Write("\b \b");
                     }
                 }
                 else if (!char.IsControl(key.KeyChar))
@@ -940,6 +941,10 @@ namespace BankApp.Robin
                                     string userName = Console.ReadLine() ?? "";
                                     Console.Write("\nPassword: ");
                                     string userPassword = ReadMasked();
+
+                                    User? lockedCheck = _userService.GetUserByUsername(userName);
+                                    bool wasAlreadyLocked = lockedCheck?.IsLockedOut ?? false;
+
                                     LoginResult userLoggedIn = _authService.Login(userName, userPassword);
 
                                     if (userLoggedIn == LoginResult.WrongCredentials)
@@ -970,13 +975,28 @@ namespace BankApp.Robin
                                         }
                                         wrongUserInfo = false;
                                     }
-
                                     if (userLoggedIn == LoginResult.LockedOut)
                                     {
-                                        Console.WriteLine("Your account is locked!");
+                                        Console.WriteLine("Your account is locked! An admin must unlock it.");
+
+                                        if (!wasAlreadyLocked && lockedCheck != null)
+                                        {
+                                            _emailService.SendEmail(
+                                                lockedCheck.Email,
+                                                "Your account has been locked",
+                                                "Your account was locked after three failed login attempts. An admin needs to review your account and unlock it.");
+                                        }
+
                                         Console.ReadKey();
                                         wrongUserInfo = false;
                                     }
+
+                                    //if (userLoggedIn == LoginResult.LockedOut)
+                                    //{
+                                    //    Console.WriteLine("Your account is locked!");
+                                    //    Console.ReadKey();
+                                    //    wrongUserInfo = false;
+                                    //}
                                 }
 
                                 break;

@@ -27,7 +27,7 @@ namespace BankApp
             CreditScoreService creditScoreService = new CreditScoreService();
             InterestRuleService interestRuleService = new InterestRuleService();
             LoanService loanService = new LoanService(interestRuleService, creditScoreService);
-            
+            new EmailService().SendEmail("goldensack.security@gmail.com", "Test", "Hello!");
             #region Transactions
             AccountBridge accountBridge = new(accountManager, loanService);
             
