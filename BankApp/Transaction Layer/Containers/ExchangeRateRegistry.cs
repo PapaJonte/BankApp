@@ -5,7 +5,6 @@ namespace BankApp.Transaction_Layer.Data;
 public class ExchangeRateRegistry
 {
     private readonly Dictionary<(Currency, Currency), decimal> exchangeRates = [];
-asdsadas
     /// <summary>
     /// Sets the exchange rate between two currencies. It is saved one way, get exchange rate handles the inversion when needed.
     /// </summary>
