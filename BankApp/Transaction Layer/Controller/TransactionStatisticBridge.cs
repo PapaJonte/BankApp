@@ -6,7 +6,9 @@ using BankApp.Transaction_Layer.Interface;
 namespace BankApp.Transaction_Layer.Controller;
 
 /// <summary>
-/// Bridge class between front end and transfer layer
+/// Bridge class between front end and transfer layer.
+/// Pretty useless should remove this and bootstrap the BankTransferStatistics. Im not sure why I didnt but 
+/// it is what it is now, dont have time to change. 
 /// </summary>
 /// <param name="bankTransferStatistic"></param>
 public class TransactionStatisticBridge(BankTransferStatistic bankTransferStatistic) : IViewTransactionStatisticBridge
@@ -35,4 +37,16 @@ public class TransactionStatisticBridge(BankTransferStatistic bankTransferStatis
     /// <param name="userID"></param>
     /// <returns></returns>
     public TotalTransactionsDateOrder GetTotalTransactionsDateOrder(int userID) => bankTransferStatistic.TransactionsByDate(userID);
+
+    /// <summary>
+    /// Return total transactions across all transactions.
+    /// </summary>
+    /// <returns></returns>
+    public TotalTransactions GetTotalBankTransactions() => bankTransferStatistic.GetTotalBankTransactions();
+
+    /// <summary>
+    /// Return MostPopularAccounts object.
+    /// </summary>
+    /// <returns></returns>
+    public MostPopularAccounts GetMostPopularAccounts() => bankTransferStatistic.GetMostPopularAccounts();
 }
