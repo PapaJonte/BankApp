@@ -2,7 +2,10 @@
 using BankApp.Pull_The_Sack.Interface;
 using BankApp.Transaction_Layer.API;
 using BankApp.Transaction_Layer.DataModel;
+using BankApp.Transaction_Layer.DataModel.Transaction_Statistical_Objects;
 using BankApp.Transaction_Layer.Enum;
+using BankApp.Transaction_Layer.Service;
+using BankApp.Transaction_Layer.Controller;
 using Spectre.Console;
 namespace BankApp.Robin
 
@@ -14,19 +17,24 @@ namespace BankApp.Robin
         //private readonly Theme theme;
 
         private readonly BankTransfer _bankTransfer;
+        private readonly BankTransferStatistic _bankTransferStatistic;
+        private readonly TransactionStatisticBridge _transactionStatisticBridge;
         private readonly ExchangeRate _exchangeRates;
         private readonly AccountManager _accountManager;
         private readonly LoanMenu _loanMenu;
         private readonly AdminLoanMenu _adminLoanMenu;
         private readonly UserService _userService;
         private readonly AuthService _authService;
+
         // CONSTRUCTOR INJECTION: We require UserService to be passed in when Menu is created
 
         // Passes both fields into our constructor so we can use the methods from Maria's class.
         public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager, 
-            BankTransfer bankTransfer, ExchangeRate exchangeRates)
+            BankTransfer bankTransfer, BankTransferStatistic bankTransferStatistic, TransactionStatisticBridge transactionStatisticBridge, ExchangeRate exchangeRates)
         {
             _bankTransfer = bankTransfer ?? throw new ArgumentNullException(nameof(bankTransfer));
+            _bankTransferStatistic = bankTransferStatistic ?? throw new ArgumentNullException(nameof(bankTransferStatistic));
+            _transactionStatisticBridge = transactionStatisticBridge ?? throw new ArgumentNullException(nameof(transactionStatisticBridge));
             _exchangeRates = exchangeRates ?? throw new ArgumentNullException(nameof(exchangeRates));
             _accountManager = accountManager ?? throw new ArgumentNullException(nameof(accountManager));
             _adminLoanMenu = adminLoanMenu ?? throw new ArgumentNullException(nameof(adminLoanMenu));
@@ -802,13 +810,7 @@ namespace BankApp.Robin
                                 break;
 
                             case 1:
-                                /*Gustaf, here. The error is my fault.
-                 * You can solve this error by inserting a Currency value as a parameter.
-                 * 
-                 * If you want to set SEK by default you need to add "Currency.SEK" as an input value.
-                 * In order to recieve access to the Currency Enum you may have to add "Enum.GetValues<Currency>()" somewhere above in this class.
-                 
-                 If you want the user to make the choice of Currency then you may insert the method "CheckCurrency()" as an input.*/
+                                
                                 Console.CursorVisible = true;
                                 Currency currency = AccountManager.CheckCurrency();
                                 _accountManager.CreateAccount(_authService.LoggedInUser.UserID, 0m, currency);
@@ -820,6 +822,7 @@ namespace BankApp.Robin
 
                             case 3:
                                 Console.WriteLine("Transaction history");
+                                _transactionStatisticBridge.GetTotalTransactionsDateOrder(_authService.LoggedInUser.UserID);
                                 break;
 
                             case 4:
