@@ -26,6 +26,16 @@ public class BankTransfer(BankTransaction bankTransaction)
         return status;
     }
 
+    /// <summary>
+    /// Handles loan transfer since it contains different structure for its data and the loanid its separated into its own function.
+    /// </summary>
+    /// <param name="">
+    /// AccountData targetAccount the account we transfer loan into
+    /// decimal loanAmount loan amount
+    /// Currency loanCurrency currency we transfer loan to
+    /// int loanID the id of the loan, used with callback to loanservice once transaction is complete.
+    /// </param>
+    /// <returns></returns>
     public StatusCode TransferLoan(AccountData targetAccount, decimal loanAmount, Currency loanCurrency, int loanID)
     {
         StatusCode status = bankTransaction.RequestLoanDeposit(targetAccount, loanAmount, loanCurrency, loanID);

@@ -6,6 +6,13 @@ namespace BankApp.Transaction_Layer.Service;
 
 public class TransactionStatisticFilter(StageTransaction stageTransaction)
 {
+    /// <summary>
+    /// Handles fetching transaction history and grouping by account number and then 
+    /// ordering them by their value. Creates data object and store result in.
+    /// </summary>
+    /// <param name="userID"></param>
+    /// <param name="orderedAccountList"></param>
+    /// <returns></returns>
     public StatusCode TryOrderByTotalVolume(int userID, out IReadOnlyList<TotalVolume> orderedAccountList)
     {
         orderedAccountList = [];
@@ -28,7 +35,13 @@ public class TransactionStatisticFilter(StageTransaction stageTransaction)
 
         return status;
     }
-
+    /// <summary>
+    /// Handles fetching transaction history and grouping by account number and then 
+    /// ordering them by how many transactions they have. Creates data object and store result in.
+    /// </summary>
+    /// <param name="userID"></param>
+    /// <param name="orderedAccountList"></param>
+    /// <returns></returns>
     public StatusCode TryOrderByTransactionCount(int userID, out IReadOnlyList<TotalCount> orderedAccountList)
     {
         orderedAccountList = [];
@@ -52,6 +65,12 @@ public class TransactionStatisticFilter(StageTransaction stageTransaction)
         return status;
     }
 
+    /// <summary>
+    /// Fetch all transactions per user ID and returns total amount of all transactions in out param.
+    /// </summary>
+    /// <param name="userID"></param>
+    /// <param name="totalAmount"></param>
+    /// <returns></returns>
     public StatusCode TryGetFullTransactionAmount(int userID, out decimal totalAmount)
     {
         totalAmount = default;
@@ -66,7 +85,13 @@ public class TransactionStatisticFilter(StageTransaction stageTransaction)
         return status;
     }
 
-    public StatusCode TryGetTransactionsByDate(int userID, out IReadOnlyDictionary<int,List<TransactionDate>> orderedTransactionDict)
+    /// <summary>
+    /// fetches transactions tied to userID and create data object where they are stored and can be parsed.
+    /// </summary>
+    /// <param name="userID"></param>
+    /// <param name="orderedTransactionDict"></param>
+    /// <returns></returns>
+    public StatusCode TryGetTransactionsByDate(int userID, out IReadOnlyDictionary<int, List<TransactionDate>> orderedTransactionDict)
     {
         orderedTransactionDict = new Dictionary<int, List<TransactionDate>>();
         Dictionary<int, List<TransactionDate>> tmpTransactions = [];
@@ -93,6 +118,12 @@ public class TransactionStatisticFilter(StageTransaction stageTransaction)
     }
 
 
+    /// <summary>
+    /// Evaluates list.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="list"></param>
+    /// <returns></returns>
     private StatusCode EvaluateStatusCode<T>(List<T> list)
     {
         StatusCode code = StatusCode.Successful;

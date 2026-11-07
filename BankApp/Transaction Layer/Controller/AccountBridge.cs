@@ -10,9 +10,23 @@ using Org.BouncyCastle.Crypto.Modes;
 
 namespace BankApp.Transaction_Layer.Controller;
 
+/// <summary>
+/// Bridge class that interfaces with account manager and loan service from the transaction layer
+/// </summary>
+/// <param name=""></param>
+/// <returns></returns>
 internal class AccountBridge(AccountManager accountManager, LoanService loanService) : IAccountBridge
 {
 
+    /// <summary>
+    /// Checks current balance on user account by account number and returns wether withdrawal is possible
+    /// </summary>
+    /// <param name="">
+    /// int userID, id of user 
+    /// int accountNumber BankAccount or SavingsAccount we want to check.
+    /// decimal amount we want to withdraw
+    /// </param>
+    /// <returns></returns>
     public bool CanWithdraw(int userID, int accountNumber, decimal amount)
     {
         if (TryGetBankAccount(userID, accountNumber, out var bankAccount))
@@ -26,6 +40,15 @@ internal class AccountBridge(AccountManager accountManager, LoanService loanServ
         return false;
     }
 
+    /// <summary>
+    /// Responsible for depositing given amount on either savings account or bank account.
+    /// </summary>
+    /// <param name="">
+    /// int userID id of user connected to account.
+    /// int accountNumber account number for savings- or checkings account.
+    /// decimal amount amount of money to deposit.
+    /// </param>
+    /// <returns></returns>
     public void Deposit(int userID, int accountNumber, decimal amount)
     {
         if (TryGetSavingsAccount(userID, accountNumber, out var savingsAccount))
@@ -42,6 +65,15 @@ internal class AccountBridge(AccountManager accountManager, LoanService loanServ
         }
     }
 
+    /// <summary>
+    /// Withdraws given amount from savings- or bank account.
+    /// </summary>
+    /// <param name="">
+    /// int userID id of user connected to account
+    /// int accountNumber account number for savings- or bankaccount
+    /// decimal amount total amount to withdraw
+    /// </param>
+    /// <returns></returns>
     public void Withdraw(int userID, int accountNumber, decimal amount)
     {
         if (TryGetSavingsAccount(userID, accountNumber, out var savingsAccount))
@@ -58,12 +90,26 @@ internal class AccountBridge(AccountManager accountManager, LoanService loanServ
         }
     }
 
+    /// <summary>
+    /// Updates loanservice once a loan transaction is complete
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public void UpdateLoanService(TransactionDataLoanObject? loanObject)
     {
         if (loanObject == null) return;
         loanService.ConfirmLoanPayout(loanObject.LoanID, loanObject.TransactionDate);
     }
 
+    /// <summary>
+    /// Tries to get bank account based on account number and userID
+    /// </summary>
+    /// <param name="">
+    /// int userID id of user connected to account.
+    /// int accountNumber number for savings- or bank account
+    /// out BankAccount bankAccount account found
+    /// </param>
+    /// <returns></returns>
     private bool TryGetBankAccount(int userID, int accountNumber, out BankAccount? bankAccount)
     {
         bankAccount = null;
@@ -80,6 +126,13 @@ internal class AccountBridge(AccountManager accountManager, LoanService loanServ
         return bankAccount != null;
     }
 
+    /// <summary>
+    /// Try to get savings account based on userID and accountNumber, returns account as out param
+    /// </summary>
+    /// <param name="userID"> user id connected to account</param>
+    /// <param name="accountNumber">accountnumber for savings- or bank acconut</param>
+    /// <param name="savingsAccount">returned savings account if found</param>
+    /// <returns></returns>
     private bool TryGetSavingsAccount(int userID, int accountNumber, out SavingsAccount? savingsAccount)
     {
         savingsAccount = null;

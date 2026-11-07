@@ -1,12 +1,8 @@
-using System;
-using BankApp.Pull_The_Sack.API;
 using BankApp.Transaction_Layer.API;
 using BankApp.Transaction_Layer.DataModel;
 using BankApp.Transaction_Layer.Enum;
 using BankApp.Transaction_Layer.Interface;
 using BankApp.Transaction_Layer.Service;
-using Org.BouncyCastle.Asn1.X509;
-using Spectre.Console;
 
 namespace BankApp.Transaction_Layer.Controller;
 
@@ -36,13 +32,21 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
 
         if (status == StatusCode.Successful)
         {
-            TransactionDataObject transactionObject = new(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit, DateTime.Now.Date); 
+            TransactionDataObject transactionObject = new(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit, DateTime.Now.Date);
             status = stageTransaction.Stage_SingleTransaction(transactionObject, true);
         }
 
         return status;
     }
 
+    /// <summary>
+    /// Request deposit loan to target account
+    /// </summary>
+    /// <param name="targetAccount">Account to receive loan</param>
+    /// <param name="amount">Amount to deposit</param>
+    /// <param name="currency">Currency loan is deposited in</param>
+    /// <param name="loanID">id of loan</param>
+    /// <returns></returns>
     public StatusCode RequestLoanDeposit(AccountData targetAccount, decimal amount, Currency currency, int loanID)
     {
         StatusCode status = StatusCode.Successful;
@@ -73,16 +77,30 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
     /// </param>
     public StatusCode RequestWithdrawal(int userID, int accountNumber, decimal amount)
     {
-        TransactionDataObject withdrawObject = new(userID, accountNumber, amount,TransactionType.Withdrawal,DateTime.Now.Date);
+        TransactionDataObject withdrawObject = new(userID, accountNumber, amount, TransactionType.Withdrawal, DateTime.Now.Date);
         StatusCode status = stageTransaction.Stage_SingleTransaction(withdrawObject, false);
         return status;
     }
 
+    /// <summary>
+    /// Transfer money between two accounts
+    /// </summary>
+    /// <param name="origin">account money withdraw from</param>
+    /// <param name="target">account money deposit in</param>
+    /// <param name="withdrawalAmount">amount to withdraw</param>
+    /// <param name="depositAmount">amount to deposit</param>
     private void RequestTransfer(AccountData origin, AccountData target, decimal withdrawalAmount, decimal depositAmount)
     {
         stageTransaction.Stage_Transaction(origin, target, withdrawalAmount, depositAmount);
     }
 
+    /// <summary>
+    /// Checks if account has sufficent funding for withdrawal and return status code
+    /// </summary>
+    /// <param name="userID">id of user connected to account</param>
+    /// <param name="accountNumber">account numbver, either savings- or bank account</param>
+    /// <param name="amount">amount to check withdraw</param>
+    /// <returns></returns>
     public StatusCode WithdrawalStatus(int userID, int accountNumber, decimal amount)
     {
         StatusCode statusCode = accountBridge.CanWithdraw(userID, accountNumber, amount) ? StatusCode.Successful : StatusCode.Failed;

@@ -10,17 +10,30 @@ using BankApp.Pull_The_Sack.Interface;
 public class LockedConsole : IConsole
 {
 
-    private sealed class Releaser(object gate) : IDisposable
+    /// <summary>
+    /// Releaser class responsible for disposing of the locked object
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
+    private sealed class Releaser(object Lock) : IDisposable
     {
-        private object? _gate = gate;
+        private object? _lock = Lock;
         public void Dispose()
         {
-            var g = Interlocked.Exchange(ref _gate, null);
-            if (g is not null) Monitor.Exit(g);
+            /*
+            ok so if I understand this correctly there are cases/bugs where two threads can hold the same 
+            Releaser object ref, and if that happens we want to guard so that the Dispose calls after release does not 
+            exit with a lock that has already been used for exit (since its already released). 
+            We use Interlocked.Exchange which makes sure that only one thread gets the lock obbject back to call the Monitor.Exit.
+            Interlocked.Exchange basically gives and sets to null in one call which prevents
+            the second thread from accessing and returning the same object. 
+            */
+            var g = Interlocked.Exchange(ref _lock, null);
+            if (g != null) Monitor.Exit(g);
         }
     }
 
-    private readonly object _gate = new();
+    private readonly object consoleLock = new();
 
     /*
     Using try read key here because listening for input even from another thread seems to cause
@@ -42,7 +55,7 @@ public class LockedConsole : IConsole
         key = default;
 
         bool available;
-        lock (_gate) { available = Console.KeyAvailable; }
+        lock (consoleLock) { available = Console.KeyAvailable; }
 
         if (!available)
             return false;
@@ -51,12 +64,25 @@ public class LockedConsole : IConsole
         return true;
     }
 
+    /// <summary>
+    /// So this was a later addition which I think mostly render the individual lock functionality redundant but I keep them
+    /// since they make sure we still lock incase we miss using this lock function.
+    /// Basically this allows us to lock a sequence of console logs instead of having every call lock individually.
+    /// This prevent some flickering when we write a lot of graphic to the terminal in one long sequence.
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public IDisposable Lock()
     {
-        Monitor.Enter(_gate);
-        return new Releaser(_gate);
+        Monitor.Enter(consoleLock);
+        return new Releaser(consoleLock);
     }
 
+    /// <summary>
+    /// Returns width of console window. If we can't fetch it return arbitrary value
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public int GetTerminalWidth()
     {
         int width;
@@ -69,25 +95,41 @@ public class LockedConsole : IConsole
         return width;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Lock and clear
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public void Clear()
     {
-        lock (_gate) { Console.Clear(); }
+        lock (consoleLock) { Console.Clear(); }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// lock and write
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public void Write(string text)
     {
-        lock (_gate) { Console.Write(text); }
+        lock (consoleLock) { Console.Write(text); }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// lock and write line
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public void WriteLine(string text = "")
     {
-        lock (_gate) { Console.WriteLine(text); }
+        lock (consoleLock) { Console.WriteLine(text); }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Fetch console width, or set it to text length. Call WriteCentered overload
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public void WriteCentered(string text)
     {
         int width;
@@ -96,10 +138,15 @@ public class LockedConsole : IConsole
         WriteCentered(text, width);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Calculate left padding based on console width and width of text
+    /// and add padding to left before writing.
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public void WriteCentered(string text, int width)
     {
-        lock (_gate)
+        lock (consoleLock)
         {
             var lines = text.Split('\n');
             int blockWidth = lines.Max(l => l.TrimEnd().Length);
@@ -114,39 +161,64 @@ public class LockedConsole : IConsole
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// SEt cursor position at left,top
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public void SetCursor(int left, int top)
     {
-        lock (_gate) { Console.SetCursorPosition(left, top); }
+        lock (consoleLock) { Console.SetCursorPosition(left, top); }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Write text at current cursor pos
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public void WriteAtCursor(string text)
     {
-        lock (_gate) { Console.Write(text); }
+        lock (consoleLock) { Console.Write(text); }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// return cursor X axis
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public int Left
     {
-        get { lock (_gate) { return Console.CursorLeft; } }
+        get { lock (consoleLock) { return Console.CursorLeft; } }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// return cursor Y axis
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public int Top
     {
-        get { lock (_gate) { return Console.CursorTop; } }
+        get { lock (consoleLock) { return Console.CursorTop; } }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// lock and readkey
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public ConsoleKeyInfo ReadKey()
     {
         return Console.ReadKey(intercept: true);
     }
 
+    /// <summary>
+    /// lock and set console color
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     public void SetConsoleColor(ConsoleColor color)
     {
-        lock (_gate)
+        lock (consoleLock)
         {
             Console.ForegroundColor = color;
         }
