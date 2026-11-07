@@ -1,11 +1,12 @@
 ﻿using BankApp.GustafsClasses;
 using BankApp.Pull_The_Sack.Interface;
 using BankApp.Transaction_Layer.API;
+using BankApp.Transaction_Layer.Controller;
 using BankApp.Transaction_Layer.DataModel;
 using BankApp.Transaction_Layer.DataModel.Transaction_Statistical_Objects;
 using BankApp.Transaction_Layer.Enum;
+using BankApp.Transaction_Layer.Interface;
 using BankApp.Transaction_Layer.Service;
-using BankApp.Transaction_Layer.Controller;
 using Spectre.Console;
 namespace BankApp.Robin
 
@@ -18,7 +19,7 @@ namespace BankApp.Robin
 
         private readonly BankTransfer _bankTransfer;
         private readonly BankTransferStatistic _bankTransferStatistic;
-        private readonly TransactionStatisticBridge _transactionStatisticBridge;
+        private readonly IViewTransactionStatisticBridge _transactionStatisticBridge;
         private readonly ExchangeRate _exchangeRates;
         private readonly AccountManager _accountManager;
         private readonly LoanMenu _loanMenu;
@@ -30,7 +31,7 @@ namespace BankApp.Robin
 
         // Passes both fields into our constructor so we can use the methods from Maria's class.
         public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager, 
-            BankTransfer bankTransfer, BankTransferStatistic bankTransferStatistic, TransactionStatisticBridge transactionStatisticBridge, ExchangeRate exchangeRates)
+            BankTransfer bankTransfer, BankTransferStatistic bankTransferStatistic, IViewTransactionStatisticBridge transactionStatisticBridge, ExchangeRate exchangeRates)
         {
             _bankTransfer = bankTransfer ?? throw new ArgumentNullException(nameof(bankTransfer));
             _bankTransferStatistic = bankTransferStatistic ?? throw new ArgumentNullException(nameof(bankTransferStatistic));

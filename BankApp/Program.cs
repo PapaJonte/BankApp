@@ -28,6 +28,7 @@ namespace BankApp
             InterestRuleService interestRuleService = new InterestRuleService();
             LoanService loanService = new LoanService(interestRuleService, creditScoreService);
             
+            
             #region Transactions
             AccountBridge accountBridge = new(accountManager, loanService);
             
@@ -49,7 +50,7 @@ namespace BankApp
             #endregion
             #endregion
 
-            Menu menu = new Menu(userService, authService, loanMenu, adminLoanMenu, accountManager, bankTransferModule, exchangeRateModule);
+            Menu menu = new Menu(userService, authService, loanMenu, adminLoanMenu, accountManager, bankTransferModule, bankTransferStatistic, viewTransactionStatisticBridge, exchangeRateModule);
 
 
             // Console.ReadKey();
