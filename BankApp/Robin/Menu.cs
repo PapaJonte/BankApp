@@ -345,15 +345,53 @@ namespace BankApp.Robin
                         switch (selectedIndex)
                         {
                             case 0:
+
+                                User? user = _authService.LoggedInUser;
+
+                                if (user == null)
+                                {
+                                    return;
+                                }
+
+                                var users = _accountManager.BankAccountList.Where(account => account.GetUserId() == user.UserID).ToList();
+
+                                foreach (BankAccount account in users)
+                                {
+                                    Console.WriteLine($"{account.GetBankAccountNumber()}: {account.GetBalance():N2} {account.GetCurrency()}");
+                                }
+
+                                Console.Write("Enter the account number: ");
+                                if (!int.TryParse(Console.ReadLine(), out int userNumber))
+                                {
+                                    Console.WriteLine("Invalid account number.");
+                                    break;
+                                }
+
+                                BankAccount? source1 = users.Find(account => account.GetBankAccountNumber() == userNumber);
+
+                                if (source1 == null)
+                                {
+                                    Console.WriteLine("Select one of your listed accounts.");
+                                    break;
+                                }
+
+                                Currency currency1 = source1.GetCurrency();
+                                Console.Write($"Enter the deposit amount: ({currency1})");
+
+                                if (!decimal.TryParse(Console.ReadLine(), out decimal amount1) || amount1 <= 0m)
+                                {
+                                    Console.WriteLine("Enter a positive amount.");
+                                    break;
+                                }
+
+                                AccountData accountData1 = new(user.UserID, userNumber, currency1);
+                                StatusCode status1 = _bankTransfer.DepositMoney(accountData1, amount1);
+
+                                Console.WriteLine(status1 == StatusCode.Successful ? $"Deposit {amount1:N2} {currency1}."
+                                    : "The deposit failed. Check that the account has enough funds.");
+
                                 Console.WriteLine($"\nWhich account would you like to deposit to?");
-
-                                int selectedIndex = 0;
-
-                               
-                                GetBankAccounts();
-                                
-                     
-                                _bankTransfer.DepositMoney();
+                                Console.ReadKey();
                                 break;
 
                             case 1:
