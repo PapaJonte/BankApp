@@ -1,18 +1,19 @@
-﻿using BankApp.GustafsClasses;
+﻿using BankApp.ConsoleUi.Display;
+using BankApp.Currencies;
+using BankApp.GustafsClasses;
+using BankApp.Jonathan;
 using BankApp.Pull_The_Sack.Interface;
 using BankApp.Transaction_Layer.Controller;
+using BankApp.Transaction_Layer.DataModel.Transaction_Statistical_Objects;
 using BankApp.Transaction_Layer.Interface;
 using BankApp.Transaction_Layer.Service;
-using Spectre.Console;
-using System.Transactions;
-using System.Net.Security;
-using BankApp.Transactions.Transfers;
 using BankApp.Transactions.Models;
 using BankApp.Transactions.Statistics;
 using BankApp.Transactions.Statistics.Models;
-using BankApp.Currencies;
-using BankApp.ConsoleUi.Display;
-using BankApp.Transaction_Layer.DataModel.Transaction_Statistical_Objects;
+using BankApp.Transactions.Transfers;
+using Spectre.Console;
+using System.Net.Security;
+using System.Transactions;
 namespace BankApp.ConsoleUi.Menus
 
 {
@@ -28,6 +29,7 @@ namespace BankApp.ConsoleUi.Menus
         private readonly ExchangeRate _exchangeRates;
         private readonly AccountManager _accountManager;
         private readonly LoanMenu _loanMenu;
+        private readonly LoanService _loanService;
         private readonly AdminLoanMenu _adminLoanMenu;
         private readonly UserService _userService;
         private readonly AuthService _authService;
@@ -36,13 +38,14 @@ namespace BankApp.ConsoleUi.Menus
 
         // Passes both fields into our constructor so we can use the methods from Maria's class.
         public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager,
-            BankTransfer bankTransfer, BankTransferStatistic bankTransferStatistic, ExchangeRate exchangeRates)
+            BankTransfer bankTransfer, BankTransferStatistic bankTransferStatistic, ExchangeRate exchangeRates, LoanService loanService)
         {
             _bankTransfer = bankTransfer ?? throw new ArgumentNullException(nameof(bankTransfer));
             _bankTransferStatistic = bankTransferStatistic ?? throw new ArgumentNullException(nameof(bankTransferStatistic));
             _exchangeRates = exchangeRates ?? throw new ArgumentNullException(nameof(exchangeRates));
             _accountManager = accountManager ?? throw new ArgumentNullException(nameof(accountManager));
             _adminLoanMenu = adminLoanMenu ?? throw new ArgumentNullException(nameof(adminLoanMenu));
+            _loanService = loanService ?? throw new ArgumentNullException(nameof(loanService));
             _loanMenu = loanMenu ?? throw new ArgumentNullException(nameof(loanMenu));
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -95,7 +98,7 @@ namespace BankApp.ConsoleUi.Menus
 
             if (result == CreateUserResult.Success)
             {
-                
+
                 Console.WriteLine(userMessage);
                 return true;
             }
@@ -126,19 +129,21 @@ namespace BankApp.ConsoleUi.Menus
                     "Log out",
                 };
 
-                for (int i = 0; i < options.Length; i++)
-                {
-                    if (i == selectedIndex)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"> {options[i]}");
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        Console.WriteLine(options[i]);
-                    }
-                }
+                DrawMenu("OWNER MENU", options, selectedIndex);
+
+                //for (int i = 0; i < options.Length; i++)
+                //{
+                //    if (i == selectedIndex)
+                //    {
+                //        Console.ForegroundColor = ConsoleColor.Green;
+                //        Console.WriteLine($"> {options[i]}");
+                //        Console.ResetColor();
+                //    }
+                //    else
+                //    {
+                //        Console.WriteLine(options[i]);
+                //    }
+                //}
 
                 ConsoleKey key = Console.ReadKey(true).Key;
 
@@ -338,19 +343,21 @@ namespace BankApp.ConsoleUi.Menus
                     returnToOwnerMenu ? "Return to owner menu" : "Log out",
                 };
 
-                for (int i = 0; i < options.Length; i++)
-                {
-                    if (i == selectedIndex)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"> {options[i]}");
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        Console.WriteLine(options[i]);
-                    }
-                }
+                DrawMenu("ADMIN MENU", options, selectedIndex);
+
+                //for (int i = 0; i < options.Length; i++)
+                //{
+                //    if (i == selectedIndex)
+                //    {
+                //        Console.ForegroundColor = ConsoleColor.Green;
+                //        Console.WriteLine($"> {options[i]}");
+                //        Console.ResetColor();
+                //    }
+                //    else
+                //    {
+                //        Console.WriteLine(options[i]);
+                //    }
+                //}
 
                 ConsoleKey key = Console.ReadKey(true).Key;
 
@@ -822,19 +829,20 @@ namespace BankApp.ConsoleUi.Menus
 
                 };
 
-                for (int i = 0; i < options.Length; i++)
-                {
-                    if (i == selectedIndex)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"> {options[i]}");
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        Console.WriteLine(options[i]);
-                    }
-                }
+                DrawMenu("Welcome", options, selectedIndex);
+                //for (int i = 0; i < options.Length; i++)
+                //{
+                //    if (i == selectedIndex)
+                //    {
+                //        Console.ForegroundColor = ConsoleColor.Green;
+                //        Console.WriteLine($"> {options[i]}");
+                //        Console.ResetColor();
+                //    }
+                //    else
+                //    {
+                //        Console.WriteLine(options[i]);
+                //    }
+                //}
 
                 ConsoleKey key = Console.ReadKey(true).Key;
 
@@ -874,7 +882,7 @@ namespace BankApp.ConsoleUi.Menus
                                 break;
 
                             case 1:
-                                
+
                                 Console.CursorVisible = true;
                                 Currency currency = AccountManager.CheckCurrency();
                                 _accountManager.CreateAccount(_authService.LoggedInUser!.UserID, 0m, currency);
@@ -899,7 +907,7 @@ namespace BankApp.ConsoleUi.Menus
                                      This loop handles account numbers.*/
                                     foreach (var transactionInstance in transactionLog.TransactionDictionary)
                                     {
-                                        Console.WriteLine($"Account number: {transactionInstance.Key } ");
+                                        Console.WriteLine($"Account number: {transactionInstance.Key} ");
                                         //This loop handles values of transaction ammount.
                                         foreach (TransactionDate transaction in transactionInstance.Value)
                                         {
@@ -969,7 +977,29 @@ namespace BankApp.ConsoleUi.Menus
                 }
             }
         }
+        private static void DrawMenu(string title, string[] options, int selectedIndex)
+        {
+            var lines = new List<string>();
 
+            for (int i = 0; i < options.Length; i++)
+            {
+                if (i == selectedIndex)
+                    lines.Add($"[green]> {Markup.Escape(options[i])}[/]");
+                else
+                    lines.Add($"  {Markup.Escape(options[i])}");
+            }
+
+            var panel = new Panel(new Markup(string.Join("\n", lines)))
+            {
+                Header = new PanelHeader($"[green]{Markup.Escape(title)}[/]"),
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(4, 1, 4, 1)
+            };
+            panel.BorderColor(Color.Green);
+
+            AnsiConsole.Write(Align.Center(panel));
+            AnsiConsole.Write(Align.Center(new Markup("\n[grey]Up/Down: move   Enter: select   Esc: back[/]")));
+        }
         private const decimal LargeTransactionLimitSek = 10000m;
 
         private void NotifyIfLargeTransaction(int userId, decimal amount, Currency currency, string description)
@@ -1021,20 +1051,24 @@ namespace BankApp.ConsoleUi.Menus
                     "Log in",
                     "Exit",
                 };
+                DrawMenu("Welcome", options, selectedIndex);
 
-                for (int i = 0; i < options.Length; i++)
-                {
-                    if (i == selectedIndex)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"> {options[i]}");
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        Console.WriteLine(options[i]);
-                    }
-                }
+
+                //for (int i = 0; i < options.Length; i++)
+                //{
+                //    if (i == selectedIndex)
+                //    {
+                //        Console.ForegroundColor = ConsoleColor.Green;
+                //        Console.WriteLine($"> {options[i]}");
+                //        Console.ResetColor();
+                //    }
+                //    else
+                //    {
+                //        Console.WriteLine(options[i]);
+                //    }
+                //}
+
+
 
                 ConsoleKey key = Console.ReadKey(true).Key;
 
@@ -1116,21 +1150,8 @@ namespace BankApp.ConsoleUi.Menus
                                         Console.ReadKey();
                                         wrongUserInfo = false;
                                     }
-
-                                    //if (userLoggedIn == LoginResult.LockedOut)
-                                    //{
-                                    //    Console.WriteLine("Your account is locked!");
-                                    //    Console.ReadKey();
-                                    //    wrongUserInfo = false;
-                                    //}
                                 }
-
                                 break;
-                            //case 1:
-                            //    Console.CursorVisible = true;
-                            //    CreateUser();
-                            //    Console.ReadKey();
-                            //    break;
 
                             case 1:
                                 Console.CursorVisible = true;
