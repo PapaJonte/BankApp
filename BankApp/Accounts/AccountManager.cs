@@ -42,7 +42,7 @@ namespace BankApp.GustafsClasses
             {
                 Console.WriteLine(
                     "Write which currency you want in your account.");
-                string currencyString = Console.ReadLine();
+                string currencyString = Console.ReadLine() ?? "";
 
                 Enum.GetValues<Currency>();
 
