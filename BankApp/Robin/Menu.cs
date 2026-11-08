@@ -9,6 +9,7 @@ using BankApp.Transaction_Layer.Interface;
 using BankApp.Transaction_Layer.Service;
 using Spectre.Console;
 using System.Transactions;
+using System.Net.Security;
 namespace BankApp.Robin
 
 {
@@ -18,6 +19,7 @@ namespace BankApp.Robin
 
         //private readonly Theme theme;
 
+        private readonly EmailService _emailService = new EmailService();
         private readonly BankTransfer _bankTransfer;
         private readonly BankTransferStatistic _bankTransferStatistic;
         private readonly ExchangeRate _exchangeRates;
@@ -32,6 +34,8 @@ namespace BankApp.Robin
         // Passes both fields into our constructor so we can use the methods from Maria's class.
         public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager, 
             BankTransfer bankTransfer, BankTransferStatistic bankTransferStatistic, ExchangeRate exchangeRates)
+        public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager,
+            BankTransfer bankTransfer, ExchangeRate exchangeRates)
         {
             _bankTransfer = bankTransfer ?? throw new ArgumentNullException(nameof(bankTransfer));
             _bankTransferStatistic = bankTransferStatistic ?? throw new ArgumentNullException(nameof(bankTransferStatistic));
@@ -116,6 +120,7 @@ namespace BankApp.Robin
                 {
                     "View accounts",
                     "Transaction history",
+                    "Update personal details",
                     "Log out",
                 };
 
@@ -138,12 +143,12 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 3) % 3;
+                        selectedIndex = (selectedIndex - 1 + options.Length) % options.Length;
 
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 3;
+                        selectedIndex = (selectedIndex + 1) % options.Length;
                         break;
 
                     case ConsoleKey.Enter:
@@ -165,6 +170,11 @@ namespace BankApp.Robin
                                 break;
 
                             case 2:
+                                UpdateMyDetails();
+                                Console.ReadKey();
+                                break;
+
+                            case 3:
                                 _authService.Logout();
                                 userMenu = false;
                                 break;
@@ -284,6 +294,7 @@ namespace BankApp.Robin
                     "Loans",
                     "Exchange rate",
                     "Interest rate",
+                    "Update personal details",
                     "Log out",
                 };
 
@@ -306,12 +317,12 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 6) % 6;
+                        selectedIndex = (selectedIndex - 1 + options.Length) % options.Length;
 
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 6;
+                        selectedIndex = (selectedIndex + 1) % options.Length;
                         break;
 
                     case ConsoleKey.Enter:
@@ -365,10 +376,14 @@ namespace BankApp.Robin
                                 break;
 
                             case 5:
+                                UpdateMyDetails();
+                                Console.ReadKey();
+                                break;
+
+                            case 6:
                                 _authService.Logout();
                                 userMenu = false;
                                 break;
-
                         }
                         break;
 
@@ -403,14 +418,14 @@ namespace BankApp.Robin
 
             // Only show accounts the signed-in customer can send money from
             List<BankAccount> accounts = GetBankAccounts();
-            
+
             foreach (BankAccount account in accounts)
             {
                 Console.WriteLine($"{account.GetBankAccountNumber()}: {account.GetBalance():N2} {account.GetCurrency()}");
             }
 
             Console.Write("Source account number: ");
-            
+
             if (!int.TryParse(Console.ReadLine(), out int sourceNumber))
             {
                 Console.WriteLine("Invalid source account number,");
@@ -418,7 +433,7 @@ namespace BankApp.Robin
             }
 
             BankAccount? source = accounts.Find(account => account.GetBankAccountNumber() == sourceNumber);
-            
+
             if (source == null)
             {
                 Console.WriteLine("Select one of your own accounts.");
@@ -427,7 +442,7 @@ namespace BankApp.Robin
 
             // Find the recipient by account number without displaying their balance
             Console.Write("Destination account number: ");
-            
+
             if (!int.TryParse(Console.ReadLine(), out int destinationNumber) || destinationNumber == sourceNumber)
             {
                 Console.WriteLine("Enter a different, valid destination account number.");
@@ -785,7 +800,7 @@ namespace BankApp.Robin
                                 Console.Clear();
                                 Console.WriteLine("===== ACCOUNTS =====");
                                 ShowLoggedInUser();
-                                
+
                                 // GetBankAccounts returns only the signed-in customer's regular accounts
                                 foreach (BankAccount bankAccount in GetBankAccounts())
                                 {
@@ -889,7 +904,7 @@ namespace BankApp.Robin
                     if (input.Length > 0)
                     {
                         input.Length--;
-                        Console.Write("\b \b");   
+                        Console.Write("\b \b");
                     }
                 }
                 else if (!char.IsControl(key.KeyChar))
@@ -961,6 +976,10 @@ namespace BankApp.Robin
                                     string userName = Console.ReadLine() ?? "";
                                     Console.Write("\nPassword: ");
                                     string userPassword = ReadMasked();
+
+                                    User? lockedCheck = _userService.GetUserByUsername(userName);
+                                    bool wasAlreadyLocked = lockedCheck?.IsLockedOut ?? false;
+
                                     LoginResult userLoggedIn = _authService.Login(userName, userPassword);
 
                                     if (userLoggedIn == LoginResult.WrongCredentials)
@@ -991,13 +1010,28 @@ namespace BankApp.Robin
                                         }
                                         wrongUserInfo = false;
                                     }
-
                                     if (userLoggedIn == LoginResult.LockedOut)
                                     {
-                                        Console.WriteLine("Your account is locked!");
+                                        Console.WriteLine("Your account is locked! An admin must unlock it.");
+
+                                        if (!wasAlreadyLocked && lockedCheck != null)
+                                        {
+                                            _emailService.SendEmail(
+                                                lockedCheck.Email,
+                                                "Your account has been locked",
+                                                "Your account was locked after three failed login attempts. An admin needs to review your account and unlock it.");
+                                        }
+
                                         Console.ReadKey();
                                         wrongUserInfo = false;
                                     }
+
+                                    //if (userLoggedIn == LoginResult.LockedOut)
+                                    //{
+                                    //    Console.WriteLine("Your account is locked!");
+                                    //    Console.ReadKey();
+                                    //    wrongUserInfo = false;
+                                    //}
                                 }
 
                                 break;

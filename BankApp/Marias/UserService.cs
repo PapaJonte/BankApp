@@ -48,9 +48,7 @@ namespace BankApp
         }
 
         /*
-         Privat hjälpmetod som skapar och lagrar en ny User.
-         Returnerar den skapade användaren så att t.ex. ett bankkonto
-         direkt kan kopplas till den (Gustaf, user story 2 och 7).
+         Method that creates a new user and adds it to the dictionary. It does not check permissions or validate input, so it is private.
         */
         private User AddUser(string username, string password, string email, string phoneNumber, UserRole role)
         {
@@ -133,7 +131,7 @@ namespace BankApp
 
             int at = email.IndexOf('@');
 
-            // Måste ha något före @, och en punkt någonstans efter @.
+            //Hsould be at least one character before the @, and there should be a dot after it (not directly after).
             return at > 0 && email.IndexOf('.', at) > at + 1 && !email.EndsWith(".");
         }
 
@@ -178,7 +176,7 @@ namespace BankApp
             return null;
         }
 
-        // För admin-menyn och statistik (user story 17).
+        //For admin-menu and statistic, returns a read-only list of all users. The menu can then display them in a table.
         public IReadOnlyList<User> GetAllUsers()
         {
             return _users.Values.ToList().AsReadOnly();
@@ -216,15 +214,15 @@ namespace BankApp
         {
             createdUser = null;
 
-            // Måste vara inloggad och minst Admin.
+            //Has to be logged in and at least admin.
             if (caller == null || caller.Role == UserRole.Customer)
                 return CreateUserResult.NotAllowed;
 
-            // Ingen kan skapa en ny Owner.
+            //No one can create an Owner account (only the first Owner was created in the constructor).
             if (role == UserRole.Owner)
                 return CreateUserResult.NotAllowed;
 
-            // Bara Owner kan skapa Admin.
+            //Only owner can create Admin accounts. Admins can only create Customer accounts.
             if (role == UserRole.Admin && caller.Role != UserRole.Owner)
                 return CreateUserResult.NotAllowed;
 

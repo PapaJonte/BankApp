@@ -35,6 +35,12 @@ public class StageTransaction
     }
 
     /// <summary>
+    /// return all completed transactions from registry
+    /// </summary>
+    /// <returns></returns>
+    public List<TransactionDataObject> GetAllCompletedTransactions() => transactionRegistry.GetAllCompletedTransactions();
+
+    /// <summary>
     /// Responsible for staging requested transaction of money. Only single transactions.
     /// Creates a transaction data object and registers it at the transaction registry.
     /// </summary>

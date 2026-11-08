@@ -1,6 +1,8 @@
+using System.Text.RegularExpressions;
 using BankApp.Transaction_Layer.Controller;
 using BankApp.Transaction_Layer.DataModel.Transaction_Statistical_Objects;
 using BankApp.Transaction_Layer.Enum;
+using Org.BouncyCastle.Crypto.Paddings;
 
 namespace BankApp.Transaction_Layer.Service;
 
@@ -114,6 +116,53 @@ public class TransactionStatisticFilter(StageTransaction stageTransaction)
             orderedTransactionDict = tmpTransactions;
         }
 
+        return status;
+    }
+
+    /// <summary>
+    /// Try to query full transaction amount and return it as out param
+    /// </summary>
+    /// <returns></returns>
+    public StatusCode TryGetFullTransactionAmount(out decimal sum)
+    {
+        var transactions = stageTransaction.GetAllCompletedTransactions();
+        StatusCode status = EvaluateStatusCode(transactions);
+
+        if (status == StatusCode.Successful)
+        {
+            sum = transactions.Sum(x => x.Amount);
+        }
+        else
+        {
+            sum = 0;
+        }
+
+        return status;
+    }
+
+    /// <summary>
+    /// Get all transactions, groups them by account numbers and order by most popular based on transactions descending.
+    /// Return status code and list as out param.
+    /// </summary>
+    /// <param name="orderedAccountList"></param>
+    /// <returns></returns>
+    public StatusCode TryGetPopularAccounts(out IReadOnlyList<TotalCount>? orderedAccountList)
+    {
+        List<TotalCount>? ordered = [];
+        var transactions = stageTransaction.GetAllCompletedTransactions();
+        StatusCode status = EvaluateStatusCode(transactions);
+
+        if (status == StatusCode.Successful)
+        {
+            var grouped = transactions.GroupBy(x => x.AccountNumber)
+                                      .OrderByDescending(x => x.Count());
+
+            foreach (var g in grouped)
+            {
+                ordered.Add(new TotalCount(g.Key, g.Count()));
+            }
+        }
+        orderedAccountList = ordered;
         return status;
     }
 
