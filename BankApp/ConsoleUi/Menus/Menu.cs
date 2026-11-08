@@ -882,7 +882,7 @@ namespace BankApp.ConsoleUi.Menus
                                 break;
 
                             case 1:
-
+                                Console.Clear();
                                 Console.CursorVisible = true;
                                 Currency currency = AccountManager.CheckCurrency();
                                 _accountManager.CreateAccount(_authService.LoggedInUser!.UserID, 0m, currency);
@@ -893,6 +893,7 @@ namespace BankApp.ConsoleUi.Menus
                                 break;
 
                             case 3:
+                                Console.Clear();
                                 Console.WriteLine("Transaction history");
                                 //Provides us with easy access to values of the object.
                                 var transactionLog = _bankTransferStatistic.TransactionsByDate(_authService.LoggedInUser!.UserID);
