@@ -90,13 +90,7 @@ namespace BankApp.Robin
 
             if (result == CreateUserResult.Success)
             {
-                /*Gustaf, here. The error is my fault.
-                 * You can solve this error by inserting a Currency value as a parameter.
-                 * 
-                 * If you want to set SEK by default you need to add "Currency.SEK" as an input value.
-                 * In order to recieve access to the Currency Enum you may have to add "Enum.GetValues<Currency>()" somewhere above in this class.
-                 
-                 If you want the user to make the choice of Currency then you may insert the method "CheckCurrency()" as an input.*/
+                
                 Console.WriteLine(userMessage);
                 return true;
             }
