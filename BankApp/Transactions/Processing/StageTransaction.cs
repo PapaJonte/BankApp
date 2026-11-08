@@ -94,7 +94,10 @@ public class StageTransaction
     public void Stage_Transaction(AccountData originAccount, AccountData targetAccount, decimal withdrawalAmount, decimal depositAmount)
     {
         TransactionDataObject tdo_withdrawal = new(originAccount.UserID, originAccount.AccountNumber, withdrawalAmount, TransactionType.Withdrawal, DateTime.Now.Date);
-        TransactionDataObject tdo_deposit = new(targetAccount.UserID, targetAccount.AccountNumber, depositAmount, TransactionType.Deposit, DateTime.Now.Date);
+        TransactionDataObject tdo_deposit = new(targetAccount.UserID, targetAccount.AccountNumber, depositAmount, TransactionType.Deposit, DateTime.Now.Date)
+        {
+            TransferSent = (originAccount.Currency, withdrawalAmount)
+        };
 
         TransactionDataWrapper wrapper = TransactionDataWrapper.ForTransaction(tdo_withdrawal, tdo_deposit);
 

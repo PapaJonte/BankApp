@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using BankApp.Currencies;
 using BankApp.Transaction_Layer.Controller;
 using BankApp.Transaction_Layer.DataModel.Transaction_Statistical_Objects;
 using BankApp.Transactions.Models;
@@ -125,21 +126,20 @@ public class TransactionStatisticFilter(StageTransaction stageTransaction)
     /// Try to query full transaction amount and return it as out param
     /// </summary>
     /// <returns></returns>
-    public StatusCode TryGetFullTransactionAmount(out decimal sum)
+    public StatusCode TryGetTransferTotals(out IReadOnlyDictionary<Currency, decimal> totals)
     {
-        var transactions = stageTransaction.GetAllCompletedTransactions();
-        StatusCode status = EvaluateStatusCode(transactions);
+        var totalsByCurrency = new Dictionary<Currency, decimal>();
 
-        if (status == StatusCode.Successful)
+        foreach (TransactionDataObject transaction in stageTransaction.GetAllCompletedTransactions())
         {
-            sum = transactions.Sum(x => x.Amount);
-        }
-        else
-        {
-            sum = 0;
+            if (transaction.TransferSent is { } sent)
+            {
+                totalsByCurrency[sent.currency] = totalsByCurrency.GetValueOrDefault(sent.currency) + sent.Amount;
+            }
         }
 
-        return status;
+        totals = totalsByCurrency;
+        return totals.Count > 0 ? StatusCode.Successful : StatusCode.Invalid;
     }
 
     /// <summary>

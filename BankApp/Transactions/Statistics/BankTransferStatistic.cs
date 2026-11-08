@@ -1,4 +1,5 @@
 using System;
+using BankApp.Currencies;
 using BankApp.Transaction_Layer.DataModel.Transaction_Statistical_Objects;
 using BankApp.Transactions.Models;
 using BankApp.Transactions.Statistics.Models;
@@ -75,10 +76,9 @@ public class BankTransferStatistic(TransactionStatisticFilter transactionStatist
     /// <returns></returns>
     public TotalTransactions GetTotalBankTransactions()
     {
-        StatusCode status = transactionStatisticFilter.TryGetFullTransactionAmount(out decimal total);
+        StatusCode status = transactionStatisticFilter.TryGetTransferTotals(out IReadOnlyDictionary<Currency, decimal> totals);
 
-        TotalTransactions totalTransactions = new(total) { StatusCode = status };
-        return totalTransactions;
+        return new TotalTransactions(totals) { StatusCode = status };
     }
 
     /// <summary>
