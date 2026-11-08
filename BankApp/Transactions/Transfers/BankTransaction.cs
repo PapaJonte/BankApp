@@ -54,7 +54,7 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
     public StatusCode RequestLoanDeposit(AccountData targetAccount, decimal amount, Currency currency, int loanID)
     {
         StatusCode status = accountBridge.ValidateAccount(targetAccount.AccountNumber);
-        status = StatusCode.Successful;
+
         if (status == StatusCode.Successful)
         {
             if (targetAccount.Currency != currency)
