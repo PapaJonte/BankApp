@@ -32,7 +32,7 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
 
         if (status == StatusCode.Successful)
         {
-            TransactionDataObject transactionObject = new(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit, DateTime.Now.Date);
+            TransactionDataObject transactionObject = new(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit, DateTime.UtcNow);
             status = stageTransaction.Stage_SingleTransaction(transactionObject, true);
         }
 
@@ -60,7 +60,7 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
         }
         if (status == StatusCode.Successful)
         {
-            TransactionDataLoanObject transactionObject = new(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit, DateTime.Now.Date, loanID);
+            TransactionDataLoanObject transactionObject = new(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit, DateTime.UtcNow, loanID);
             status = stageTransaction.Stage_SingleTransaction(transactionObject, true);
         }
 
@@ -77,7 +77,7 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
     /// </param>
     public StatusCode RequestWithdrawal(int userID, int accountNumber, decimal amount)
     {
-        TransactionDataObject withdrawObject = new(userID, accountNumber, amount, TransactionType.Withdrawal, DateTime.Now.Date);
+        TransactionDataObject withdrawObject = new(userID, accountNumber, amount, TransactionType.Withdrawal, DateTime.UtcNow);
         StatusCode status = stageTransaction.Stage_SingleTransaction(withdrawObject, false);
         return status;
     }
