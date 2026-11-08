@@ -20,6 +20,9 @@ public class TransactionScheduler
     public void StartSchedule(Action OnScheduleListener)
     {
         OnSchedule += OnScheduleListener;
+        // Only for testing
+        //_ = TransactionSchedule(1000, ct.Token);
+        // 15 minute delay
         _ = TransactionSchedule(scheduleDurationInMinutes * 60000, ct.Token);
     }
 
