@@ -166,7 +166,7 @@ public class StageTransaction
     {
         if (withdrawalObject == null) throw new NullReferenceException("Withdrawal object is null!");
         accountBridge.Withdraw(withdrawalObject.userID, withdrawalObject.AccountNumber, withdrawalObject.Amount);
-        withdrawalObject = withdrawalObject with { TransactionDate = DateTime.Now.Date };
+        withdrawalObject = withdrawalObject with { TransactionDate = DateTime.UtcNow };
         transactionRegistry.RegisterSuccessfulTransaction(withdrawalObject);
     }
     
@@ -180,7 +180,7 @@ public class StageTransaction
     {
         if (depositObject == null) throw new NullReferenceException("Deposit object is null!");
         accountBridge.Deposit(depositObject.userID, depositObject.AccountNumber, depositObject.Amount);
-        depositObject = depositObject with { TransactionDate = DateTime.Now.Date };
+        depositObject = depositObject with { TransactionDate = DateTime.UtcNow };
         transactionRegistry.RegisterSuccessfulTransaction(depositObject);
         if(depositObject is TransactionDataLoanObject)
         {
