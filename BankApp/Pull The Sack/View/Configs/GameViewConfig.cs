@@ -38,11 +38,9 @@ public record GameViewConfig : ViewConfig
 
     public string PullTheSackPrompt = "Press space to Pull the Sack!";
 
-    /// <summary>Number of reels displayed on the payline.</summary>
     public int ReelCols { get; init; } = 3;
     public int ReelRows { get; init; } = 3;
 
-    /// <summary>Number of glyphs drawn per reel.</summary>
     public int ReelHeight { get; init; } = 3;
     public int ReelWidth { get; init; } = 5;
     public int ResolveSlowDownSteps { get; init; } = 4;

@@ -93,8 +93,8 @@ public class StageTransaction
     /// <returns></returns>
     public void Stage_Transaction(AccountData originAccount, AccountData targetAccount, decimal withdrawalAmount, decimal depositAmount)
     {
-        TransactionDataObject tdo_withdrawal = new(originAccount.UserID, originAccount.AccountNumber, withdrawalAmount, TransactionType.Withdrawal, DateTime.Now.Date);
-        TransactionDataObject tdo_deposit = new(targetAccount.UserID, targetAccount.AccountNumber, depositAmount, TransactionType.Deposit, DateTime.Now.Date);
+        TransactionDataObject tdo_withdrawal = new(originAccount.UserID, originAccount.AccountNumber, withdrawalAmount, TransactionType.Withdrawal, DateTime.UtcNow);
+                TransactionDataObject tdo_deposit = new(targetAccount.UserID, targetAccount.AccountNumber, depositAmount, TransactionType.Deposit, DateTime.UtcNow);
 
         TransactionDataWrapper wrapper = TransactionDataWrapper.ForTransaction(tdo_withdrawal, tdo_deposit);
 
@@ -163,7 +163,7 @@ public class StageTransaction
     {
         if (withdrawalObject == null) throw new NullReferenceException("Withdrawal object is null!");
         accountBridge.Withdraw(withdrawalObject.userID, withdrawalObject.AccountNumber, withdrawalObject.Amount);
-        withdrawalObject = withdrawalObject with { TransactionDate = DateTime.Now.Date };
+        withdrawalObject = withdrawalObject with { TransactionDate = DateTime.UtcNow };
         transactionRegistry.RegisterSuccessfulTransaction(withdrawalObject);
     }
     
@@ -177,7 +177,7 @@ public class StageTransaction
     {
         if (depositObject == null) throw new NullReferenceException("Deposit object is null!");
         accountBridge.Deposit(depositObject.userID, depositObject.AccountNumber, depositObject.Amount);
-        depositObject = depositObject with { TransactionDate = DateTime.Now.Date };
+        depositObject = depositObject with { TransactionDate = DateTime.UtcNow };
         transactionRegistry.RegisterSuccessfulTransaction(depositObject);
         if(depositObject is TransactionDataLoanObject)
         {
