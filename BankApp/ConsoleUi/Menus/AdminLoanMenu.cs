@@ -40,7 +40,7 @@ namespace BankApp.ConsoleUi.Menus
             Console.Write("Interest adjustment in percentage points: ");
             bool validAdjustment = decimal.TryParse(Console.ReadLine(), out decimal adjustment);
 
-            if(!validMinimum || !validMaximum || !validAdjustment || adjustment < 0)
+            if (!validMinimum || !validMaximum || !validAdjustment || adjustment < 0)
             {
                 Console.WriteLine("Enter a valid score bracket and a non-negative adjustment");
                 return;
@@ -120,43 +120,43 @@ namespace BankApp.ConsoleUi.Menus
                     {
                         Console.WriteLine(options[i]);
                     }
+                }
 
-                    switch (Console.ReadKey(true).Key)
-                    {
-                        case ConsoleKey.UpArrow:
-                            selectedOption = (selectedOption - 1 + options.Length) % options.Length;
-                            break;
+                switch (Console.ReadKey(true).Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        selectedOption = (selectedOption - 1 + options.Length) % options.Length;
+                        break;
 
-                        case ConsoleKey.DownArrow:
-                            selectedOption = (selectedOption + 1) % options.Length;
-                            break;
+                    case ConsoleKey.DownArrow:
+                        selectedOption = (selectedOption + 1) % options.Length;
+                        break;
 
-                        case ConsoleKey.Escape:
-                            return;
+                    case ConsoleKey.Escape:
+                        return;
 
-                        case ConsoleKey.Enter:
-                            Console.Clear();
-                            Console.CursorVisible = true;
+                    case ConsoleKey.Enter:
+                        Console.Clear();
+                        Console.CursorVisible = true;
 
-                            // Reuse the existing rate prompts and validation.
-                            switch (selectedOption)
-                            {
-                                case 0:
-                                    UpdateBaseRate();
-                                    break;
+                        // Reuse the existing rate prompts and validation.
+                        switch (selectedOption)
+                        {
+                            case 0:
+                                UpdateBaseRate();
+                                break;
 
-                                case 1:
-                                    UpdateCreditScoreAdjustment();
-                                    break;
+                            case 1:
+                                UpdateCreditScoreAdjustment();
+                                break;
 
-                                case 2:
-                                    return;
-                            }
+                            case 2:
+                                return;
+                        }
 
-                            Console.WriteLine("\nPress any key to continue...");
-                            Console.ReadKey(true);
-                            break;
-                    }
+                        Console.WriteLine("\nPress any key to continue...");
+                        Console.ReadKey(true);
+                        break;
                 }
             }
         }

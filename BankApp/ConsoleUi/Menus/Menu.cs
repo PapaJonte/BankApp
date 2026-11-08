@@ -977,6 +977,38 @@ namespace BankApp.ConsoleUi.Menus
                 }
             }
         }
+
+        private static (string UserName, string Password) ReadLoginDetails()
+        {
+            Console.Clear();
+            Console.CursorVisible = true;
+
+            // Big centered heading
+            AnsiConsole.Write(Align.Center(new FigletText("Log in").Color(Color.Green)));
+
+            var panel = new Panel(new Markup("[grey]Enter your personal identity number and password.[/]"))
+            {
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(4, 1, 4, 1)
+            };
+            panel.BorderColor(Color.Green);
+            AnsiConsole.Write(Align.Center(panel));
+            AnsiConsole.WriteLine();
+
+            // Push the prompts towards the middle of the window
+            string indent = new string(' ', Math.Max(0, (Console.WindowWidth - 50) / 2));
+
+            string userName = AnsiConsole.Prompt(
+                new TextPrompt<string>($"{indent}[green]Personal identity number:[/]")
+                    .AllowEmpty());
+
+            string password = AnsiConsole.Prompt(
+                new TextPrompt<string>($"{indent}[green]Password:[/]")
+                    .Secret()
+                    .AllowEmpty());
+
+            return (userName, password);
+        }
         private static void DrawMenu(string title, string[] options, int selectedIndex)
         {
             var lines = new List<string>();
@@ -1093,10 +1125,12 @@ namespace BankApp.ConsoleUi.Menus
                                 while (wrongUserInfo)
                                 {
                                     Console.Clear();
-                                    Console.Write("\nPersonal identity number: ");
-                                    string userName = Console.ReadLine() ?? "";
-                                    Console.Write("\nPassword: ");
-                                    string userPassword = ReadMasked();
+                                    //Console.Write("\nPersonal identity number: ");
+                                    //string userName = Console.ReadLine() ?? "";
+                                    //Console.Write("\nPassword: ");
+                                    //string userPassword = ReadMasked();
+
+                                    var (userName, userPassword) = ReadLoginDetails();
 
                                     User? lockedCheck = _userService.GetUserByUsername(userName);
                                     bool wasAlreadyLocked = lockedCheck?.IsLockedOut ?? false;

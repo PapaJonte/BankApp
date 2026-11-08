@@ -129,10 +129,21 @@ namespace BankApp
             if (string.IsNullOrWhiteSpace(email))
                 return false;
 
+            if (email.Any(char.IsWhiteSpace))
+                return false;
+
             int at = email.IndexOf('@');
 
-            //Hsould be at least one character before the @, and there should be a dot after it (not directly after).
-            return at > 0 && email.IndexOf('.', at) > at + 1 && !email.EndsWith(".");
+            // Exactly one @ is allowed
+            if (at != email.LastIndexOf('@'))
+                return false;
+
+            // At least one character before the @, and a dot after it (not directly after)
+            if (at <= 0 || email.IndexOf('.', at) <= at + 1 || email.EndsWith("."))
+                return false;
+
+            // Make sure the mail library can parse it too
+            return MimeKit.MailboxAddress.TryParse(email, out _);
         }
 
         /*

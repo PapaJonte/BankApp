@@ -18,45 +18,53 @@ namespace BankApp
     {
         static void Main(string[] args)
         {
+            #region Accounts and users
 
-            Theme theme = new Theme();
-            #region  ExchangeRate Module
+            // Share one exchange-rate service across accounts, transactions and menus
             ExchangeRate exchangeRateModule = new();
-            #endregion
             AccountManager accountManager = new AccountManager(exchangeRateModule);
             UserService userService = new UserService(accountManager);
             AuthService authService = new AuthService(userService);
+
+            #endregion
+
+            #region Loan services
+
             CreditScoreService creditScoreService = new CreditScoreService();
             InterestRuleService interestRuleService = new InterestRuleService();
             LoanService loanService = new LoanService(interestRuleService, creditScoreService);
-            
-            
-           
-            #region Transactions
+
+            #endregion
+
+            #region Transaction processing
+
             AccountBridge accountBridge = new(accountManager, loanService);
-            
-            #region Transaction Module
             TransactionScheduler transactionScheduler = new();
             TransactionRegistry transactionRegistry = new();
             StageTransaction transactionStaging = new(transactionScheduler, transactionRegistry, accountBridge);
+
             BankTransaction bankTransactionModule = new(transactionStaging, exchangeRateModule, accountBridge);
             BankTransfer bankTransferModule = new(bankTransactionModule);
+
+            #endregion
+
+            #region Transaction history and statistics
+
             TransactionStatisticFilter transactionFilter = new(transactionStaging);
             BankTransferStatistic bankTransferStatistic = new(transactionFilter);
             IViewTransactionStatisticBridge viewTransactionStatisticBridge = new TransactionStatisticBridge(bankTransferStatistic);
+
             #endregion
 
-            LoanMenu loanMenu = new LoanMenu(loanService, accountManager, viewTransactionStatisticBridge, bankTransferModule, exchangeRateModule);
+            #region Console menus
+
+            Theme theme = new Theme();
+            LoanMenu loanMenu = new LoanMenu(loanService, accountManager, bankTransferModule, exchangeRateModule);
             AdminLoanMenu adminLoanMenu = new AdminLoanMenu(loanService, accountManager, bankTransferModule);
-
-            #region Transfer Module
-            #endregion
-            #endregion
 
             Menu menu = new Menu(userService, authService, loanMenu, adminLoanMenu, accountManager, bankTransferModule, bankTransferStatistic, exchangeRateModule, loanService);
 
-
-            // Console.ReadKey();
+            #endregion
 
             menu.LoginMenu();
         }
