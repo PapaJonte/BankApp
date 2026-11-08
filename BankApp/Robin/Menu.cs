@@ -4,6 +4,7 @@ using BankApp.Transaction_Layer.API;
 using BankApp.Transaction_Layer.DataModel;
 using BankApp.Transaction_Layer.Enum;
 using Spectre.Console;
+using System.Net.Security;
 namespace BankApp.Robin
 
 {
@@ -115,6 +116,7 @@ namespace BankApp.Robin
                 {
                     "View accounts",
                     "Transaction history",
+                    "Update personal details",
                     "Log out",
                 };
 
@@ -137,12 +139,12 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 3) % 3;
+                        selectedIndex = (selectedIndex - 1 + options.Length) % options.Length;
 
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 3;
+                        selectedIndex = (selectedIndex + 1) % options.Length;
                         break;
 
                     case ConsoleKey.Enter:
@@ -164,6 +166,11 @@ namespace BankApp.Robin
                                 break;
 
                             case 2:
+                                UpdateMyDetails();
+                                Console.ReadKey();
+                                break;
+
+                            case 3:
                                 _authService.Logout();
                                 userMenu = false;
                                 break;
@@ -283,6 +290,7 @@ namespace BankApp.Robin
                     "Loans",
                     "Exchange rate",
                     "Interest rate",
+                    "Update personal details",
                     "Log out",
                 };
 
@@ -305,12 +313,12 @@ namespace BankApp.Robin
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex - 1 + 6) % 6;
+                        selectedIndex = (selectedIndex - 1 + options.Length) % options.Length;
 
                         break;
 
                     case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex + 1) % 6;
+                        selectedIndex = (selectedIndex + 1) % options.Length;
                         break;
 
                     case ConsoleKey.Enter:
@@ -364,10 +372,14 @@ namespace BankApp.Robin
                                 break;
 
                             case 5:
+                                UpdateMyDetails();
+                                Console.ReadKey();
+                                break;
+
+                            case 6:
                                 _authService.Logout();
                                 userMenu = false;
                                 break;
-
                         }
                         break;
 
