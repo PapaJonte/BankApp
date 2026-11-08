@@ -12,6 +12,7 @@ using BankApp.Transactions.Statistics;
 using BankApp.Transactions.Statistics.Models;
 using BankApp.Currencies;
 using BankApp.ConsoleUi.Display;
+using BankApp.Transaction_Layer.DataModel.Transaction_Statistical_Objects;
 namespace BankApp.ConsoleUi.Menus
 
 {
@@ -119,8 +120,9 @@ namespace BankApp.ConsoleUi.Menus
                 string[] options =
                 {
                     "View accounts",
-                    "Transaction history",
+                    "Admin tools",
                     "Update personal details",
+                    "Bank statistics",
                     "Log out",
                 };
 
@@ -163,10 +165,8 @@ namespace BankApp.ConsoleUi.Menus
                                 break;
 
                             case 1:
-                                //
-                                Console.Clear();
-                                Console.WriteLine("Transaction history");
-                                Console.ReadKey();
+                                // Admin tools
+                                ShowAdminMenu(_authService.LoggedInUser!.UserID, returnToOwnerMenu: true);
                                 break;
 
                             case 2:
@@ -175,6 +175,11 @@ namespace BankApp.ConsoleUi.Menus
                                 break;
 
                             case 3:
+                                ShowBankStatistics();
+                                Console.ReadKey(true);
+                                break;
+
+                            case 4:
                                 _authService.Logout();
                                 userMenu = false;
                                 break;
@@ -182,8 +187,8 @@ namespace BankApp.ConsoleUi.Menus
                         break;
 
                     case ConsoleKey.Escape:
+                        _authService.Logout();
                         userMenu = false;
-
                         break;
                 }
             }
@@ -275,7 +280,42 @@ namespace BankApp.ConsoleUi.Menus
             Console.WriteLine($"Rate saved. 1 {fromCurrency} = {rate} {toCurrency}");
         }
 
-        public void ShowAdminMenu(int userId)
+        private void ShowBankStatistics()
+        {
+            Console.Clear();
+            Console.WriteLine("===== BANK STATISTICS =====");
+
+            // Display one transfer total per source currency
+            var transfers = _bankTransferStatistic.GetTotalBankTransactions();
+            Console.WriteLine("\nTotal transferred:");
+
+            if (transfers.TotalsByCurrency.Count == 0)
+            {
+                Console.WriteLine("No completed transfers.");
+            }
+
+            foreach (var total in transfers.TotalsByCurrency)
+            {
+                Console.WriteLine($"{total.Value:N2} {total.Key}");
+            }
+
+            // Rank accounts by their number of completed transaction entries
+            var popularity = _bankTransferStatistic.GetMostPopularAccounts();
+            Console.WriteLine("\nMost active accounts:");
+
+            if (popularity.AccountsOrdered is not { Count: > 0 } accounts)
+            {
+                Console.WriteLine("No completed transactions.");
+                return;
+            }
+
+            foreach (var account in accounts)
+            {
+                Console.WriteLine($"Account {account.AccountNumber}: {account.Count} transactions");
+            }
+        }
+
+        public void ShowAdminMenu(int userId, bool returnToOwnerMenu = false)
         {
             Console.Clear();
             bool userMenu = true;
@@ -295,7 +335,7 @@ namespace BankApp.ConsoleUi.Menus
                     "Exchange rate",
                     "Interest rate",
                     "Update personal details",
-                    "Log out",
+                    returnToOwnerMenu ? "Return to owner menu" : "Log out",
                 };
 
                 for (int i = 0; i < options.Length; i++)
@@ -381,14 +421,20 @@ namespace BankApp.ConsoleUi.Menus
                                 break;
 
                             case 6:
-                                _authService.Logout();
+                                if (!returnToOwnerMenu)
+                                {
+                                    _authService.Logout();
+                                }
                                 userMenu = false;
                                 break;
                         }
                         break;
 
                     case ConsoleKey.Escape:
-                        _authService.Logout();
+                        if (!returnToOwnerMenu)
+                        {
+                            _authService.Logout();
+                        }
                         userMenu = false;
 
                         break;
@@ -999,11 +1045,15 @@ namespace BankApp.ConsoleUi.Menus
                                     if (userLoggedIn == LoginResult.Success)
                                     {
                                         Console.WriteLine("\nLogin successful!");
-                                        if (_authService.IsLoggedInUserAdmin())
+                                        if (_authService.IsLoggedInUserOwner())
                                         {
-                                            ShowAdminMenu(_authService.LoggedInUser.UserID);
+                                            ShowOwnerMenu();
                                         }
 
+                                        else if (_authService.IsLoggedInUserAdmin())
+                                        {
+                                            ShowAdminMenu(_authService.LoggedInUser!.UserID);
+                                        }
                                         else
                                         {
                                             ShowUserMenu();

@@ -36,13 +36,22 @@ public class TransactionRegistry
     /// <returns></returns>
     public void RegisterSuccessfulTransaction(TransactionDataObject transactionObject)
     {
-        transactionHistory.Add(transactionObject);
+        lock (registryLock)
+        {
+            transactionHistory.Add(transactionObject);
+        }
     }
     /// <summary>
     /// return all completed transactions as new list.
     /// </summary>
     /// <returns></returns>
-    public List<TransactionDataObject> GetAllCompletedTransactions() => [.. transactionHistory];
+    public List<TransactionDataObject> GetAllCompletedTransactions()
+    {
+        lock (registryLock)
+        {
+            return [.. transactionHistory];
+        }
+    }
     public List<TransactionDataObject> GetAllTransactionsOnUserID(int userID)
     {
         return [.. transactionHistory.Where(x => x.userID == userID)];
