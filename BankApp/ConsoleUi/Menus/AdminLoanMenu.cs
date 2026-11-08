@@ -91,6 +91,76 @@ namespace BankApp.ConsoleUi.Menus
             Console.WriteLine("Base rate updated for new loan applications.");
         }
 
+        public void ShowInterestRateMenu()
+        {
+            string[] options =
+            {
+                "Update base interest rate",
+                "Update credit-score interest adjustment",
+                "Return to admin menu"
+            };
+
+            int selectedOption = 0;
+
+            while (true)
+            {
+                Console.Clear();
+                Console.CursorVisible = false;
+                Console.WriteLine("===== LOAN INTEREST RATES =====\n");
+
+                for (int i = 0; i < options.Length; i++)
+                {
+                    if (i == selectedOption)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"> {options[i]}");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.WriteLine(options[i]);
+                    }
+
+                    switch (Console.ReadKey(true).Key)
+                    {
+                        case ConsoleKey.UpArrow:
+                            selectedOption = (selectedOption - 1 + options.Length) % options.Length;
+                            break;
+
+                        case ConsoleKey.DownArrow:
+                            selectedOption = (selectedOption + 1) % options.Length;
+                            break;
+
+                        case ConsoleKey.Escape:
+                            return;
+
+                        case ConsoleKey.Enter:
+                            Console.Clear();
+                            Console.CursorVisible = true;
+
+                            // Reuse the existing rate prompts and validation.
+                            switch (selectedOption)
+                            {
+                                case 0:
+                                    UpdateBaseRate();
+                                    break;
+
+                                case 1:
+                                    UpdateCreditScoreAdjustment();
+                                    break;
+
+                                case 2:
+                                    return;
+                            }
+
+                            Console.WriteLine("\nPress any key to continue...");
+                            Console.ReadKey(true);
+                            break;
+                    }
+                }
+            }
+        }
+
         // Displays the menu
         public void ShowAdminLoanMenu(int userId)
         {

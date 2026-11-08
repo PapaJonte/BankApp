@@ -407,7 +407,7 @@ namespace BankApp.ConsoleUi.Menus
 
                             case 2:
                                 // Loans
-                                _adminLoanMenu.ShowAdminLoanMenu(_authService.LoggedInUser.UserID);
+                                _adminLoanMenu.ShowAdminLoanMenu(_authService.LoggedInUser!.UserID);
 
                                 break;
 
@@ -419,7 +419,7 @@ namespace BankApp.ConsoleUi.Menus
 
                             case 4:
                                 // Interest rate
-                                //UpdateInterestRule();
+                                _adminLoanMenu.ShowInterestRateMenu();
                                 break;
 
                             case 5:
@@ -455,7 +455,7 @@ namespace BankApp.ConsoleUi.Menus
 
             foreach (BankAccount bankAccount in _accountManager.BankAccountList)
             {
-                if (bankAccount.GetUserId() == _authService.LoggedInUser.UserID)
+                if (bankAccount.GetUserId() == _authService.LoggedInUser!.UserID)
 
                 {
                     bankAccount.GetBankAccountNumber();
@@ -885,7 +885,7 @@ namespace BankApp.ConsoleUi.Menus
 
                                 Console.CursorVisible = true;
                                 Currency currency = AccountManager.CheckCurrency();
-                                _accountManager.CreateAccount(_authService.LoggedInUser.UserID, 0m, currency);
+                                _accountManager.CreateAccount(_authService.LoggedInUser!.UserID, 0m, currency);
                                 break;
 
                             case 2:
@@ -895,7 +895,7 @@ namespace BankApp.ConsoleUi.Menus
                             case 3:
                                 Console.WriteLine("Transaction history");
                                 //Provides us with easy access to values of the object.
-                                var transactionLog = _bankTransferStatistic.TransactionsByDate(_authService.LoggedInUser.UserID);
+                                var transactionLog = _bankTransferStatistic.TransactionsByDate(_authService.LoggedInUser!.UserID);
                                 //Check if log is empty
                                 if (transactionLog.TransactionDictionary.Count == 0)
                                 {
@@ -922,7 +922,7 @@ namespace BankApp.ConsoleUi.Menus
 
                             case 4:
                                 Console.WriteLine("Loans");
-                                _loanMenu.ShowLoanMenu(_authService.LoggedInUser.UserID);
+                                _loanMenu.ShowLoanMenu(_authService.LoggedInUser!.UserID);
 
                                 break;
 
