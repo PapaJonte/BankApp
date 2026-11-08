@@ -17,16 +17,14 @@ namespace BankApp.ConsoleUi.Menus
     {
         private readonly LoanService loanService;
         private readonly AccountManager accountManager;
-        private readonly IViewTransactionStatisticBridge bankTransferStatistics;
         private readonly BankTransfer bankTransfer;
         private readonly ExchangeRate exchangeRates;
 
         // Constructor
-        public LoanMenu(LoanService loanService, AccountManager accountManager, IViewTransactionStatisticBridge bankTransferStatistics, BankTransfer bankTransfer, ExchangeRate exchangeRates)
+        public LoanMenu(LoanService loanService, AccountManager accountManager, BankTransfer bankTransfer, ExchangeRate exchangeRates)
         {
             this.loanService = loanService;
             this.accountManager = accountManager;
-            this.bankTransferStatistics = bankTransferStatistics;
             this.bankTransfer = bankTransfer;
             this.exchangeRates = exchangeRates;
         }

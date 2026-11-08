@@ -46,7 +46,7 @@ namespace BankApp
             IViewTransactionStatisticBridge viewTransactionStatisticBridge = new TransactionStatisticBridge(bankTransferStatistic);
             #endregion
 
-            LoanMenu loanMenu = new LoanMenu(loanService, accountManager, viewTransactionStatisticBridge, bankTransferModule, exchangeRateModule);
+            LoanMenu loanMenu = new LoanMenu(loanService, accountManager, bankTransferModule, exchangeRateModule);
             AdminLoanMenu adminLoanMenu = new AdminLoanMenu(loanService, accountManager, bankTransferModule);
 
             #region Transfer Module
