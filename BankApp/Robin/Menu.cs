@@ -8,6 +8,7 @@ using BankApp.Transaction_Layer.Enum;
 using BankApp.Transaction_Layer.Interface;
 using BankApp.Transaction_Layer.Service;
 using Spectre.Console;
+using System.Transactions;
 namespace BankApp.Robin
 
 {
@@ -19,7 +20,6 @@ namespace BankApp.Robin
 
         private readonly BankTransfer _bankTransfer;
         private readonly BankTransferStatistic _bankTransferStatistic;
-        private readonly IViewTransactionStatisticBridge _transactionStatisticBridge;
         private readonly ExchangeRate _exchangeRates;
         private readonly AccountManager _accountManager;
         private readonly LoanMenu _loanMenu;
@@ -31,11 +31,10 @@ namespace BankApp.Robin
 
         // Passes both fields into our constructor so we can use the methods from Maria's class.
         public Menu(UserService userService, AuthService authService, LoanMenu loanMenu, AdminLoanMenu adminLoanMenu, AccountManager accountManager, 
-            BankTransfer bankTransfer, BankTransferStatistic bankTransferStatistic, IViewTransactionStatisticBridge transactionStatisticBridge, ExchangeRate exchangeRates)
+            BankTransfer bankTransfer, BankTransferStatistic bankTransferStatistic, ExchangeRate exchangeRates)
         {
             _bankTransfer = bankTransfer ?? throw new ArgumentNullException(nameof(bankTransfer));
             _bankTransferStatistic = bankTransferStatistic ?? throw new ArgumentNullException(nameof(bankTransferStatistic));
-            _transactionStatisticBridge = transactionStatisticBridge ?? throw new ArgumentNullException(nameof(transactionStatisticBridge));
             _exchangeRates = exchangeRates ?? throw new ArgumentNullException(nameof(exchangeRates));
             _accountManager = accountManager ?? throw new ArgumentNullException(nameof(accountManager));
             _adminLoanMenu = adminLoanMenu ?? throw new ArgumentNullException(nameof(adminLoanMenu));
@@ -823,12 +822,35 @@ namespace BankApp.Robin
 
                             case 3:
                                 Console.WriteLine("Transaction history");
-                                _transactionStatisticBridge.GetTotalTransactionsDateOrder(_authService.LoggedInUser.UserID);
+                                var transactionLog = _bankTransferStatistic.TransactionsByDate(_authService.LoggedInUser.UserID);
+                                //Check if log is empty
+                                if (transactionLog.TransactionDictionary.Count == 0)
+                                {
+                                    Console.WriteLine("You have made no transactions.");
+                                }
+                                else
+                                {
+                                    /*If dictionary happens to have content then we access the elements by nestled foreach loops.
+                                     This one is a foreach*/
+                                    foreach (var transactionInstance in transactionLog.TransactionDictionary)
+                                    {
+                                        Console.WriteLine($"Account number: {transactionInstance.Key } ");
+
+                                        foreach (TransactionDate transaction in transactionInstance.Value)
+                                        {
+                                            Console.WriteLine($"Transaction date: {transaction.Date}, ammount: {transaction.Amount:N2}");
+                                        }
+                                    }
+                                }
+
+                                Console.WriteLine("\nPress any key to continue.");
+                                Console.ReadKey(true);
                                 break;
 
                             case 4:
                                 Console.WriteLine("Loans");
                                 _loanMenu.ShowLoanMenu(_authService.LoggedInUser.UserID);
+
                                 break;
 
                             case 5:
