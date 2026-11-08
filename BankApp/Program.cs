@@ -53,7 +53,7 @@ namespace BankApp
             #endregion
             #endregion
 
-            Menu menu = new Menu(userService, authService, loanMenu, adminLoanMenu, accountManager, bankTransferModule, bankTransferStatistic, exchangeRateModule);
+            Menu menu = new Menu(userService, authService, loanMenu, adminLoanMenu, accountManager, bankTransferModule, bankTransferStatistic, exchangeRateModule, loanService);
 
 
             // Console.ReadKey();
