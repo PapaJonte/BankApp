@@ -848,7 +848,7 @@ namespace BankApp.ConsoleUi.Menus
                                         //This loop handles values of transaction ammount.
                                         foreach (TransactionDate transaction in transactionInstance.Value)
                                         {
-                                            Console.WriteLine($"Transaction date: {transaction.Date}, ammount: {transaction.Amount:N2}");
+                                            Console.WriteLine($"Transaction date: {transaction.Date.ToLocalTime()}, ammount: {transaction.Amount:N2}");
                                         }
                                     }
                                 }
