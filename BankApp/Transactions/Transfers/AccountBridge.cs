@@ -57,7 +57,7 @@ internal class AccountBridge(AccountManager accountManager, LoanService loanServ
         }
         else if (TryGetBankAccount(userID, accountNumber, out var bankAccount))
         {
-            if (bankAccount!.GetThresholdNotification(amount, TransactionType.Deposit) <= amount)
+            if (Math.Abs(bankAccount!.GetThresholdNotification(amount, TransactionType.Deposit)) <= amount)
             {
                 //call notification service when impl
             }
