@@ -155,5 +155,39 @@ internal class AccountBridge(AccountManager accountManager, LoanService loanServ
         return false;
     }
 
+    /// <summary>
+    /// Checks if account number is attached to an account.
+    /// </summary>
+    /// <param name="userID"></param>
+    /// <param name="accountNumber"></param>
+    /// <returns></returns>
+    public StatusCode ValidateAccount(int accountNumber)
+    {
+        var accounts = accountManager.BankAccountList;
+        bool foundAccount = false;
+        foreach (var bankAccount in accounts)
+        {
+            if (bankAccount.GetBankAccountNumber() == accountNumber)
+            {
+                foundAccount = true;
+            }
+            foreach (var savingsAccount in bankAccount.SavingAccounts)
+            {
+                if (bankAccount.GetBankAccountNumber() == accountNumber)
+                {
+                    foundAccount = true;
+                    break;
+                }
+            }
+
+            if (foundAccount)
+            {
+                break;
+            }
+        }
+
+        return foundAccount ? StatusCode.Successful : StatusCode.Failed;
+    }
+
 
 }

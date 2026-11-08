@@ -9,4 +9,5 @@ public interface IAccountBridge
     public void Withdraw(int userID, int accountNumber, decimal amount);
     public void Deposit(int userID, int accountNumber, decimal amount);
     public void UpdateLoanService(TransactionDataLoanObject? loanObject);
+    public StatusCode ValidateAccount(int accountNumber);
 }
