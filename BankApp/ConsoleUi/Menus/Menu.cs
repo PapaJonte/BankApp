@@ -517,6 +517,12 @@ namespace BankApp.ConsoleUi.Menus
             AccountData target = new(destination.GetUserId(), destinationNumber, destination.GetCurrency());
             StatusCode status = _bankTransfer.TransferMoney(origin, target, amount, sourceCurrency);
 
+            if (status == StatusCode.Successful)
+            {
+                NotifyIfLargeTransaction(source.GetUserId(), amount, sourceCurrency,
+                    $"Transfer of {amount:N2} {sourceCurrency} from account {sourceNumber} to account {destinationNumber}.");
+            }
+
             Console.WriteLine(status == StatusCode.Successful ? "Transfer queued." : "Transfer could not be queued. Check your balance and the exchange rate.");
         }
 
@@ -665,6 +671,9 @@ namespace BankApp.ConsoleUi.Menus
                 Console.WriteLine("The deposit could not be queued.");
                 return;
             }
+
+            NotifyIfLargeTransaction(_authService.LoggedInUser!.UserID, amount, destination.Currency,
+                $"Deposit of {amount:N2} {destination.Currency} to account {accountNumber}.");
 
             Console.WriteLine("Deposit queued.");
 
@@ -961,6 +970,38 @@ namespace BankApp.ConsoleUi.Menus
             }
         }
 
+        private const decimal LargeTransactionLimitSek = 10000m;
+
+        private void NotifyIfLargeTransaction(int userId, decimal amount, Currency currency, string description)
+        {
+            decimal amountInSek = amount;
+
+            if (currency != Currency.SEK)
+            {
+                StatusCode rateStatus = _exchangeRates.TryCalculateExchangeValue(currency, Currency.SEK, amount, out decimal converted);
+                if (rateStatus != StatusCode.Successful)
+                {
+                    return; // no rate available, so we cannot judge the size
+                }
+                amountInSek = converted;
+            }
+
+            if (amountInSek <= LargeTransactionLimitSek)
+            {
+                return;
+            }
+
+            User? user = _userService.GetUserById(userId);
+            if (user == null)
+            {
+                return;
+            }
+
+            _emailService.SendEmail(
+                user.Email,
+                "Large transaction on your account",
+                $"A large transaction has been queued on your account:\n{description}\n\nIf this was not you, contact the bank.");
+        }
 
         public void LoginMenu()
         {
