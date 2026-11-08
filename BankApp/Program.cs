@@ -27,6 +27,8 @@ namespace BankApp
             CreditScoreService creditScoreService = new CreditScoreService();
             InterestRuleService interestRuleService = new InterestRuleService();
             LoanService loanService = new LoanService(interestRuleService, creditScoreService);
+            
+            
             new EmailService().SendEmail("goldensack.security@gmail.com", "Test", "Hello!");
             #region Transactions
             AccountBridge accountBridge = new(accountManager, loanService);
@@ -49,7 +51,7 @@ namespace BankApp
             #endregion
             #endregion
 
-            Menu menu = new Menu(userService, authService, loanMenu, adminLoanMenu, accountManager, bankTransferModule, exchangeRateModule);
+            Menu menu = new Menu(userService, authService, loanMenu, adminLoanMenu, accountManager, bankTransferModule, bankTransferStatistic, exchangeRateModule);
 
 
             // Console.ReadKey();
