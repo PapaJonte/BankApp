@@ -816,6 +816,7 @@ namespace BankApp.Robin
 
                             case 3:
                                 Console.WriteLine("Transaction history");
+                                //Provides us with easy access to values of the object.
                                 var transactionLog = _bankTransferStatistic.TransactionsByDate(_authService.LoggedInUser.UserID);
                                 //Check if log is empty
                                 if (transactionLog.TransactionDictionary.Count == 0)
@@ -825,11 +826,11 @@ namespace BankApp.Robin
                                 else
                                 {
                                     /*If dictionary happens to have content then we access the elements by nestled foreach loops.
-                                     This one is a foreach*/
+                                     This loop handles account numbers.*/
                                     foreach (var transactionInstance in transactionLog.TransactionDictionary)
                                     {
                                         Console.WriteLine($"Account number: {transactionInstance.Key } ");
-
+                                        //This loop handles values of transaction ammount.
                                         foreach (TransactionDate transaction in transactionInstance.Value)
                                         {
                                             Console.WriteLine($"Transaction date: {transaction.Date}, ammount: {transaction.Amount:N2}");
@@ -838,7 +839,7 @@ namespace BankApp.Robin
                                 }
 
                                 Console.WriteLine("\nPress any key to continue.");
-                                Console.ReadKey(true);
+                                Console.ReadKey(true); //Makes sure the user actually gets to see the transaction history log.
                                 break;
 
                             case 4:
