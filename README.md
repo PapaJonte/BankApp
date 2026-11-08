@@ -1,4 +1,51 @@
 # BankApp
+User, Authentication and Permissions:
+This part of BankApp handles users, login and roles. It lives in the "Users" folder and consists of three classes.
+-User: Holds a user´s data. The password is never stored in clear text, only as a hash and a salt.
+-UserService: Creates and finds users, validates input and changes passwords.
+-AuthService: Handles login, logout, account lockout and permission checks.
+
+Roles:
+-Customer: Use their own account and update their own contact information.
+-Admin: Creates customers, unlocks accounts and resets customer´s passwords if they happen to get locked out.
+-Owner: Everything an Admin can do, plus create Admin accounts and reset Admins' passwords. 
+
+Permissions are enforced in `UserService` and `AuthService`. Viewing bank-wide
+statistics is implemented in the Transactions layer (`BankTransferStatistic`),
+not in the user classes. 
+**Login and lockout**
+- After 3 failed attempts in a row, the account is locked.
+- A successful login resets the counter.
+- Only an Admin or Owner can unlock a locked account.
+
+New users:
+- Permissions are checked in `UserService`, not only in the menu, so the rules hold even if the menu forgets to check.
+- Every new customer automatically gets a SEK account with a balance of 0.
+Example:
+var userService = new UserService(accountManager);
+var auth = new AuthService(userService);
+LoginResult result = auth.Login("199001011234", "myPassword");
+if (result == LoginResult.Success && auth.IsLoggedInUserAdmin())
+{
+    CreateUserResult res = userService.CreateUser(
+        auth.LoggedInUser, "198505051234", "password123",
+        "anna@example.com", "0701234567", out User? created);
+    if (res != CreateUserResult.Success)
+        Console.WriteLine(UserService.GetErrorMessage(res));
+}
+
+Result values:
+- `LoginResult`: `Success`, `WrongCredentials`, `LockedOut`
+- `CreateUserResult`: `Success`, `NotAllowed`, `InvalidPersonalNumber`, `UsernameTaken`, `InvalidPassword`, `InvalidEmail`, `InvalidPhone`
+
+Known limitations:
+- Users are stored in memory only and are lost when the program closes.
+- The Owner and Admin are created at startup with built-in default passwords. In a real system these should come from configuration or be changed on first login.
+- Validation of email and phone numbers is basic.
+- Permission rules are repeated in several methods and could be gathered in one place.
+- Some methods return only `true` or `false`, so the menu cannot tell why they failed.
+
+
 
 ---Accounts---
 
