@@ -1,8 +1,10 @@
 using BankApp.Currencies;
+using BankApp.Pull_The_Sack.API;
 using BankApp.Transaction_Layer.Enum;
 using BankApp.Transactions.Models;
 using BankApp.Transactions.Processing;
 using BankApp.Transactions.Transfers;
+using Spectre.Console;
 
 namespace BankApp.Transaction_Layer.Controller;
 
@@ -20,22 +22,24 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
     /// </param>
     public StatusCode RequestDeposit(AccountData targetAccount, decimal amount, Currency currency)
     {
-        StatusCode status = StatusCode.Successful;
-        if (targetAccount.Currency != currency)
-        {
-            status = exchangeRateModule.TryCalculateExchangeValue(currency, targetAccount.Currency, amount, out decimal convertedAmount);
-            if (status == StatusCode.Successful)
-            {
-                amount = convertedAmount;
-            }
-        }
-
+        StatusCode status = accountBridge.ValidateAccount(targetAccount.AccountNumber);
         if (status == StatusCode.Successful)
         {
-            TransactionDataObject transactionObject = new(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit, DateTime.UtcNow);
-            status = stageTransaction.Stage_SingleTransaction(transactionObject, true);
-        }
+            if (targetAccount.Currency != currency)
+            {
+                status = exchangeRateModule.TryCalculateExchangeValue(currency, targetAccount.Currency, amount, out decimal convertedAmount);
+                if (status == StatusCode.Successful)
+                {
+                    amount = convertedAmount;
+                }
+            }
 
+            if (status == StatusCode.Successful)
+            {
+                TransactionDataObject transactionObject = new(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit, DateTime.UtcNow);
+                status = stageTransaction.Stage_SingleTransaction(transactionObject, true);
+            }
+        }
         return status;
     }
 
@@ -49,19 +53,23 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
     /// <returns></returns>
     public StatusCode RequestLoanDeposit(AccountData targetAccount, decimal amount, Currency currency, int loanID)
     {
-        StatusCode status = StatusCode.Successful;
-        if (targetAccount.Currency != currency)
-        {
-            status = exchangeRateModule.TryCalculateExchangeValue(currency, targetAccount.Currency, amount, out decimal convertedAmount);
-            if (status == StatusCode.Successful)
-            {
-                amount = convertedAmount;
-            }
-        }
+        StatusCode status = accountBridge.ValidateAccount(targetAccount.AccountNumber);
+        status = StatusCode.Successful;
         if (status == StatusCode.Successful)
         {
-            TransactionDataLoanObject transactionObject = new(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit, DateTime.UtcNow, loanID);
-            status = stageTransaction.Stage_SingleTransaction(transactionObject, true);
+            if (targetAccount.Currency != currency)
+            {
+                status = exchangeRateModule.TryCalculateExchangeValue(currency, targetAccount.Currency, amount, out decimal convertedAmount);
+                if (status == StatusCode.Successful)
+                {
+                    amount = convertedAmount;
+                }
+            }
+            if (status == StatusCode.Successful)
+            {
+                TransactionDataLoanObject transactionObject = new(targetAccount.UserID, targetAccount.AccountNumber, amount, TransactionType.Deposit, DateTime.UtcNow, loanID);
+                status = stageTransaction.Stage_SingleTransaction(transactionObject, true);
+            }
         }
 
         return status;
@@ -78,7 +86,13 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
     public StatusCode RequestWithdrawal(int userID, int accountNumber, decimal amount)
     {
         TransactionDataObject withdrawObject = new(userID, accountNumber, amount, TransactionType.Withdrawal, DateTime.UtcNow);
-        StatusCode status = stageTransaction.Stage_SingleTransaction(withdrawObject, false);
+        StatusCode status = accountBridge.ValidateAccount(accountNumber);
+
+        if (status == StatusCode.Successful)
+        {
+            status = stageTransaction.Stage_SingleTransaction(withdrawObject, false);
+        }
+
         return status;
     }
 
@@ -125,35 +139,43 @@ public class BankTransaction(StageTransaction stageTransaction, ExchangeRate exc
         decimal withdrawalAmount = 0m, depositAmount = 0m;
         StatusCode statusCode;
 
-        if (originAccount.Currency == transferCurrency && targetAccount.Currency == transferCurrency)
-        {
-            // Both accounts use the same currency, so the amounts are equal
-            withdrawalAmount = transferAmount;
-            depositAmount = transferAmount;
-            statusCode = StatusCode.Successful;
-        }
-        else if (originAccount.Currency == transferCurrency)
-        {
-            // The customer entered the amount to send. Calculate what the recipient gets
-            withdrawalAmount = transferAmount;
-            statusCode = exchangeRateModule.TryCalculateExchangeValue(originAccount.Currency, targetAccount.Currency, transferAmount, out depositAmount);
-        }
-        else if (targetAccount.Currency == transferCurrency)
-        {
-            // The customer entered the amount the recipient should get. Calculate what to debit
-            depositAmount = transferAmount;
-            statusCode = exchangeRateModule.TryCalculateExchangeValue(targetAccount.Currency, originAccount.Currency, transferAmount, out withdrawalAmount);
-        }
-        else
-        {
-            // The entered currency must match one of the accounts
-            statusCode = StatusCode.Invalid;
-        }
-
-        //Check if withdraw possible
+        statusCode = accountBridge.ValidateAccount(originAccount.AccountNumber);
         if (statusCode == StatusCode.Successful)
         {
-            statusCode = WithdrawalStatus(originAccount.UserID, originAccount.AccountNumber, withdrawalAmount);
+            statusCode = accountBridge.ValidateAccount(targetAccount.AccountNumber);
+        }
+        if (statusCode == StatusCode.Successful)
+        {
+            if (originAccount.Currency == transferCurrency && targetAccount.Currency == transferCurrency)
+            {
+                // Both accounts use the same currency, so the amounts are equal
+                withdrawalAmount = transferAmount;
+                depositAmount = transferAmount;
+                statusCode = StatusCode.Successful;
+            }
+            else if (originAccount.Currency == transferCurrency)
+            {
+                // The customer entered the amount to send. Calculate what the recipient gets
+                withdrawalAmount = transferAmount;
+                statusCode = exchangeRateModule.TryCalculateExchangeValue(originAccount.Currency, targetAccount.Currency, transferAmount, out depositAmount);
+            }
+            else if (targetAccount.Currency == transferCurrency)
+            {
+                // The customer entered the amount the recipient should get. Calculate what to debit
+                depositAmount = transferAmount;
+                statusCode = exchangeRateModule.TryCalculateExchangeValue(targetAccount.Currency, originAccount.Currency, transferAmount, out withdrawalAmount);
+            }
+            else
+            {
+                // The entered currency must match one of the accounts
+                statusCode = StatusCode.Invalid;
+            }
+
+            //Check if withdraw possible
+            if (statusCode == StatusCode.Successful)
+            {
+                statusCode = WithdrawalStatus(originAccount.UserID, originAccount.AccountNumber, withdrawalAmount);
+            }
         }
 
         if (statusCode == StatusCode.Successful)
