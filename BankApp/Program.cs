@@ -1,14 +1,16 @@
 ﻿using BankApp.Jonathan;
 using BankApp.Pull_The_Sack;
 using BankApp.Robin;
-using BankApp.Transaction_Layer.API;
 using BankApp.Transaction_Layer.Controller;
-using BankApp.Transaction_Layer.Data;
 using BankApp.Transaction_Layer.Service;
 using BankApp.GustafsClasses;
 using Spectre.Console;
-using BankApp.Transaction_Layer.Interface;
 using BankApp.Pull_The_Sack.API;
+using BankApp.Transactions.Transfers;
+using BankApp.Transactions.Processing;
+using BankApp.Transactions.Statistics;
+using BankApp.Currencies;
+using BankApp.ConsoleUi.Menus;
 
 namespace BankApp
 {
