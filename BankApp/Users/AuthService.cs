@@ -5,22 +5,15 @@ using BankApp.GustafsClasses;
 
 namespace BankApp
 {
-    // Result of a login attempt. Can be used in menu.
+    //Result of a login attempt. Can be used in menu.
     public enum LoginResult
     {
         Success,
         WrongCredentials,
         LockedOut
     }
-
     /*
- AuthService handles authentication and permissions:
- - logging in and out
- - keeping track of who is currently logged in
- - locking accounts after three failed login attempts (user story 3)
- - checking roles (Customer / Admin / Owner)
- - checking that a bank account belongs to the logged-in user
-
+ //AuthService handles authentication and permissions:
  It uses UserService to find users, but does not store any users itself.
 */
     internal class AuthService
@@ -58,7 +51,6 @@ namespace BankApp
             user.ResetFailedLogins();
             LoggedInUser = user;
             return LoginResult.Success;
-
         }
 
         //Logs out the current user by clearing LoggedInUser.
@@ -67,16 +59,7 @@ namespace BankApp
             LoggedInUser = null;
         }
 
-        /* PERMISSIONS
-     
-        Admin and Owner can both do "admin things" (for example create users
-        and unlock accounts), checked with IsAdmin / IsLoggedInUserAdmin.
-        On top of that, the Owner can do some things that only the Owner
-        can do, checked with IsOwner / IsLoggedInUserOwner.
-         Returns true if the given user has admin rights.
-         Both Admin and Owner count as admin here, since the Owner can do
-         everything an Admin can do. Returns false if the user is null.
-        */ 
+        //PERMISSIONS
         public bool IsAdmin(User? user)
         {
             return user != null &&
@@ -112,7 +95,7 @@ namespace BankApp
             return LoggedInUser != null && LoggedInUser.Role == UserRole.Owner;
         }
 
-        // Unlocks a locked account. Only an Admin or Owner can unlock accounts.
+        //Unlocks a locked account. Only an Admin or Owner can unlock accounts.
         public bool UnlockUser(string username)
         {
             if (!IsLoggedInUserAdmin())
@@ -125,7 +108,6 @@ namespace BankApp
             user.Unlock();
             return true;
         }
-
         //Checks that a bank account belongs to the given user by comparing the user ID of the account with the user ID of the user.
         public bool OwnsAccount(User? user, BankAccount? account)
         {

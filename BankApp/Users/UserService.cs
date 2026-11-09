@@ -24,32 +24,29 @@ namespace BankApp
 
     internal class UserService
     {
-        // All users are stored in memory in a dictionary, with the internal UserID as key.
+        //All users are stored in memory in a dictionary, with the internal UserID as key.
         private readonly Dictionary<int, User> _users = new Dictionary<int, User>();
        
-        // Gives every user a unique internal ID, starting from 1. The ID is never reused, even if a user is deleted.
+        //Gives every user a unique internal ID, starting from 1. The ID is never reused, even if a user is deleted.
         private int _nextUserId = 1;
 
-        // Minimum password length. Used in validation and error messages.
+        //Minimum password length. Used in validation and error messages.
         private const int MinPasswordLength = 6;
 
-        /*
-         Ther has to be an owner and admin from the beginning, or else no one can create new users (user story 2).
-        */
-
+        
+        //Ther has to be an owner and admin from the beginning, or else no one can create new users (user story 2).
         private readonly AccountManager _accountManager;
         public UserService(AccountManager accountManager)
         {
             _accountManager = accountManager;
 
-            AddUser("00000000-0000", "ownerpassword123", "owner@gmail.com", "0729216167", UserRole.Owner);
-            AddUser("11111111-1111", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
+            AddUser("20010101-0000", "ownerpassword123", "owner@gmail.com", "0729216167", UserRole.Owner);
+            AddUser("20010101-1111", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
 
         }
 
-        /*
-         Method that creates a new user and adds it to the dictionary. It does not check permissions or validate input, so it is private.
-        */
+        
+        //Method that creates a new user and adds it to the dictionary. It does not check permissions or validate input, so it is private.
         private User AddUser(string username, string password, string email, string phoneNumber, UserRole role)
         {
             string normalizedUsername = NormalizeUsername(username);
@@ -92,8 +89,6 @@ namespace BankApp
 
         /*
   Checks if a username is a valid personal number.
-  Valid means: after removing dashes and spaces, it is exactly 12 characters
-   and every character is a digit.
     Returns false if the username is null, empty or only whitespace.
 */
         public bool IsValidPersonalNumberFormat(string username)
@@ -109,7 +104,7 @@ namespace BankApp
             return digitsOnly.All(char.IsDigit);
         }
 
-        /* Other validation methods used by both CreateUser and UpdateUserInfo.
+        /*Other validation methods used by both CreateUser and UpdateUserInfo.
         These are public so that the menu can check before calling the service, to avoid unnecessary error messages.*/
         public bool IsValidPassword(string password)
         {
@@ -117,13 +112,7 @@ namespace BankApp
         }
 
 
-        /*Simple email check (not a full email standard check).
-        Valid means:
-        - there is at least one character before the @
-        - there is a dot somewhere after the @, but not directly after it
-        - the email does not end with a dot
-        Example: "name@example.com" is valid, "name@.com" and "name@example." are not.
-       */
+        //Simple email check, checks if it is valid.
         public bool IsValidEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -134,24 +123,19 @@ namespace BankApp
 
             int at = email.IndexOf('@');
 
-            // Exactly one @ is allowed
+            //Exactly one @ is allowed
             if (at != email.LastIndexOf('@'))
                 return false;
 
-            // At least one character before the @, and a dot after it (not directly after)
+            //At least one character before the @, and a dot after it (not directly after)
             if (at <= 0 || email.IndexOf('.', at) <= at + 1 || email.EndsWith("."))
                 return false;
 
-            // Make sure the mail library can parse it too
+            //Make sure the mail library can parse it too
             return MimeKit.MailboxAddress.TryParse(email, out _);
         }
 
-        /*
-        Checks if a phone number is valid:
-        - Spaces and dashes are removed first.
-        - A leading "+" (country code, e.g. +46) is allowed and removed before checking.
-        - The rest must be 7-15 digits.
-       */
+        //Checks if a phone number is valid:
         public bool IsValidPhone(string phone)
         {
             if (string.IsNullOrWhiteSpace(phone))
@@ -167,17 +151,14 @@ namespace BankApp
 
         /* GET USERS
         Covers user story 1 (unique username) and 6 (finding the receiver of a transfer). 
-         
-        
         Finds a user by username (personal number).
-         The input is normalized first, so it works with or without dashes/spaces.
-         Returns null if no user is found.*/
+        The input is normalized first, so it works with or without dashes/spaces.
+        Returns null if no user is found.*/
         public User? GetUserByUsername(string username)
         {
             string normalizedUsername = NormalizeUsername(username);
             return _users.Values.FirstOrDefault(u => u.Username == normalizedUsername);
         }
-
 
         public User? GetUserById(int userId)
         {
@@ -200,22 +181,7 @@ namespace BankApp
 
         /* 
                CREATE USER
-        Covers: user story 2 ("the administrator should be able to create new users").
- 
-         Creates a new user if the caller has permission and all input is valid.
- 
-         caller      = the user who is currently logged in (AuthService.LoggedInUser).
-                       We pass in the actual user object instead of a bool like "isAdmin",
-                       so UserService checks the role itself. With a bool, anyone could
-                       just pass in "true".
-         createdUser = the new user (or null if it failed).
-         role        = the role of the new user. Defaults to Customer.
- 
-         Permission rules:
-         - The caller must be logged in and be at least Admin (Customers cannot create users).
-         - Nobody can create a new Owner.
-         - Only the Owner can create a new Admin.
- 
+         - Only the Owner can create a new Admin. An admin can create a costumer.
          The checks run in order and stop at the first error, and the returned
          CreateUserResult tells the menu exactly what went wrong.
         */
@@ -264,10 +230,8 @@ namespace BankApp
         }
 
         /*
-        Translates a CreateUserResult into a readable message (in Swedish, since the app UI is Swedish).
-         This way the menu only has to print GetErrorMessage(result), instead of
-         writing its own switch on the enum in Menu.cs.
-         It is static because it does not use any data from a specific UserService instance.
+        Translates a CreateUserResult into a readable message.
+        It is static because it does not use any data from a specific UserService instance.
         */
         public static string GetErrorMessage(CreateUserResult result)
         {
@@ -300,14 +264,9 @@ namespace BankApp
             user.UpdateUserInfo(newEmail, newPhone);
             return true;
         }
-
         /*
          CHANGE PASSWORD (for example when an admin has given the user a start password)
          Changes the password of a user.
-         - The user must be logged in (not null).
-         - The old password must be correct, so nobody can change the password
-           of an unlocked computer without knowing it.
-         - The new password must pass the same rules as when creating a user.
          Returns true if the password was changed, otherwise false.
          */
         public bool ChangePassword(User? user, string oldPassword, string newPassword)
@@ -345,9 +304,5 @@ namespace BankApp
             target.Unlock();
             return true;
         }
-
-
-
-
     }
 }
