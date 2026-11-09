@@ -131,20 +131,6 @@ namespace BankApp.ConsoleUi.Menus
 
                 DrawMenu("OWNER MENU", options, selectedIndex);
 
-                //for (int i = 0; i < options.Length; i++)
-                //{
-                //    if (i == selectedIndex)
-                //    {
-                //        Console.ForegroundColor = ConsoleColor.Green;
-                //        Console.WriteLine($"> {options[i]}");
-                //        Console.ResetColor();
-                //    }
-                //    else
-                //    {
-                //        Console.WriteLine(options[i]);
-                //    }
-                //}
-
                 ConsoleKey key = Console.ReadKey(true).Key;
 
                 switch (key)
@@ -795,11 +781,6 @@ namespace BankApp.ConsoleUi.Menus
                                 Console.ReadKey(true);
                                 break;
 
-                            case 3:
-                                // Open account
-                                Console.Clear();
-                                OpenAccount();
-                                break;
                         }
                         break;
 
@@ -875,8 +856,8 @@ namespace BankApp.ConsoleUi.Menus
                             case 1:
                                 Console.Clear();
                                 Console.CursorVisible = true;
+                                OpenAccount();
                                 Currency currency = AccountManager.CheckCurrency();
-                                _accountManager.CreateAccount(_authService.LoggedInUser!.UserID, 0m, currency);
                                 break;
 
                             case 2:
