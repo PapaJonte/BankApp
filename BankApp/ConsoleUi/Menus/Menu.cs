@@ -1128,9 +1128,9 @@ namespace BankApp.ConsoleUi.Menus
                                     if (userLoggedIn == LoginResult.WrongCredentials)
                                     {
                                         Console.CursorVisible = false;
-                                        Console.WriteLine("\nIncorrect credentials!" +
+                                        AnsiConsole.MarkupLine("\n[red slowblink]Incorrect credentials!" +
                                             "\nPress any key to try again." +
-                                            "\nPress Esc to exit");
+                                            "\nPress Esc to exit[/]");
 
                                         key = Console.ReadKey(true).Key;
                                         if (key == ConsoleKey.Escape)
