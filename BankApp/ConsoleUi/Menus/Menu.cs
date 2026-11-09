@@ -78,35 +78,47 @@ namespace BankApp.ConsoleUi.Menus
         public bool CreateUser()
         {
             Console.Clear();
-            Console.Write("\nPlease enter details.");
-            Console.Write("\nPersonal identity number: ");
-            string userName = Console.ReadLine() ?? "";
-            Console.Write("\nPassword: ");
-            string userPass = Console.ReadLine() ?? "";
-            Console.Write("\nEmail: ");
-            string userEmail = Console.ReadLine() ?? "";
-            Console.Write("\nPhone number: ");
-            string userPhoneNumber = Console.ReadLine() ?? "";
+            bool isRunning = true;
 
-            /*Maria: Updated to use the new CreateUser, it passes the currently
-            logged-in user (instead of plain bools) so the role check happens for real,
-            and reads the CreateUserResult enum to show the exact reason on failure instead of a generic true/false.
-            */
-            CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
-
-            string userMessage = UserService.GetErrorMessage(result);
-
-            if (result == CreateUserResult.Success)
+            while (isRunning)
             {
+                Console.WriteLine("\nPress esc to go back");
 
-                Console.WriteLine(userMessage);
-                return true;
+                Console.Write("\nPlease enter details.");
+                Console.Write("\nPersonal identity number: ");
+                string? userName = ReadLineOrEscape();
+                if (userName == null) return false;
+                Console.Write("\nPassword: ");
+                string? userPass = ReadLineOrEscape();
+                if (userPass == null) return false;
+                Console.Write("\nEmail: ");
+                string? userEmail = ReadLineOrEscape();
+                if (userEmail == null) return false;
+                Console.Write("\nPhone number: ");
+                string? userPhoneNumber = ReadLineOrEscape();
+                if (userPhoneNumber == null) return false;
+                /*Maria: Updated to use the new CreateUser, it passes the currently
+                logged-in user (instead of plain bools) so the role check happens for real,
+                and reads the CreateUserResult enum to show the exact reason on failure instead of a generic true/false.
+                */
+                CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
+
+                string userMessage = UserService.GetErrorMessage(result);
+
+                if (result == CreateUserResult.Success)
+                {
+
+                    Console.WriteLine(userMessage);
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine(userMessage);
+                    return false;
+                }
+
             }
-            else
-            {
-                Console.WriteLine(userMessage);
-                return false;
-            }
+            return true;
         }
         public void ShowOwnerMenu()
         {
@@ -330,20 +342,6 @@ namespace BankApp.ConsoleUi.Menus
                 };
 
                 DrawMenu("ADMIN MENU", options, selectedIndex);
-
-                //for (int i = 0; i < options.Length; i++)
-                //{
-                //    if (i == selectedIndex)
-                //    {
-                //        Console.ForegroundColor = ConsoleColor.Green;
-                //        Console.WriteLine($"> {options[i]}");
-                //        Console.ResetColor();
-                //    }
-                //    else
-                //    {
-                //        Console.WriteLine(options[i]);
-                //    }
-                //}
 
                 ConsoleKey key = Console.ReadKey(true).Key;
 
@@ -950,7 +948,42 @@ namespace BankApp.ConsoleUi.Menus
                 }
             }
         }
+        // Reads a line of text. Returns null if the user presses Esc.
+        private static string? ReadLineOrEscape()
+        {
+            var input = new System.Text.StringBuilder();
 
+            while (true)
+            {
+                ConsoleKeyInfo key = Console.ReadKey(true);
+
+                if (key.Key == ConsoleKey.Escape)
+                {
+                    Console.WriteLine();
+                    return null;
+                }
+
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    return input.ToString();
+                }
+
+                if (key.Key == ConsoleKey.Backspace)
+                {
+                    if (input.Length > 0)
+                    {
+                        input.Length--;
+                        Console.Write("\b \b");
+                    }
+                }
+                else if (!char.IsControl(key.KeyChar))
+                {
+                    input.Append(key.KeyChar);
+                    Console.Write(key.KeyChar);
+                }
+            }
+        }
         private static (string UserName, string Password) ReadLoginDetails()
         {
             Console.Clear();
