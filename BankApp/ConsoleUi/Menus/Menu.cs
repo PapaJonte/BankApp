@@ -78,47 +78,47 @@ namespace BankApp.ConsoleUi.Menus
         public bool CreateUser()
         {
             Console.Clear();
-            bool isRunning = true;
+            Console.CursorVisible = true;
 
-            while (isRunning)
+            AnsiConsole.Write(Align.Center(new FigletText("New user").Color(Color.Green)));
+
+            var info = new Panel(new Markup("[grey]Fill in the details below. Press Esc at any time to go back.[/]"))
             {
-                Console.WriteLine("\nPress esc to go back");
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(4, 1, 4, 1)
+            };
+            info.BorderColor(Color.Green);
+            AnsiConsole.Write(Align.Center(info));
+            AnsiConsole.WriteLine();
 
-                Console.Write("\nPlease enter details.");
-                Console.Write("\nPersonal identity number: ");
-                string? userName = ReadLineOrEscape();
-                if (userName == null) return false;
-                Console.Write("\nPassword: ");
-                string? userPass = ReadLineOrEscape();
-                if (userPass == null) return false;
-                Console.Write("\nEmail: ");
-                string? userEmail = ReadLineOrEscape();
-                if (userEmail == null) return false;
-                Console.Write("\nPhone number: ");
-                string? userPhoneNumber = ReadLineOrEscape();
-                if (userPhoneNumber == null) return false;
-                /*Maria: Updated to use the new CreateUser, it passes the currently
-                logged-in user (instead of plain bools) so the role check happens for real,
-                and reads the CreateUserResult enum to show the exact reason on failure instead of a generic true/false.
-                */
-                CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
+            string indent = new string(' ', Math.Max(0, (Console.WindowWidth - 50) / 2));
 
-                string userMessage = UserService.GetErrorMessage(result);
+            AnsiConsole.Markup($"{indent}[green]Personal identity number:[/] ");
+            string? userName = ReadLineOrEscape();
+            if (userName == null) return false;
 
-                if (result == CreateUserResult.Success)
-                {
+            AnsiConsole.Markup($"{indent}[green]Password:[/] ");
+            string? userPass = ReadLineOrEscape();
+            if (userPass == null) return false;
 
-                    Console.WriteLine(userMessage);
-                    return true;
-                }
-                else
-                {
-                    Console.WriteLine(userMessage);
-                    return false;
-                }
+            AnsiConsole.Markup($"{indent}[green]Email:[/] ");
+            string? userEmail = ReadLineOrEscape();
+            if (userEmail == null) return false;
 
-            }
-            return true;
+            AnsiConsole.Markup($"{indent}[green]Phone number:[/] ");
+            string? userPhoneNumber = ReadLineOrEscape();
+            if (userPhoneNumber == null) return false;
+
+            CreateUserResult result = _userService.CreateUser(_authService.LoggedInUser, userName, userPass, userEmail, userPhoneNumber, out User? createdUser, UserRole.Customer);
+
+            string userMessage = UserService.GetErrorMessage(result);
+            bool success = result == CreateUserResult.Success;
+
+            AnsiConsole.WriteLine();
+            string color = success ? "green" : "red";
+            AnsiConsole.Write(Align.Center(new Markup($"[{color}]{Markup.Escape(userMessage)}[/]")));
+
+            return success;
         }
         public void ShowOwnerMenu()
         {
@@ -678,7 +678,7 @@ namespace BankApp.ConsoleUi.Menus
 
         private void ShowTransferMenu()
         {
-            string[] options = { "Deposit", "Withdraw", "Transfer", "Open account" };
+            string[] options = { "Deposit", "Withdraw", "Transfer",};
 
             int selectedIndex = 0;
 
@@ -1015,6 +1015,21 @@ namespace BankApp.ConsoleUi.Menus
 
             return (userName, password);
         }
+
+        private static void DrawMenu1(string title)
+        {
+            var lines = new List<string>();
+
+            var panel = new Panel(new Markup(string.Join("\n", lines)))
+            {
+                Header = new PanelHeader($"[green]{Markup.Escape(title)}[/]"),
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(4, 1, 4, 1)
+            };
+            panel.BorderColor(Color.Green);
+
+            AnsiConsole.Write(Align.Center(panel));
+        }
         private static void DrawMenu(string title, string[] options, int selectedIndex)
         {
             var lines = new List<string>();
@@ -1128,9 +1143,9 @@ namespace BankApp.ConsoleUi.Menus
                                     if (userLoggedIn == LoginResult.WrongCredentials)
                                     {
                                         Console.CursorVisible = false;
-                                        Console.WriteLine("\nIncorrect credentials!" +
+                                        AnsiConsole.MarkupLine("\n[red bold]Incorrect credentials!" +
                                             "\nPress any key to try again." +
-                                            "\nPress Esc to exit");
+                                            "\nPress Esc to exit[/]");
 
                                         key = Console.ReadKey(true).Key;
                                         if (key == ConsoleKey.Escape)
