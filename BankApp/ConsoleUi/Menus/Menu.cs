@@ -1143,7 +1143,7 @@ namespace BankApp.ConsoleUi.Menus
                                     if (userLoggedIn == LoginResult.WrongCredentials)
                                     {
                                         Console.CursorVisible = false;
-                                        AnsiConsole.MarkupLine("\n[red bold]Incorrect credentials!" +
+                                        AnsiConsole.MarkupLine("\n[red slowblink]Incorrect credentials!" +
                                             "\nPress any key to try again." +
                                             "\nPress Esc to exit[/]");
 
