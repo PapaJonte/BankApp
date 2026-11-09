@@ -42,8 +42,8 @@ namespace BankApp
         {
             _accountManager = accountManager;
 
-            AddUser("00000000-0000", "ownerpassword123", "owner@gmail.com", "0729216167", UserRole.Owner);
-            AddUser("11111111-1111", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
+            AddUser("200101-0000", "ownerpassword123", "owner@gmail.com", "0729216167", UserRole.Owner);
+            AddUser("2001021111", "adminpassword123", "admin@gmail.com", "0729216167", UserRole.Admin);
 
         }
 
