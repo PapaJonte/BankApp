@@ -1159,7 +1159,7 @@ namespace BankApp.ConsoleUi.Menus
                                     }
                                     if (userLoggedIn == LoginResult.LockedOut)
                                     {
-                                        Console.WriteLine("Your account is locked! An admin must unlock it.");
+                                        AnsiConsole.MarkupLine("[red slowblink]Your account is locked! An admin must unlock it.[/]");
 
                                         if (!wasAlreadyLocked && lockedCheck != null)
                                         {
