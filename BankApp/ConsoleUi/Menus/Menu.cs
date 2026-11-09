@@ -735,11 +735,13 @@ namespace BankApp.ConsoleUi.Menus
                         {
                             case 0:
                                 // Deposit
+                                Console.Clear();
                                 DepositToAccount();
                                 Console.ReadKey(true);
                                 break;
 
                             case 1:
+                                Console.Clear();
                                 User? customer = _authService.LoggedInUser;
 
                                 if (customer == null)
@@ -788,12 +790,14 @@ namespace BankApp.ConsoleUi.Menus
 
                             case 2:
                                 // Transfer
+                                Console.Clear();
                                 TransferBetweenAccounts();
                                 Console.ReadKey(true);
                                 break;
 
                             case 3:
                                 // Open account
+                                Console.Clear();
                                 OpenAccount();
                                 break;
                         }
@@ -830,19 +834,6 @@ namespace BankApp.ConsoleUi.Menus
                 };
 
                 DrawMenu("Welcome", options, selectedIndex);
-                //for (int i = 0; i < options.Length; i++)
-                //{
-                //    if (i == selectedIndex)
-                //    {
-                //        Console.ForegroundColor = ConsoleColor.Green;
-                //        Console.WriteLine($"> {options[i]}");
-                //        Console.ResetColor();
-                //    }
-                //    else
-                //    {
-                //        Console.WriteLine(options[i]);
-                //    }
-                //}
 
                 ConsoleKey key = Console.ReadKey(true).Key;
 
@@ -1065,7 +1056,6 @@ namespace BankApp.ConsoleUi.Menus
                 "Large transaction on your account",
                 $"A large transaction has been queued on your account:\n{description}\n\nIf this was not you, contact the bank.");
         }
-
         public void LoginMenu()
         {
             Console.Clear();
@@ -1085,23 +1075,6 @@ namespace BankApp.ConsoleUi.Menus
                     "Exit",
                 };
                 DrawMenu("Welcome", options, selectedIndex);
-
-
-                //for (int i = 0; i < options.Length; i++)
-                //{
-                //    if (i == selectedIndex)
-                //    {
-                //        Console.ForegroundColor = ConsoleColor.Green;
-                //        Console.WriteLine($"> {options[i]}");
-                //        Console.ResetColor();
-                //    }
-                //    else
-                //    {
-                //        Console.WriteLine(options[i]);
-                //    }
-                //}
-
-
 
                 ConsoleKey key = Console.ReadKey(true).Key;
 
